@@ -1,0 +1,37 @@
+name: hubcity_transit_flutter
+description: "Hub City Transit Android app migrated from Next.js/TypeScript implementation."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  dio: ^5.9.0
+  go_router: ^16.2.5
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.11.0
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  connectivity_plus: ^7.0.0
+  shared_preferences: ^2.5.3
+  intl: ^0.20.2
+  logger: ^2.6.2
+  geolocator: ^14.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.9.0
+  freezed: ^3.2.3
+  json_serializable: ^6.11.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/routes_wgs84.json
