@@ -20,6 +20,7 @@ void main() {
         overrides: [
           routesProvider.overrideWith((ref) async => []),
           stopsBySelectedRouteProvider.overrideWith((ref) async => []),
+          allStopsByRouteProvider.overrideWith((ref) async => const {}),
           busLocationPollingProvider.overrideWith(
             (ref) => const Stream<Never>.empty(),
           ),
