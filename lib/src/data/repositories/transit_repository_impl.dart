@@ -24,9 +24,10 @@ final class TransitRepositoryImpl implements TransitRepository {
 
   @override
   Future<List<StopModel>> getStops({String? routeId}) async {
-    final response = await _dio.get<Map<String, dynamic>>(
+    final response = await _safeGet(
       '/api/stops',
       queryParameters: routeId == null ? null : {'route': routeId},
+      fallbackMessage: 'Unable to load stops at this time.',
     );
 
     final dynamic data = response.data;
@@ -69,7 +70,7 @@ final class TransitRepositoryImpl implements TransitRepository {
       if (error.response?.statusCode == 503) {
         return null;
       }
-      rethrow;
+      throw Exception(_mapDioError(error, 'Unable to load bus location.'));
     }
   }
 
@@ -79,9 +80,10 @@ final class TransitRepositoryImpl implements TransitRepository {
     required double userLat,
     required double userLng,
   }) async {
-    final response = await _dio.get<Map<String, dynamic>>(
+    final response = await _safeGet(
       '/api/eta',
       queryParameters: {'bus': busId, 'userLat': userLat, 'userLng': userLng},
+      fallbackMessage: 'Unable to load ETA right now.',
     );
 
     final data = response.data;
@@ -93,6 +95,40 @@ final class TransitRepositoryImpl implements TransitRepository {
       );
     }
     return EtaResultModel.fromJson(data);
+  }
+
+  Future<Response<Map<String, dynamic>>> _safeGet(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    required String fallbackMessage,
+  }) async {
+    try {
+      return await _dio.get<Map<String, dynamic>>(
+        path,
+        queryParameters: queryParameters,
+      );
+    } on DioException catch (error) {
+      throw Exception(_mapDioError(error, fallbackMessage));
+    }
+  }
+
+  String _mapDioError(DioException error, String fallbackMessage) {
+    if (error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.sendTimeout ||
+        error.type == DioExceptionType.receiveTimeout) {
+      return 'Request timed out. Please try again.';
+    }
+
+    if (error.type == DioExceptionType.connectionError) {
+      return 'No internet connection.';
+    }
+
+    final statusCode = error.response?.statusCode;
+    if (statusCode != null && statusCode >= 500) {
+      return 'Server is unavailable. Please try again shortly.';
+    }
+
+    return fallbackMessage;
   }
 }
 
