@@ -52,6 +52,29 @@
 - Added unit tests for schedule adjustment and bus status derivation.
 - Upgraded schedule page with stop search/filter UX for Android parity progression.
 
+## 2026-04-24 - Production Hardening + Validation Pass
+
+### Completed
+- Stabilized widget tests by overriding the all-route stops provider to prevent background network timers during teardown.
+- Hardened network layer with explicit app user-agent and one-shot retry for transient timeout/connection/server failures.
+- Added repository-level user-friendly error mapping for timeout/offline/server-unavailable scenarios.
+- Hardened Android manifest defaults:
+	- cleartext traffic disabled
+	- app backup/data extraction disabled
+	- network security policy pinned
+	- production app label set to `Hub City Transit`
+- Added Android release hardening:
+	- `key.properties`-based release signing support
+	- release minification and resource shrinking enabled
+	- `proguard-rules.pro` added
+	- signing secrets ignored in `.gitignore`
+- Replaced placeholder README with concrete dev/release/deploy guidance for Play Store.
+
+### Validation (current)
+- `flutter analyze` passes with no issues.
+- `flutter test` passes.
+- `flutter build appbundle --release` remains blocked by environment-level Android NDK license acceptance on this machine.
+
 ### Risks/Notes
 - Exact visual parity requires custom Flutter widgets for the web sidebar/bottom-sheet behavior.
 - API base URL currently defaults to production domain; environment override uses `--dart-define=HCT_BASE_API_URL=...`.
