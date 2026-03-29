@@ -12,6 +12,8 @@
 | ETA fetch (`/api/eta`) | Implemented | Typed model and request path ready |
 | Polling cadence | Partially implemented | Bus polling every 3s plus ETA auto-refresh every 30s after user requests ETA |
 | Route and stop rendering on map | Implemented | `flutter_map` renders all route polylines, selected route stop markers, and live bus marker |
+| Stop detail interactions and transfer chips | Implemented | Stop selection card on map with transfer route chips and route-switch action |
+| Schedule transfer filtering | Implemented | Transfer-only filter and transfer route chips on schedule list |
 | Mobile nav shell (Map/Schedule/About) | Implemented | Bottom navigation via `go_router` shell |
 
 ## Pending For Full Parity
@@ -22,9 +24,10 @@
 | GPS-aware schedule adjustment algorithm | Partially implemented | Core use case now ports GPS snap + bounded/smoothed delta; full schedule dataset wiring is pending |
 | Multi-bus trip disambiguation (`identifyTripByBusPosition`) | Implemented | Ported in schedule adjustment domain use case |
 | Stale tri-state (`live/connecting/offline`) with thresholds | Implemented | Provider-derived status and map status card are live |
-| ETA refresh and nearest-stop experience parity | Partially implemented | On-demand ETA card with location permission flow and 30s refresh is live; detailed stop-panel parity is pending |
-| Transfer chip behavior and detailed stop panels | Not implemented | `features/stops` module |
+| ETA refresh and nearest-stop experience parity | Partially implemented | On-demand ETA card with location permission flow and 30s refresh is live; nearest-stop scheduling data remains lightweight versus web |
+| Transfer chip behavior and detailed stop panels | Implemented | Delivered within `features/map` and `features/schedule` presentation layers |
 | Search and advanced sidebar interactions | Not implemented | `features/map` UI layer |
+| Android release hardening | Implemented | Network security config, no-backup policy, minify/shrink, and release-signing support via `key.properties` |
 
 ## Platform Differences To Track
 
