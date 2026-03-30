@@ -18,11 +18,12 @@ Both apps share the same live data pipeline — ArcGIS for real-time GPS, and a 
 
 - **Live bus tracking** on an interactive map (OpenStreetMap tiles via flutter_map)
 - **Real-time arrival estimates** — not just the printed schedule. If the bus is running 4 minutes late, the arrivals reflect that
-- **Trip planner** — type any address or landmark, and the app figures out which stop to walk to, which bus to take, and where to get off
+- **Trip planner** — type any address or landmark, and the app figures out which stop to walk to, which bus to take, and where to get off. Draws the full walk + ride route on the map
 - **All 6 routes** — Blue, Green, Red, Orange, Purple, Brown
-- **Transfer detection** at shared stops
+- **Transfer detection** at shared stops (tap the chip to switch routes)
 - **Dark mode** + dark map basemap toggle
 - **Schedule view** with live status badge
+- Map state persists across tab switches — camera position, selected stop, active trip all stay put
 
 ---
 
