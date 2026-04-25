@@ -10,108 +10,45 @@ class MainScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
     final selectedIndex = _indexFromLocation(location);
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surface.withValues(alpha: 0.96),
-          border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
-        ),
-        padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
-        child: Row(
-          children: [
-            _NavItem(
-              active: selectedIndex == 0,
-              icon: Icons.map_rounded,
-              label: 'Map',
-              colorScheme: colorScheme,
-              onTap: () => context.go('/map'),
-            ),
-            _NavItem(
-              active: selectedIndex == 1,
-              icon: Icons.calendar_today_rounded,
-              label: 'Schedule',
-              colorScheme: colorScheme,
-              onTap: () => context.go('/schedule'),
-            ),
-            _NavItem(
-              active: selectedIndex == 2,
-              icon: Icons.attach_money_rounded,
-              label: 'Fares',
-              colorScheme: colorScheme,
-              onTap: () => context.go('/fares'),
-            ),
-          ],
-        ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (index) {
+          switch (index) {
+            case 0:
+              context.go('/map');
+            case 1:
+              context.go('/schedule');
+            case 2:
+              context.go('/settings');
+          }
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map_rounded),
+            label: 'Map',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_today_outlined),
+            selectedIcon: Icon(Icons.calendar_today_rounded),
+            label: 'Schedule',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded),
+            label: 'Settings',
+          ),
+        ],
       ),
     );
   }
 
   int _indexFromLocation(String location) {
-    if (location.startsWith('/schedule')) {
-      return 1;
-    }
-    if (location.startsWith('/fares')) {
-      return 2;
-    }
+    if (location.startsWith('/schedule')) return 1;
+    if (location.startsWith('/settings')) return 2;
     return 0;
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.active,
-    required this.icon,
-    required this.label,
-    required this.colorScheme,
-    required this.onTap,
-  });
-
-  final bool active;
-  final IconData icon;
-  final String label;
-  final ColorScheme colorScheme;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 46,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: active ? colorScheme.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Icon(
-                  icon,
-                  color: active ? Colors.white : colorScheme.onSurfaceVariant,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color: active ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -18,7 +18,7 @@ class _LaunchPageState extends State<LaunchPage> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(milliseconds: 2400), _routeNext);
+    _timer = Timer(const Duration(milliseconds: 2200), _routeNext);
   }
 
   @override
@@ -28,41 +28,41 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _routeNext() async {
+    if (!mounted) return;
+
+    // Check if onboarding has been seen
     final prefs = await SharedPreferences.getInstance();
-    final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
-    if (!onboardingSeen) {
-      if (!mounted) {
-        return;
-      }
+    final seen = prefs.getBool('onboarding_seen') ?? false;
+    if (!mounted) return;
+
+    if (!seen) {
       context.go('/onboarding');
       return;
     }
 
     final permission = await Geolocator.checkPermission();
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
 
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
       context.go('/map');
-      return;
+    } else {
+      context.go('/map'); // go straight to map; location FAB handles permission
     }
-
-    context.go('/location-permission');
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Scaffold(
       body: Stack(
         children: [
-          Container(color: const Color(0xFFFAF9FC)),
           Positioned.fill(
             child: Opacity(
-              opacity: 0.05,
-              child: CustomPaint(painter: _DotPatternPainter()),
+              opacity: 0.04,
+              child: CustomPaint(painter: _DotPatternPainter(cs.onSurface)),
             ),
           ),
           SafeArea(
@@ -73,81 +73,80 @@ class _LaunchPageState extends State<LaunchPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 124,
-                      height: 124,
+                      width: 120,
+                      height: 120,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F3F7),
+                        color: cs.surfaceContainerLow,
                         shape: BoxShape.circle,
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x12000000),
+                            color: cs.primary.withValues(alpha: 0.12),
                             blurRadius: 30,
-                            offset: Offset(0, 12),
+                            offset: const Offset(0, 12),
                           ),
                         ],
                       ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 92,
-                            height: 92,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFFE3E2E6), width: 4),
+                      child: Stack(alignment: Alignment.center, children: [
+                        Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: cs.outlineVariant,
+                              width: 3,
                             ),
                           ),
-                          Container(
-                            width: 62,
-                            height: 62,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF000101),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.directions_bus_rounded,
-                              size: 30,
-                              color: Colors.white,
-                            ),
+                        ),
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: cs.primary,
+                            shape: BoxShape.circle,
                           ),
-                        ],
-                      ),
+                          child: Icon(
+                            Icons.directions_bus_rounded,
+                            size: 28,
+                            color: cs.onPrimary,
+                          ),
+                        ),
+                      ]),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 28),
                     Text(
-                      'Hub City Transit',
+                      'Hub City\nTransit',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.displayMedium,
+                      style: tt.displayMedium,
                     ),
                     const SizedBox(height: 10),
                     Text(
                       'Connecting the city, efficiently.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                      style: tt.bodyLarge?.copyWith(
+                        color: cs.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 48),
                     Text(
                       'INITIALIZING SYSTEM...',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                        letterSpacing: 0.7,
-                      ),
+                      style: tt.labelMedium?.copyWith(letterSpacing: 0.8),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     SizedBox(
-                      width: 196,
+                      width: 180,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(999),
-                        child: const LinearProgressIndicator(minHeight: 6),
+                        child: LinearProgressIndicator(
+                          minHeight: 5,
+                          backgroundColor: cs.outlineVariant,
+                          color: cs.primary,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 44),
+                    const SizedBox(height: 40),
                     Text(
                       'v2.4.0 (Build 891)',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                      style: tt.bodySmall,
                     ),
                   ],
                 ),
@@ -161,9 +160,12 @@ class _LaunchPageState extends State<LaunchPage> {
 }
 
 class _DotPatternPainter extends CustomPainter {
+  _DotPatternPainter(this.color);
+  final Color color;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = const Color(0xFF000101);
+    final paint = Paint()..color = color;
     const spacing = 28.0;
     for (double y = 6; y < size.height; y += spacing) {
       for (double x = 6; x < size.width; x += spacing) {
@@ -173,5 +175,5 @@ class _DotPatternPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _DotPatternPainter old) => old.color != color;
 }
