@@ -11,11 +11,10 @@ Android-first Flutter migration of the Hub City Transit application.
 
 ## Runtime Configuration
 
-The standalone Flutter app uses direct upstream services for live bus location
-and ETA, while keeping routes, stops, and schedules bundled inside the app.
+The Flutter app consumes the Next.js backend API for live bus/stops/ETA data.
 
 ```bash
-flutter run --dart-define=ARCGIS_URL=... --dart-define=GOOGLE_MAPS_API_KEY=...
+flutter run --dart-define=HCT_BASE_API_URL=https://your-official-api-host
 ```
 
 ## Release Signing Setup (Play Store)
@@ -35,8 +34,8 @@ If not present, release builds fall back to debug signing for local smoke tests 
 ## Build Commands
 
 ```bash
-flutter build appbundle --release --dart-define=ARCGIS_URL=... --dart-define=GOOGLE_MAPS_API_KEY=...
-flutter build apk --release --dart-define=ARCGIS_URL=... --dart-define=GOOGLE_MAPS_API_KEY=...
+flutter build appbundle --release --dart-define=HCT_BASE_API_URL=https://your-official-api-host
+flutter build apk --release --dart-define=HCT_BASE_API_URL=https://your-official-api-host
 ```
 
 ## Production Readiness Checklist

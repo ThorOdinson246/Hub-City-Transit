@@ -4,8 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/app_constants.dart';
 
 final dioProvider = Provider<Dio>((ref) {
+  if (baseApiUrl.isEmpty) {
+    throw StateError(
+      'HCT_BASE_API_URL is not set. Provide --dart-define=HCT_BASE_API_URL=https://<official-api-host>.',
+    );
+  }
+
   final dio = Dio(
     BaseOptions(
+      baseUrl: baseApiUrl,
       connectTimeout: requestTimeout,
       receiveTimeout: requestTimeout,
       sendTimeout: requestTimeout,
