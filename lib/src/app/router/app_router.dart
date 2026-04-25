@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,24 +22,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             const NoTransitionPage(child: LaunchPage()),
       ),
       GoRoute(
-        path: '/location-permission',
-        pageBuilder: (context, state) =>
-            const NoTransitionPage(child: LocationPermissionPage()),
-      ),
-      GoRoute(
         path: '/onboarding',
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: OnboardingPage()),
       ),
       GoRoute(
-        path: '/settings',
+        path: '/location-permission',
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: SettingsPage()),
+            const NoTransitionPage(child: LocationPermissionPage()),
       ),
       GoRoute(
         path: '/about',
-        pageBuilder: (context, state) =>
-            const NoTransitionPage(child: AboutPage()),
+        pageBuilder: (context, state) => const MaterialPage(child: AboutPage()),
       ),
       ShellRoute(
         builder: (context, state, child) => MainScaffold(child: child),
@@ -52,6 +47,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/schedule',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: SchedulePage()),
+          ),
+          GoRoute(
+            path: '/settings',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsPage()),
           ),
           GoRoute(
             path: '/fares',

@@ -11,405 +11,346 @@ import '../../../domain/usecases/schedule_adjustment_use_case.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
-
   @override
   ConsumerState<SchedulePage> createState() => _SchedulePageState();
 }
 
 class _SchedulePageState extends ConsumerState<SchedulePage> {
-  String query = '';
-  bool transferOnly = false;
+  String _query = '';
+  bool _transferOnly = false;
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
     final route = ref.watch(selectedRouteProvider);
     final stopsAsync = ref.watch(stopsBySelectedRouteProvider);
     final allStopsByRouteAsync = ref.watch(allStopsByRouteProvider);
     final scheduleAsync = ref.watch(selectedRouteScheduleProvider);
     final adjustment = ref.watch(selectedRouteAdjustmentProvider);
+    final routeColor = routeColors[route]!;
 
-    return SafeArea(
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Schedule',
-                style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
+    return SafeArea(child: Column(children: [
+      // ── Header ──────────────────────────────────────────────────────────
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Schedule', style: tt.headlineLarge),
+          const SizedBox(height: 4),
+          Row(children: [
+            Icon(Icons.alt_route_rounded, color: routeColor, size: 18),
+            const SizedBox(width: 6),
+            Text(routeNames[route] ?? route.value,
+              style: TextStyle(color: routeColor, fontWeight: FontWeight.w800, fontSize: 18)),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: cs.outlineVariant),
               ),
+              child: Text('Inbound',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: cs.onSurfaceVariant)),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Row(
-              children: [
-                Icon(Icons.alt_route_rounded, color: routeColors[route], size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  routeNames[route] ?? route.value,
-                  style: TextStyle(
-                    color: routeColors[route],
-                    fontWeight: FontWeight.w700,
-                    fontSize: 19,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  '• Inbound',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search stops on this route',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  query = value.trim().toLowerCase();
-                });
-              },
-            ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                FilterChip(
-                  selected: transferOnly,
-                  showCheckmark: false,
-                  onSelected: (value) {
-                    setState(() {
-                      transferOnly = value;
-                    });
-                  },
-                  label: const Text('Transfers only'),
-                ),
-                const SizedBox(width: 8),
-                if (adjustment != null)
-                  Chip(
-                    backgroundColor: const Color(0xFFBFDBFE),
-                    avatar: Icon(
-                      adjustment.isLiveAdjusted
-                          ? Icons.gps_fixed_rounded
-                          : Icons.schedule_rounded,
-                      size: 16,
-                    ),
-                    label: Text(
-                      adjustment.isLiveAdjusted
-                          ? 'Live adjusted'
-                          : 'Schedule view',
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: stopsAsync.when(
-              data: (stops) => allStopsByRouteAsync.when(
-                data: (allStopsByRoute) => scheduleAsync.when(
-                  data: (schedule) => _buildScheduleList(
-                    route: route,
-                    stops: stops,
-                    allStopsByRoute: allStopsByRoute,
-                    schedule: schedule,
-                    adjustment: adjustment,
-                  ),
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (error, _) =>
-                      _ErrorState(message: 'Failed to load schedule: $error'),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) => _ErrorState(
-                  message: 'Failed to load transfer data: $error',
-                ),
-              ),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) =>
-                  _ErrorState(message: 'Failed to load stops: $error'),
-            ),
-          ),
-        ],
+          ]),
+        ]),
       ),
-    );
+
+      // ── Route chips ──────────────────────────────────────────────────────
+      const SizedBox(height: 10),
+      SizedBox(
+        height: 38,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: RouteId.values.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 6),
+          itemBuilder: (_, i) {
+            final r = RouteId.values[i];
+            final sel = r == route;
+            return ChoiceChip(
+              showCheckmark: false,
+              selected: sel,
+              selectedColor: routeColors[r],
+              backgroundColor: cs.surfaceContainerLow,
+              side: BorderSide(
+                color: sel ? routeColors[r]! : cs.outlineVariant,
+              ),
+              label: Text(routeNames[r]?.replaceAll(' Route', '') ?? r.value,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: sel ? Colors.white : cs.onSurface,
+                )),
+              onSelected: (_) {
+                ref.read(selectedRouteProvider.notifier).state = r;
+                ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
+              },
+            );
+          },
+        ),
+      ),
+
+      // ── Search + filter bar ───────────────────────────────────────────────
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+        child: Row(children: [
+          Expanded(
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Search stops...',
+                prefixIcon: Icon(Icons.search_rounded),
+                isDense: true,
+              ),
+              onChanged: (v) => setState(() => _query = v.trim().toLowerCase()),
+            ),
+          ),
+          const SizedBox(width: 8),
+          FilterChip(
+            selected: _transferOnly,
+            showCheckmark: false,
+            label: const Text('Transfers', style: TextStyle(fontSize: 11)),
+            onSelected: (v) => setState(() => _transferOnly = v),
+          ),
+        ]),
+      ),
+
+      // ── Live adjusted chip ────────────────────────────────────────────────
+      if (adjustment?.isLiveAdjusted == true)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: Row(children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFF16A34A).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.gps_fixed_rounded, size: 13, color: Color(0xFF16A34A)),
+                const SizedBox(width: 5),
+                const Text('Live Adjusted',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
+              ]),
+            ),
+          ]),
+        ),
+
+      const SizedBox(height: 10),
+
+      // ── List ───────────────────────────────────────────────────────────────
+      Expanded(child: stopsAsync.when(
+        data: (stops) => allStopsByRouteAsync.when(
+          data: (allStops) => scheduleAsync.when(
+            data: (schedule) => _buildList(
+              context, cs, tt, route, routeColor, stops, allStops, schedule, adjustment),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => _Err('Schedule error: $e'),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, _) => _Err('Transfer data error: $e'),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => _Err('Stops error: $e'),
+      )),
+    ]));
   }
 
-  Widget _buildScheduleList({
-    required RouteId route,
-    required List<StopModel> stops,
-    required Map<RouteId, List<StopModel>> allStopsByRoute,
-    required RouteScheduleModel? schedule,
-    required AdjustmentResult? adjustment,
-  }) {
+  Widget _buildList(
+    BuildContext context,
+    ColorScheme cs,
+    TextTheme tt,
+    RouteId route,
+    Color routeColor,
+    List<StopModel> stops,
+    Map<RouteId, List<StopModel>> allStops,
+    RouteScheduleModel? schedule,
+    AdjustmentResult? adjustment,
+  ) {
     if (schedule == null) {
-      return const Center(child: Text('No schedule available for this route'));
+      return const Center(child: Text('No schedule available'));
     }
 
     final transferMap = <String, List<TransferStopConnection>>{};
-    for (final stop in stops) {
-      transferMap['${stop.stopId}:${stop.location}'] = findTransferConnections(
-        selectedRoute: route,
-        stop: stop,
-        allStopsByRoute: allStopsByRoute,
-      );
+    for (final s in stops) {
+      transferMap['${s.stopId}'] = findTransferConnections(
+        selectedRoute: route, stop: s, allStopsByRoute: allStops);
     }
 
-    final entries = List<_ScheduleEntry>.generate(schedule.stops.length, (index) {
-      final scheduleStopName = schedule.stops[index];
-      final connections =
-          _findConnectionsForScheduleStop(scheduleStopName, stops, transferMap);
-      final adjustedStop =
-          adjustment != null && index < adjustment.stops.length
-              ? adjustment.stops[index]
-              : null;
-
-      return _ScheduleEntry(
-        index: index,
-        stopName: scheduleStopName,
-        scheduledTime: adjustedStop?.scheduledTime ?? '',
-        adjustedTime: adjustedStop?.adjustedTime ?? '',
-        isPast: adjustedStop?.isPast ?? false,
-        isCurrent:
-            adjustment != null && adjustment.snappedStopIndex == index,
-        transferConnections: connections,
-      );
-    }).where((entry) {
-      final matchesQuery =
-          query.isEmpty || entry.stopName.toLowerCase().contains(query);
-      if (!matchesQuery) {
-        return false;
-      }
-      if (!transferOnly) {
-        return true;
-      }
-      return entry.transferConnections.isNotEmpty;
-    }).toList(growable: false);
-
-    if (entries.isEmpty) {
-      return const Center(child: Text('No matching stops'));
+    final entries = <_Entry>[];
+    for (var i = 0; i < schedule.stops.length; i++) {
+      final name = schedule.stops[i];
+      if (_query.isNotEmpty && !name.toLowerCase().contains(_query)) continue;
+      final conn = _connectionsFor(name, stops, transferMap);
+      if (_transferOnly && conn.isEmpty) continue;
+      final adj = adjustment != null && i < adjustment.stops.length ? adjustment.stops[i] : null;
+      entries.add(_Entry(
+        index: i,
+        name: name,
+        scheduled: adj?.scheduledTime ?? '',
+        adjusted: adj?.adjustedTime ?? '',
+        isPast: adj?.isPast ?? false,
+        isCurrent: adjustment?.snappedStopIndex == i,
+        connections: conn,
+      ));
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(14, 6, 14, 16),
+    if (entries.isEmpty) return const Center(child: Text('No matching stops'));
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(14, 6, 14, 24),
       itemCount: entries.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 10),
-      itemBuilder: (context, index) {
-        final entry = entries[index];
-        final colorScheme = Theme.of(context).colorScheme;
-
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-              Container(
-                width: 18,
-                alignment: Alignment.topCenter,
-                margin: const EdgeInsets.only(top: 8),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: entry.isCurrent
-                            ? routeColors[route]
-                            : Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: entry.isCurrent
-                              ? Colors.black
-                              : const Color(0xFF9CA3AF),
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 2,
-                      height: 108,
-                      color: const Color(0xFFD1D5DB),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: entry.isCurrent
-                        ? const Color(0xFFF9FAFB)
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: entry.isCurrent
-                          ? routeColors[route]!
-                          : const Color(0xFFC5C6CA),
-                    ),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 4,
-                        height: 74,
-                        decoration: BoxDecoration(
-                          color: routeColors[route],
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              entry.stopName,
-                              style: TextStyle(
-                                fontSize: entry.isCurrent ? 31 / 2 : 14,
-                                fontWeight: entry.isCurrent
-                                    ? FontWeight.w800
-                                    : FontWeight.w700,
-                                color: entry.isPast
-                                    ? colorScheme.onSurfaceVariant
-                                    : colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Stop ID: ${8120 + entry.index}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            if (entry.transferConnections.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: entry.transferConnections
-                                    .map(
-                                      (connection) => Chip(
-                                        visualDensity: VisualDensity.compact,
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        backgroundColor: routeColors[connection.routeId]!
-                                            .withValues(alpha: 0.14),
-                                        label: Text(
-                                          routeNames[connection.routeId] ??
-                                              connection.routeId.name,
-                                          style: const TextStyle(fontSize: 10),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(growable: false),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            entry.adjustedTime.isNotEmpty
-                                ? entry.adjustedTime
-                                : entry.scheduledTime,
-                            style: TextStyle(
-                              fontSize: entry.isCurrent ? 34 / 2 : 13,
-                              fontWeight: entry.isCurrent
-                                  ? FontWeight.w800
-                                  : FontWeight.w600,
-                            ),
-                          ),
-                          if (entry.isCurrent)
-                            const Text(
-                              'On time',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF6B7280),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-        );
-      },
-    );
-  }
-
-  List<TransferStopConnection> _findConnectionsForScheduleStop(
-    String stopName,
-    List<StopModel> routeStops,
-    Map<String, List<TransferStopConnection>> transferMap,
-  ) {
-    final normalizedTarget = _normalize(stopName);
-    for (final stop in routeStops) {
-      final normalizedStop = _normalize(stop.location);
-      if (normalizedStop.contains(normalizedTarget) ||
-          normalizedTarget.contains(normalizedStop)) {
-        return transferMap['${stop.stopId}:${stop.location}'] ?? const [];
-      }
-    }
-    return const [];
-  }
-
-  String _normalize(String value) =>
-      value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
-}
-
-class _ScheduleEntry {
-  const _ScheduleEntry({
-    required this.index,
-    required this.stopName,
-    required this.scheduledTime,
-    required this.adjustedTime,
-    required this.isPast,
-    required this.isCurrent,
-    required this.transferConnections,
-  });
-
-  final int index;
-  final String stopName;
-  final String scheduledTime;
-  final String adjustedTime;
-  final bool isPast;
-  final bool isCurrent;
-  final List<TransferStopConnection> transferConnections;
-}
-
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text(
-          message,
-          textAlign: TextAlign.center,
-        ),
+      itemBuilder: (_, i) => _StopRow(
+        entry: entries[i],
+        route: route,
+        routeColor: routeColor,
+        cs: cs, tt: tt,
+        isLast: i == entries.length - 1,
       ),
     );
   }
+
+  List<TransferStopConnection> _connectionsFor(
+    String name, List<StopModel> stops, Map<String, List<TransferStopConnection>> map) {
+    final n = _norm(name);
+    for (final s in stops) {
+      if (_norm(s.location).contains(n) || n.contains(_norm(s.location))) {
+        return map['${s.stopId}'] ?? [];
+      }
+    }
+    return [];
+  }
+
+  String _norm(String v) => v.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+}
+
+class _Entry {
+  const _Entry({required this.index, required this.name, required this.scheduled,
+    required this.adjusted, required this.isPast, required this.isCurrent, required this.connections});
+  final int index;
+  final String name, scheduled, adjusted;
+  final bool isPast, isCurrent;
+  final List<TransferStopConnection> connections;
+}
+
+class _StopRow extends StatelessWidget {
+  const _StopRow({required this.entry, required this.route, required this.routeColor,
+    required this.cs, required this.tt, required this.isLast});
+  final _Entry entry;
+  final RouteId route;
+  final Color routeColor;
+  final ColorScheme cs;
+  final TextTheme tt;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    final timeStr = entry.adjusted.isNotEmpty ? entry.adjusted : entry.scheduled;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // Timeline dot
+        SizedBox(width: 20, child: Column(children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 12, height: 12,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: entry.isCurrent ? routeColor : cs.surfaceContainerLowest,
+              border: Border.all(
+                color: entry.isCurrent ? routeColor
+                    : entry.isPast ? cs.outlineVariant : cs.outline,
+                width: 2,
+              ),
+            ),
+          ),
+          if (!isLast) Container(width: 2, height: 60, color: cs.outlineVariant),
+        ])),
+        const SizedBox(width: 8),
+
+        // Card
+        Expanded(child: Opacity(
+          opacity: entry.isPast ? 0.5 : 1.0,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: entry.isCurrent
+                  ? cs.surfaceContainerLow
+                  : cs.surfaceContainerLowest,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: entry.isCurrent ? routeColor : cs.outlineVariant.withValues(alpha: 0.6),
+                width: entry.isCurrent ? 1.5 : 1,
+              ),
+            ),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Accent bar
+              Container(
+                width: 3.5, height: entry.isCurrent ? 80 : 44,
+                decoration: BoxDecoration(color: routeColor, borderRadius: BorderRadius.circular(999)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Expanded(child: Text(entry.name,
+                    style: entry.isCurrent
+                        ? tt.titleMedium?.copyWith(fontWeight: FontWeight.w800)
+                        : tt.bodyMedium?.copyWith(fontWeight: FontWeight.w700))),
+                  if (entry.isCurrent)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF16A34A),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: const [
+                        Icon(Icons.bolt_rounded, size: 10, color: Colors.white),
+                        SizedBox(width: 2),
+                        Text('LIVE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.white)),
+                      ]),
+                    ),
+                ]),
+                Text('Stop ID: ${8120 + entry.index}',
+                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
+                if (entry.connections.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Wrap(spacing: 5, runSpacing: 5, children: entry.connections.map((c) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: routeColors[c.routeId]!.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(routeNames[c.routeId]?.replaceAll(' Route', '') ?? c.routeId.name,
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: routeColors[c.routeId])),
+                  )).toList()),
+                ],
+              ])),
+              const SizedBox(width: 8),
+              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text(timeStr,
+                  style: entry.isCurrent
+                      ? TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: cs.onSurface)
+                      : tt.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+                if (entry.isCurrent)
+                  Text('On time', style: tt.labelSmall?.copyWith(color: const Color(0xFF16A34A))),
+              ]),
+            ]),
+          ),
+        )),
+      ]),
+    );
+  }
+}
+
+class _Err extends StatelessWidget {
+  const _Err(this.msg);
+  final String msg;
+  @override
+  Widget build(BuildContext context) => Center(child: Padding(
+    padding: const EdgeInsets.all(24),
+    child: Text(msg, textAlign: TextAlign.center),
+  ));
 }
