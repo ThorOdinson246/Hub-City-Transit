@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Permission Onboarding - Hub City Transit</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#201b17",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#d1e4ff",
+                    "on-background": "#1b1b1e",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#1a1c1e",
+                    "primary-container": "#1a1c1e",
+                    "on-secondary-fixed-variant": "#00497d",
+                    "on-primary-fixed-variant": "#454749",
+                    "inverse-primary": "#c6c6c9",
+                    "surface-tint": "#5d5e61",
+                    "on-secondary-fixed": "#001d36",
+                    "inverse-surface": "#303033",
+                    "surface-container-low": "#f5f3f7",
+                    "outline-variant": "#c5c6ca",
+                    "tertiary": "#010100",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#75777a",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1b1b1e",
+                    "surface-container": "#efedf1",
+                    "surface-dim": "#dbd9dd",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-container": "#838486",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ebe0da",
+                    "on-tertiary-fixed-variant": "#4c4641",
+                    "background": "#faf9fc",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e9e7eb",
+                    "tertiary-container": "#201b17",
+                    "surface-variant": "#e3e2e6",
+                    "inverse-on-surface": "#f2f0f4",
+                    "on-surface-variant": "#44474a",
+                    "on-secondary-container": "#00477b",
+                    "secondary": "#0061a4",
+                    "surface": "#faf9fc",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "primary": "#000101",
+                    "on-tertiary-container": "#8b837d",
+                    "primary-fixed-dim": "#c6c6c9",
+                    "tertiary-fixed-dim": "#cfc5be",
+                    "primary-fixed": "#e2e2e5",
+                    "secondary-container": "#77b7ff",
+                    "surface-container-highest": "#e3e2e6",
+                    "surface-bright": "#faf9fc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-spacing-sm": "12px",
+                    "stack-spacing-md": "24px",
+                    "component-padding-y": "16px",
+                    "margin-horizontal": "24px",
+                    "component-padding-x": "20px",
+                    "stack-spacing-lg": "40px",
+                    "gutter": "16px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "label-lg": [
+                            "Manrope"
+                    ],
+                    "display-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "title-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-lg": [
+                            "Manrope"
+                    ],
+                    "body-md": [
+                            "Manrope"
+                    ],
+                    "headline-md": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "label-sm": [
+                            "Manrope"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-lg": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.1px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "57px",
+                            {
+                                    "lineHeight": "64px",
+                                    "letterSpacing": "-0.25px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "title-lg": [
+                            "22px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "letterSpacing": "0.5px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.25px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-sm": [
+                            "11px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.5px",
+                                    "fontWeight": "500"
+                            }
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+<style>
+        /* Base Material Icons setup */
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased relative overflow-hidden">
+<!-- Ambient Background Element -->
+<div class="absolute -top-32 -right-32 w-96 h-96 bg-secondary-container/30 rounded-full blur-[80px] pointer-events-none"></div>
+<main class="flex-grow flex flex-col justify-between px-margin-horizontal pt-16 pb-10 max-w-md mx-auto w-full relative z-10">
+<!-- Top spacer for balance -->
+<div class="flex-grow flex flex-col justify-center items-center">
+<!-- Civic Tech Illustration Container -->
+<div class="relative w-56 h-56 mb-stack-spacing-lg flex items-center justify-center">
+<!-- Decorative rings -->
+<div class="absolute inset-0 border-[2px] border-surface-variant rounded-full opacity-50 scale-110"></div>
+<div class="absolute inset-0 border-[1px] border-surface-variant rounded-full opacity-30 scale-125"></div>
+<!-- Main Illustration Bubble -->
+<div class="w-40 h-40 bg-surface-container-high rounded-full flex items-center justify-center shadow-sm relative overflow-hidden bg-cover bg-center" data-alt="Modern vector illustration of a stylized city map with a prominent location pin, clean geometric shapes, cool blue and dark charcoal color palette, high tech transit theme">
+<!-- Icon fallback layered on top -->
+<div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg relative z-10">
+<span class="material-symbols-outlined text-on-primary text-[32px]" data-icon="my_location" style="font-variation-settings: 'FILL' 1;">my_location</span>
+</div>
+</div>
+</div>
+<!-- Text Content -->
+<div class="text-center px-4">
+<h1 class="font-headline-lg text-headline-lg text-on-background mb-stack-spacing-sm">Find your bus faster</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[300px] mx-auto">
+                    Enable location to see the nearest stops and get accurate arrival times.
+                </p>
+</div>
+</div>
+<!-- Action Area (Pinned to bottom) -->
+<div class="w-full flex flex-col gap-stack-spacing-sm mt-8">
+<button class="w-full bg-primary text-on-primary py-component-padding-y px-component-padding-x rounded-full font-label-lg text-label-lg flex justify-center items-center shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+                Enable Location
+            </button>
+<button class="w-full bg-transparent text-on-surface-variant py-component-padding-y px-component-padding-x rounded-full font-label-lg text-label-lg flex justify-center items-center">
+                Continue without location
+            </button>
+</div>
+</main>
+</body></html>
