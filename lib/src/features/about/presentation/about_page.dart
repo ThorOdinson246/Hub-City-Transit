@@ -12,13 +12,33 @@ class AboutPage extends StatelessWidget {
 
     return SafeArea(
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          Text(
-            'About',
-            style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFC5C6CA)),
+            ),
+            child: const Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Color(0xFF000101),
+                  child: Icon(Icons.info_rounded, color: Colors.white, size: 18),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'About Hub City Transit',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             'Providing reliable, accessible, and efficient public transportation services to the greater metropolitan area.',
             style: TextStyle(color: colorScheme.onSurfaceVariant),
@@ -34,9 +54,9 @@ class AboutPage extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: colorScheme.outlineVariant),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFC5C6CA)),
               ),
               child: Row(
                 children: [
@@ -68,8 +88,9 @@ class AboutPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(14),
+              color: const Color(0xFFF5F3F7),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFC5C6CA)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,10 +111,6 @@ class AboutPage extends StatelessWidget {
                     onPressed: () {},
                     icon: const Icon(Icons.support_agent_rounded),
                     label: const Text('Contact Support'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                    ),
                   ),
                 ),
               ],
