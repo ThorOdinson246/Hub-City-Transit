@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LaunchPage extends StatefulWidget {
   const LaunchPage({super.key});
@@ -27,6 +28,16 @@ class _LaunchPageState extends State<LaunchPage> {
   }
 
   Future<void> _routeNext() async {
+    final prefs = await SharedPreferences.getInstance();
+    final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
+    if (!onboardingSeen) {
+      if (!mounted) {
+        return;
+      }
+      context.go('/onboarding');
+      return;
+    }
+
     final permission = await Geolocator.checkPermission();
     if (!mounted) {
       return;

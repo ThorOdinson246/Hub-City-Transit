@@ -36,12 +36,7 @@ void main() {
               NoTransitionPage(child: const SizedBox.shrink()),
             ),
             GoRoute(
-              path: '/about',
-              pageBuilder: (context, state) =>
-              NoTransitionPage(child: const SizedBox.shrink()),
-            ),
-            GoRoute(
-              path: '/settings',
+              path: '/fares',
               pageBuilder: (context, state) =>
               NoTransitionPage(child: const SizedBox.shrink()),
             ),
@@ -68,7 +63,6 @@ void main() {
 
     expect(find.text('Map'), findsWidgets);
     expect(find.text('Schedule'), findsWidgets);
-    expect(find.text('About'), findsWidgets);
-    expect(find.text('Settings'), findsWidgets);
+    expect(find.text('Fares'), findsWidgets);
   });
 }

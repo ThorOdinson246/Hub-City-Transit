@@ -38,17 +38,10 @@ class MainScaffold extends StatelessWidget {
             ),
             _NavItem(
               active: selectedIndex == 2,
-              icon: Icons.info_rounded,
-              label: 'About',
+              icon: Icons.attach_money_rounded,
+              label: 'Fares',
               colorScheme: colorScheme,
-              onTap: () => context.go('/about'),
-            ),
-            _NavItem(
-              active: selectedIndex == 3,
-              icon: Icons.settings_rounded,
-              label: 'Settings',
-              colorScheme: colorScheme,
-              onTap: () => context.go('/settings'),
+              onTap: () => context.go('/fares'),
             ),
           ],
         ),
@@ -60,11 +53,8 @@ class MainScaffold extends StatelessWidget {
     if (location.startsWith('/schedule')) {
       return 1;
     }
-    if (location.startsWith('/about')) {
+    if (location.startsWith('/fares')) {
       return 2;
-    }
-    if (location.startsWith('/settings')) {
-      return 3;
     }
     return 0;
   }
