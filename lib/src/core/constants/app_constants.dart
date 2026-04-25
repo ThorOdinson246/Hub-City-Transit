@@ -6,8 +6,12 @@ const Duration etaCacheTtl = Duration(seconds: 30);
 const Duration requestTimeout = Duration(seconds: 12);
 
 const String localRouteAssetPath = 'assets/data/routes_wgs84.json';
+const String localStopsAssetPath = 'assets/data/stops.json';
 
 const String baseApiUrl = String.fromEnvironment(
   'HCT_BASE_API_URL',
-  defaultValue: 'https://hubcitytransit.vercel.app',
+  defaultValue: String.fromEnvironment(
+    'NEXT_PUBLIC_SITE_URL',
+    defaultValue: '',
+  ),
 );

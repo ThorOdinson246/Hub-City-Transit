@@ -77,7 +77,8 @@
 
 ### Risks/Notes
 - Exact visual parity requires custom Flutter widgets for the web sidebar/bottom-sheet behavior.
-- API base URL currently defaults to production domain; environment override uses `--dart-define=HCT_BASE_API_URL=...`.
+- Flutter now targets the same Next.js host as the web app via `NEXT_PUBLIC_SITE_URL` (with `HCT_BASE_API_URL` available only as an explicit override).
+- ArcGIS and Google Directions remain server-side behind the Next.js `/api/*` endpoints for parity with the web app.
 - Build blocker detail: `sdkmanager` is not available on PATH in this environment, so NDK license acceptance must be done via Android Studio SDK Manager or machine-level SDK tooling before APK builds can pass.
 
 ### Handoff Continuation Instructions

@@ -82,30 +82,33 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                     for (final stop in stops) {
                       map['${stop.stopId}:${stop.location}'] =
                           findTransferConnections(
-                        selectedRoute: route,
-                        stop: stop,
-                        allStopsByRoute: allStopsByRoute,
-                      );
+                            selectedRoute: route,
+                            stop: stop,
+                            allStopsByRoute: allStopsByRoute,
+                          );
                     }
                     return map;
                   },
                   orElse: () => const <String, List<TransferStopConnection>>{},
                 );
 
-                final filtered = stops.where((stop) {
-                  final matchesQuery =
-                      query.isEmpty ||
-                      stop.location.toLowerCase().contains(query);
-                  if (!matchesQuery) {
-                    return false;
-                  }
-                  if (!transferOnly) {
-                    return true;
-                  }
-                  final key = '${stop.stopId}:${stop.location}';
-                  final hasTransfer = (transferMap[key] ?? const []).isNotEmpty;
-                  return hasTransfer;
-                }).toList(growable: false);
+                final filtered = stops
+                    .where((stop) {
+                      final matchesQuery =
+                          query.isEmpty ||
+                          stop.location.toLowerCase().contains(query);
+                      if (!matchesQuery) {
+                        return false;
+                      }
+                      if (!transferOnly) {
+                        return true;
+                      }
+                      final key = '${stop.stopId}:${stop.location}';
+                      final hasTransfer =
+                          (transferMap[key] ?? const []).isNotEmpty;
+                      return hasTransfer;
+                    })
+                    .toList(growable: false);
 
                 if (filtered.isEmpty) {
                   return const Center(child: Text('No matching stops'));

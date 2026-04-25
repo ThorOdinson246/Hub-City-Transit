@@ -20,7 +20,8 @@ final dioProvider = Provider<Dio>((ref) {
   dio.interceptors.add(
     InterceptorsWrapper(
       onError: (error, handler) async {
-        final shouldRetry = error.type == DioExceptionType.connectionTimeout ||
+        final shouldRetry =
+            error.type == DioExceptionType.connectionTimeout ||
             error.type == DioExceptionType.sendTimeout ||
             error.type == DioExceptionType.receiveTimeout ||
             error.type == DioExceptionType.connectionError ||

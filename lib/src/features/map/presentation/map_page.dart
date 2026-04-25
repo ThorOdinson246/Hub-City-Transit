@@ -399,7 +399,8 @@ class _MapPageState extends ConsumerState<MapPage> {
                                     ),
                                     child: _buildStopDetailCard(
                                       selectedRoute: selectedRoute,
-                                      allStopsByRouteAsync: allStopsByRouteAsync,
+                                      allStopsByRouteAsync:
+                                          allStopsByRouteAsync,
                                     ),
                                   ),
                                 ),
@@ -632,8 +633,8 @@ class _MapPageState extends ConsumerState<MapPage> {
               children: connections
                   .map(
                     (connection) => ActionChip(
-                      backgroundColor:
-                          routeColors[connection.routeId]!.withValues(alpha: 0.18),
+                      backgroundColor: routeColors[connection.routeId]!
+                          .withValues(alpha: 0.18),
                       avatar: CircleAvatar(
                         radius: 7,
                         backgroundColor: routeColors[connection.routeId],

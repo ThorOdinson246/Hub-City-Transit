@@ -33,18 +33,18 @@ final stopsBySelectedRouteProvider = FutureProvider<List<StopModel>>((
   return repository.getStops(routeId: route.value);
 });
 
-final allStopsByRouteProvider = FutureProvider<Map<RouteId, List<StopModel>>>(
-  (ref) async {
-    final repository = ref.watch(transitRepositoryProvider);
-    final entries = await Future.wait(
-      RouteId.values.map((route) async {
-        final stops = await repository.getStops(routeId: route.value);
-        return MapEntry(route, stops);
-      }),
-    );
-    return Map<RouteId, List<StopModel>>.fromEntries(entries);
-  },
-);
+final allStopsByRouteProvider = FutureProvider<Map<RouteId, List<StopModel>>>((
+  ref,
+) async {
+  final repository = ref.watch(transitRepositoryProvider);
+  final entries = await Future.wait(
+    RouteId.values.map((route) async {
+      final stops = await repository.getStops(routeId: route.value);
+      return MapEntry(route, stops);
+    }),
+  );
+  return Map<RouteId, List<StopModel>>.fromEntries(entries);
+});
 
 final busLocationPollingProvider = StreamProvider<BusLocationModel?>((
   ref,
