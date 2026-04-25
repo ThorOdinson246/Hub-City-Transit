@@ -49,3 +49,5 @@ key.properties
 *.jks
 *.keystore
 env/
+.env
+stitch_assets/

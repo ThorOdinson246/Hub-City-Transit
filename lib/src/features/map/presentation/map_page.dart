@@ -27,6 +27,7 @@ class _MapPageState extends ConsumerState<MapPage> {
   BusId? _lastBus;
   RouteId? _lastRoute;
   StopModel? _selectedStop;
+  bool _showFabMenu = false;
   bool _etaRequested = false;
   bool _etaLoading = false;
   bool _etaInFlight = false;
@@ -416,6 +417,62 @@ class _MapPageState extends ConsumerState<MapPage> {
                             ],
                           ),
                         ),
+                        Positioned(
+                          right: 14,
+                          bottom: 128,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              if (_showFabMenu) ...[
+                                _MapActionButton(
+                                  label: 'Show all routes',
+                                  icon: Icons.layers_rounded,
+                                  onTap: () {
+                                    setState(() {
+                                      _showFabMenu = false;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 8),
+                                _MapActionButton(
+                                  label: 'Nearby stops',
+                                  icon: Icons.near_me_rounded,
+                                  onTap: () {
+                                    setState(() {
+                                      _showFabMenu = false;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 8),
+                                _MapActionButton(
+                                  label: 'Search route',
+                                  icon: Icons.search_rounded,
+                                  onTap: () {
+                                    setState(() {
+                                      _showFabMenu = false;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+                              FloatingActionButton(
+                                heroTag: 'map-menu-fab',
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                onPressed: () {
+                                  setState(() {
+                                    _showFabMenu = !_showFabMenu;
+                                  });
+                                },
+                                child: Icon(
+                                  _showFabMenu
+                                      ? Icons.close_rounded
+                                      : Icons.route_rounded,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -665,6 +722,42 @@ class _MapPageState extends ConsumerState<MapPage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _MapActionButton extends StatelessWidget {
+  const _MapActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(999),
+      elevation: 2,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(width: 8),
+              Icon(icon, size: 18),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
