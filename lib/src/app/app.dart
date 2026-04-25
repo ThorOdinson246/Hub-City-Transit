@@ -16,7 +16,7 @@ class HubCityTransitApp extends ConsumerWidget {
       title: appName,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

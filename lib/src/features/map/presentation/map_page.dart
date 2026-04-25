@@ -14,7 +14,6 @@ import '../../../core/utils/haversine.dart';
 import '../../../core/utils/transfer_connections.dart';
 import '../../../data/models/eta_result_model.dart';
 import '../../../data/models/stop_model.dart';
-import '../../../domain/usecases/schedule_adjustment_use_case.dart';
 
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
@@ -28,6 +27,7 @@ class _MapPageState extends ConsumerState<MapPage> {
   RouteId? _lastRoute;
   StopModel? _selectedStop;
   bool _showFabMenu = false;
+  bool _mapUiVisible = true;
   bool _etaRequested = false;
   bool _etaLoading = false;
   bool _etaInFlight = false;
@@ -37,11 +37,36 @@ class _MapPageState extends ConsumerState<MapPage> {
   String? _etaError;
   EtaResultModel? _eta;
   Timer? _etaTimer;
+  Timer? _uiRestoreTimer;
 
   @override
   void dispose() {
     _etaTimer?.cancel();
+    _uiRestoreTimer?.cancel();
     super.dispose();
+  }
+
+  void _handleMapGesture(bool hasGesture) {
+    if (hasGesture) {
+      _uiRestoreTimer?.cancel();
+      if (_mapUiVisible) {
+        setState(() {
+          _mapUiVisible = false;
+          _showFabMenu = false;
+        });
+      }
+      return;
+    }
+
+    _uiRestoreTimer?.cancel();
+    _uiRestoreTimer = Timer(const Duration(milliseconds: 450), () {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _mapUiVisible = true;
+      });
+    });
   }
 
   void _resetEtaState() {
@@ -192,7 +217,6 @@ class _MapPageState extends ConsumerState<MapPage> {
     final stopsAsync = ref.watch(stopsBySelectedRouteProvider);
     final allStopsByRouteAsync = ref.watch(allStopsByRouteProvider);
     final busAsync = ref.watch(busLocationPollingProvider);
-    final busStatus = ref.watch(busStatusProvider);
 
     if (_lastBus != selectedBus) {
       _lastBus = selectedBus;
@@ -203,55 +227,8 @@ class _MapPageState extends ConsumerState<MapPage> {
       _selectedStop = null;
     }
 
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    'Live Map',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
-                  ),
-                ),
-                Chip(
-                  label: Text(routeNames[selectedRoute] ?? selectedRoute.value),
-                  avatar: CircleAvatar(
-                    backgroundColor: routeColors[selectedRoute],
-                    radius: 7,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 56,
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                final route = RouteId.values[index];
-                final selected = route == selectedRoute;
-                return ChoiceChip(
-                  selected: selected,
-                  label: Text(routeNames[route] ?? route.value),
-                  onSelected: (_) {
-                    ref.read(selectedRouteProvider.notifier).state = route;
-                    ref.read(selectedBusProvider.notifier).state =
-                        routeBusMap[route]!.first;
-                  },
-                );
-              },
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
-              itemCount: RouteId.values.length,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Expanded(
-            child: routesAsync.when(
-              data: (routes) {
+    return routesAsync.when(
+      data: (routes) {
                 final busLocation = busAsync.asData?.value;
                 final selectedCenter = busLocation != null
                     ? LatLng(busLocation.lat, busLocation.lng)
@@ -313,178 +290,277 @@ class _MapPageState extends ConsumerState<MapPage> {
                     : [
                         Marker(
                           point: LatLng(busLocation.lat, busLocation.lng),
-                          width: 26,
-                          height: 26,
-                          child: const Icon(
-                            Icons.directions_bus,
-                            color: Colors.black,
-                            size: 24,
+                          width: 68,
+                          height: 52,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: routeColors[selectedRoute],
+                                  borderRadius: BorderRadius.circular(999),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x1A000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  selectedBus.value.toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Container(
+                                width: 26,
+                                height: 26,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: routeColors[selectedRoute]!,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.directions_bus_rounded,
+                                  size: 16,
+                                  color: routeColors[selectedRoute],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ];
-
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Stack(
-                      children: [
-                        FlutterMap(
-                          options: MapOptions(
-                            initialCenter: selectedCenter,
-                            initialZoom: 13,
-                            minZoom: 11,
-                            maxZoom: 18,
+                return Stack(
+                  children: [
+                    Positioned.fill(
+                      child: FlutterMap(
+                        options: MapOptions(
+                          initialCenter: selectedCenter,
+                          initialZoom: 13,
+                          minZoom: 11,
+                          maxZoom: 18,
+                          onPositionChanged: (_, hasGesture) {
+                            _handleMapGesture(hasGesture);
+                          },
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                            subdomains: const ['a', 'b', 'c', 'd'],
+                            userAgentPackageName: 'com.hubcitytransit',
                           ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName: 'com.hubcitytransit',
+                          PolylineLayer(polylines: polylineLayers),
+                          MarkerLayer(markers: stopMarkers),
+                          MarkerLayer(markers: busMarker),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: SafeArea(
+                        bottom: false,
+                        child: AnimatedSlide(
+                          offset: _mapUiVisible ? Offset.zero : const Offset(0, -1),
+                          duration: const Duration(milliseconds: 220),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 56,
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.93),
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(color: const Color(0xFFC5C6CA)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.menu_rounded),
+                                      ),
+                                      const Expanded(
+                                        child: Text(
+                                          'Hub City Transit',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.account_circle_outlined),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  height: 46,
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: RouteId.values.length,
+                                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                                    itemBuilder: (context, index) {
+                                      final route = RouteId.values[index];
+                                      final selected = route == selectedRoute;
+                                      return ChoiceChip(
+                                        showCheckmark: false,
+                                        selected: selected,
+                                        label: Text(routeNames[route] ?? route.value),
+                                        selectedColor: const Color(0xFF000101),
+                                        labelStyle: TextStyle(
+                                          color: selected
+                                              ? Colors.white
+                                              : const Color(0xFF44474A),
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                        onSelected: (_) {
+                                          ref.read(selectedRouteProvider.notifier).state =
+                                              route;
+                                          ref.read(selectedBusProvider.notifier).state =
+                                              routeBusMap[route]!.first;
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                            PolylineLayer(polylines: polylineLayers),
-                            MarkerLayer(markers: stopMarkers),
-                            MarkerLayer(markers: busMarker),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 12,
+                      bottom: 154,
+                      child: AnimatedOpacity(
+                        opacity: _mapUiVisible ? 1 : 0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            if (_showFabMenu) ...[
+                              _MapActionButton(
+                                label: 'Show all routes',
+                                icon: Icons.layers_rounded,
+                                onTap: () {
+                                  setState(() {
+                                    _showFabMenu = false;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 8),
+                              _MapActionButton(
+                                label: 'Nearby stops',
+                                icon: Icons.location_on_rounded,
+                                onTap: () {
+                                  setState(() {
+                                    _showFabMenu = false;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 8),
+                              _MapActionButton(
+                                label: 'Search route',
+                                icon: Icons.search_rounded,
+                                onTap: () {
+                                  setState(() {
+                                    _showFabMenu = false;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                            FloatingActionButton(
+                              heroTag: 'map-menu-fab',
+                              backgroundColor: const Color(0xFF000101),
+                              foregroundColor: Colors.white,
+                              onPressed: () {
+                                setState(() {
+                                  _showFabMenu = !_showFabMenu;
+                                  _mapUiVisible = true;
+                                });
+                              },
+                              child: Icon(
+                                _showFabMenu ? Icons.close_rounded : Icons.route_rounded,
+                              ),
+                            ),
                           ],
                         ),
-                        Positioned(
-                          left: 10,
-                          right: 10,
-                          top: 10,
-                          child: Card(
+                      ),
+                    ),
+                    Positioned(
+                      left: 12,
+                      right: 12,
+                      bottom: 10,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_selectedStop != null)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.97),
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x22000000),
+                                    blurRadius: 18,
+                                    offset: Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
+                                child: _buildStopDetailCard(
+                                  selectedRoute: selectedRoute,
+                                  allStopsByRouteAsync: allStopsByRouteAsync,
+                                ),
+                              ),
+                            ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.97),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 10,
                               ),
-                              child: busAsync.when(
-                                data: (location) {
-                                  if (location == null) {
-                                    return Text(
-                                      'Status: ${_statusLabel(busStatus)}',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    );
-                                  }
-                                  return Text(
-                                    'Status: ${_statusLabel(busStatus)} · ${selectedBus.value} · ${location.lat.toStringAsFixed(5)}, ${location.lng.toStringAsFixed(5)}',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  );
-                                },
-                                loading: () => const Text(
-                                  'Connecting to live bus feed...',
-                                ),
-                                error: (error, _) =>
-                                    Text('Bus feed error: $error'),
-                              ),
+                              child: _buildEtaCard(selectedBus),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          left: 10,
-                          right: 10,
-                          bottom: 10,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (_selectedStop != null)
-                                Card(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 10,
-                                    ),
-                                    child: _buildStopDetailCard(
-                                      selectedRoute: selectedRoute,
-                                      allStopsByRouteAsync:
-                                          allStopsByRouteAsync,
-                                    ),
-                                  ),
-                                ),
-                              Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
-                                  ),
-                                  child: _buildEtaCard(selectedBus),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                          right: 14,
-                          bottom: 128,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (_showFabMenu) ...[
-                                _MapActionButton(
-                                  label: 'Show all routes',
-                                  icon: Icons.layers_rounded,
-                                  onTap: () {
-                                    setState(() {
-                                      _showFabMenu = false;
-                                    });
-                                  },
-                                ),
-                                const SizedBox(height: 8),
-                                _MapActionButton(
-                                  label: 'Nearby stops',
-                                  icon: Icons.near_me_rounded,
-                                  onTap: () {
-                                    setState(() {
-                                      _showFabMenu = false;
-                                    });
-                                  },
-                                ),
-                                const SizedBox(height: 8),
-                                _MapActionButton(
-                                  label: 'Search route',
-                                  icon: Icons.search_rounded,
-                                  onTap: () {
-                                    setState(() {
-                                      _showFabMenu = false;
-                                    });
-                                  },
-                                ),
-                                const SizedBox(height: 10),
-                              ],
-                              FloatingActionButton(
-                                heroTag: 'map-menu-fab',
-                                backgroundColor: Colors.black,
-                                foregroundColor: Colors.white,
-                                onPressed: () {
-                                  setState(() {
-                                    _showFabMenu = !_showFabMenu;
-                                  });
-                                },
-                                child: Icon(
-                                  _showFabMenu
-                                      ? Icons.close_rounded
-                                      : Icons.route_rounded,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) =>
-                  Center(child: Text('Failed to load map data: $error')),
-            ),
-          ),
-        ],
-      ),
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('Failed to load map data: $error')),
     );
   }
 
@@ -632,9 +708,23 @@ class _MapPageState extends ConsumerState<MapPage> {
       subtitle.add('~$walkMins min walk');
     }
 
+    final routeLabel = routeNames[selectedRoute] ?? selectedRoute.name;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            width: 44,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFD1D5DB),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+        ),
         Row(
           children: [
             Expanded(
@@ -651,13 +741,12 @@ class _MapPageState extends ConsumerState<MapPage> {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    subtitle.join(' · '),
-                    style: const TextStyle(color: Colors.black54, fontSize: 12),
-                  ),
+                  const SizedBox(height: 2),
+                  Text(subtitle.join('  ·  '), style: const TextStyle(fontSize: 12)),
                 ],
               ),
             ),
+            _RoutePill(label: routeLabel, color: routeColors[selectedRoute]!),
             IconButton(
               onPressed: () {
                 setState(() {
@@ -684,7 +773,17 @@ class _MapPageState extends ConsumerState<MapPage> {
               );
             }
 
-            return Wrap(
+            final routeStops = ref.read(stopsBySelectedRouteProvider).asData?.value ?? const <StopModel>[];
+            final selectedIdx = routeStops.indexWhere((s) => s.stopId == stop.stopId);
+            final nextStops = selectedIdx < 0
+                ? const <StopModel>[]
+                : routeStops.skip(selectedIdx + 1).take(3).toList(growable: false);
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (connections.isNotEmpty)
+                  Wrap(
               spacing: 8,
               runSpacing: 8,
               children: connections
@@ -709,6 +808,31 @@ class _MapPageState extends ConsumerState<MapPage> {
                     ),
                   )
                   .toList(growable: false),
+                  ),
+                if (nextStops.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  const Text('Next Stops', style: TextStyle(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 6),
+                  ...nextStops.map(
+                    (next) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.radio_button_unchecked, size: 16),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              next.location,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             );
           },
           loading: () => const SizedBox(
@@ -722,6 +846,33 @@ class _MapPageState extends ConsumerState<MapPage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _RoutePill extends StatelessWidget {
+  const _RoutePill({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
     );
   }
 }
@@ -759,16 +910,5 @@ class _MapActionButton extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-String _statusLabel(BusStatus status) {
-  switch (status) {
-    case BusStatus.live:
-      return 'Live';
-    case BusStatus.connecting:
-      return 'Connecting';
-    case BusStatus.offline:
-      return 'Offline';
   }
 }

@@ -6,6 +6,7 @@ import '../../features/launch/presentation/launch_page.dart';
 import '../../features/map/presentation/map_page.dart';
 import '../../features/onboarding/presentation/location_permission_page.dart';
 import '../../features/schedule/presentation/schedule_page.dart';
+import '../../features/settings/presentation/settings_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -39,6 +40,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/about',
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: AboutPage()),
+          ),
+          GoRoute(
+            path: '/settings',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsPage()),
           ),
         ],
       ),

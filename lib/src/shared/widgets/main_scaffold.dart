@@ -10,34 +10,45 @@ class MainScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
     final selectedIndex = _indexFromLocation(location);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: child,
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFFF4F4F8),
-          border: Border(top: BorderSide(color: Color(0x14000000))),
+        decoration: BoxDecoration(
+          color: colorScheme.surface.withValues(alpha: 0.96),
+          border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
         ),
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
         child: Row(
           children: [
             _NavItem(
               active: selectedIndex == 0,
               icon: Icons.map_rounded,
               label: 'Map',
+              colorScheme: colorScheme,
               onTap: () => context.go('/map'),
             ),
             _NavItem(
               active: selectedIndex == 1,
               icon: Icons.calendar_today_rounded,
               label: 'Schedule',
+              colorScheme: colorScheme,
               onTap: () => context.go('/schedule'),
             ),
             _NavItem(
               active: selectedIndex == 2,
               icon: Icons.info_rounded,
               label: 'About',
+              colorScheme: colorScheme,
               onTap: () => context.go('/about'),
+            ),
+            _NavItem(
+              active: selectedIndex == 3,
+              icon: Icons.settings_rounded,
+              label: 'Settings',
+              colorScheme: colorScheme,
+              onTap: () => context.go('/settings'),
             ),
           ],
         ),
@@ -52,6 +63,9 @@ class MainScaffold extends StatelessWidget {
     if (location.startsWith('/about')) {
       return 2;
     }
+    if (location.startsWith('/settings')) {
+      return 3;
+    }
     return 0;
   }
 }
@@ -61,12 +75,14 @@ class _NavItem extends StatelessWidget {
     required this.active,
     required this.icon,
     required this.label,
+    required this.colorScheme,
     required this.onTap,
   });
 
   final bool active;
   final IconData icon;
   final String label;
+  final ColorScheme colorScheme;
   final VoidCallback onTap;
 
   @override
@@ -76,30 +92,30 @@ class _NavItem extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(vertical: 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 46,
+                height: 36,
                 decoration: BoxDecoration(
-                  color: active ? Colors.black : Colors.transparent,
-                  shape: BoxShape.circle,
+                  color: active ? colorScheme.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 child: Icon(
                   icon,
-                  color: active ? Colors.white : const Color(0xFF6B7280),
+                  color: active ? Colors.white : colorScheme.onSurfaceVariant,
                   size: 20,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 11.5,
                   fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                  color: active ? Colors.black : const Color(0xFF6B7280),
+                  color: active ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

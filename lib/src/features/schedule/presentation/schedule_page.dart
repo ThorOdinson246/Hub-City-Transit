@@ -31,22 +31,34 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     return SafeArea(
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFC5C6CA)),
+            ),
             child: Row(
               children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: routeColors[route],
+                  child: const Icon(
+                    Icons.schedule_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Schedule',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        'Route Schedule',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                       ),
-                      const SizedBox(height: 4),
                       Text(
                         routeNames[route] ?? route.value,
                         style: TextStyle(
@@ -55,15 +67,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                         ),
                       ),
                     ],
-                  ),
-                ),
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: routeColors[route],
-                  child: const Icon(
-                    Icons.directions_bus_rounded,
-                    color: Colors.white,
-                    size: 18,
                   ),
                 ),
               ],
@@ -75,8 +78,6 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
               decoration: InputDecoration(
                 hintText: 'Search stops on this route',
                 prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -220,12 +221,12 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           decoration: BoxDecoration(
             color: entry.isCurrent
                 ? colorScheme.primaryContainer
-                : colorScheme.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(20),
+                : Colors.white,
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: entry.isCurrent
                   ? routeColors[route]!
-                  : colorScheme.outlineVariant,
+                  : const Color(0xFFC5C6CA),
             ),
           ),
           padding: const EdgeInsets.all(14),
