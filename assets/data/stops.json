@@ -1,0 +1,1374 @@
+{
+  "blue": [
+    {
+      "stopId": 1,
+      "location": "Main St and Front St",
+      "lat": 31.326397,
+      "lng": -89.289503,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 2,
+      "location": "Main St and New Orleans St at Federal Building",
+      "lat": 31.328024,
+      "lng": -89.291928,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 3,
+      "location": "McLeod St at Fire Station No.1",
+      "lat": 31.327993,
+      "lng": -89.293734,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 4,
+      "location": "Hardy St and Green St at Main Library",
+      "lat": 31.324909,
+      "lng": -89.296941,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 5,
+      "location": "Hardy St and Hutchinson Ave",
+      "lat": 31.324847,
+      "lng": -89.309931,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 6,
+      "location": "Hardy St and N 17th",
+      "lat": 31.324847,
+      "lng": -89.314404,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 7,
+      "location": "Hardy St and Park Ave",
+      "lat": 31.324847,
+      "lng": -89.317746,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 8,
+      "location": "Hardy St and 21st Ave",
+      "lat": 31.324855,
+      "lng": -89.322696,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 9,
+      "location": "Hardy St and 25th Ave",
+      "lat": 31.324878,
+      "lng": -89.327681,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 10,
+      "location": "Hardy St at USM Rose Garden",
+      "lat": 31.324878,
+      "lng": -89.331203,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 11,
+      "location": "Hardy St and 31st Ave",
+      "lat": 31.324901,
+      "lng": -89.335847,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 12,
+      "location": "Hardy St and Ross Blvd",
+      "lat": 31.324955,
+      "lng": -89.339467,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 13,
+      "location": "Hardy St and 36th Ave",
+      "lat": 31.325039,
+      "lng": -89.343114,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 14,
+      "location": "Hardy St and 38th Ave",
+      "lat": 31.325085,
+      "lng": -89.345459,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 15,
+      "location": "Hardy St and 40th Ave",
+      "lat": 31.325116,
+      "lng": -89.347579,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 16,
+      "location": "Hwy 98 W and Coco Cola St",
+      "lat": 31.324379,
+      "lng": -89.359203,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 17,
+      "location": "Hwy 98 W and Mayfair Rd",
+      "lat": 31.323704,
+      "lng": -89.363479,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 18,
+      "location": "E Hospital Dr at Green Eye Institute",
+      "lat": 31.324418,
+      "lng": -89.36603,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 19,
+      "location": "W Hospital Dr and Millsaps Dr",
+      "lat": 31.323972,
+      "lng": -89.367701,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 20,
+      "location": "Turtle Creek Mall SE side of loop road",
+      "lat": 31.324402,
+      "lng": -89.374358,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 21,
+      "location": "Turtle Creek Mall S side of loop road",
+      "lat": 31.32342,
+      "lng": -89.375777,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 22,
+      "location": "Turtle Creek Mall W side of loop road",
+      "lat": 31.327395,
+      "lng": -89.37805,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 23,
+      "location": "Cross Creek Parkway at Bed Bath and Beyond",
+      "lat": 31.323627,
+      "lng": -89.381356,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 24,
+      "location": "Walmart",
+      "lat": 31.320512,
+      "lng": -89.379263,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 25,
+      "location": "Hwy 98 W at Lowe's",
+      "lat": 31.321993,
+      "lng": -89.375148,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 26,
+      "location": "Hwy 98 W at TJ Maxx",
+      "lat": 31.322277,
+      "lng": -89.371537,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 27,
+      "location": "Hwy 98 W and Fairfield Dr",
+      "lat": 31.322729,
+      "lng": -89.366713,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 28,
+      "location": "Hwy 98 W and Mayfair Rd",
+      "lat": 31.323228,
+      "lng": -89.363111,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 29,
+      "location": "Hardy St at Midtown Market Shopping Center",
+      "lat": 31.32329,
+      "lng": -89.355861,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 30,
+      "location": "Hardy St at Midtown Market Place",
+      "lat": 31.324832,
+      "lng": -89.344507,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 31,
+      "location": "Hardy St and 34th Ave",
+      "lat": 31.32474,
+      "lng": -89.340518,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 32,
+      "location": "Hardy St and 30th Ave",
+      "lat": 31.324663,
+      "lng": -89.334437,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 33,
+      "location": "S 29th and Hardy St",
+      "lat": 31.323811,
+      "lng": -89.332622,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 34,
+      "location": "S 28th Ave and Arlington Loop",
+      "lat": 31.321241,
+      "lng": -89.33123,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 35,
+      "location": "S 28th Ave and Hardy",
+      "lat": 31.324556,
+      "lng": -89.331248,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 36,
+      "location": "Hardy St and 25th Ave",
+      "lat": 31.324594,
+      "lng": -89.327879,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 37,
+      "location": "Hardy and 21st Ave",
+      "lat": 31.324602,
+      "lng": -89.322875,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 38,
+      "location": "Hardy St and Park Ave",
+      "lat": 31.324625,
+      "lng": -89.317971,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 39,
+      "location": "Hardy and S 17th Ave at Zoo",
+      "lat": 31.324617,
+      "lng": -89.314674,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 40,
+      "location": "Hardy St and Hutchinson Ave",
+      "lat": 31.324648,
+      "lng": -89.309544,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 41,
+      "location": "Hardy St and Pinehurst St",
+      "lat": 31.324655,
+      "lng": -89.303651,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 42,
+      "location": "Hardy St and Mamie St",
+      "lat": 31.324702,
+      "lng": -89.299941,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 43,
+      "location": "Hardy St and 1st Ave",
+      "lat": 31.324709,
+      "lng": -89.295692,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 44,
+      "location": "Front St and Forrest St at City Hall",
+      "lat": 31.325477,
+      "lng": -89.29077,
+      "direction": "Inbound"
+    }
+  ],
+  "gold": [
+    {
+      "stopId": 1,
+      "location": "Service Dr at Hillcrest Dorm",
+      "lat": 31.333894,
+      "lng": -89.329424,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 2,
+      "location": "Eagle Walk and Black and Gold Blvd",
+      "lat": 31.330472,
+      "lng": -89.330637,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 3,
+      "location": "Eagle Walk and College Dr",
+      "lat": 31.327978,
+      "lng": -89.330628,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 4,
+      "location": "Southern Miss Dr and W Memorial Dr",
+      "lat": 31.325883,
+      "lng": -89.333008,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 5,
+      "location": "W Memorial Dr and Hardy St",
+      "lat": 31.324955,
+      "lng": -89.332954,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 6,
+      "location": "Hardy St and 31st Ave",
+      "lat": 31.324901,
+      "lng": -89.335847,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 7,
+      "location": "N 31st Ave and Pearl St",
+      "lat": 31.326651,
+      "lng": -89.335937,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 8,
+      "location": "Pearl St and N 34th Ave",
+      "lat": 31.326827,
+      "lng": -89.340761,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 9,
+      "location": "N 35th Ave and Montague Blvd",
+      "lat": 31.328416,
+      "lng": -89.341965,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 10,
+      "location": "Montague Blvd and Fraternity Dr at DuBard School",
+      "lat": 31.328377,
+      "lng": -89.33829,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 11,
+      "location": "Montague Blvd and Golden Eagle Ave",
+      "lat": 31.328331,
+      "lng": -89.334859,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 12,
+      "location": "Golden Eagle Ave and Charles Lane",
+      "lat": 31.329459,
+      "lng": -89.334724,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 13,
+      "location": "W 4th St at Century Park",
+      "lat": 31.331907,
+      "lng": -89.332945,
+      "direction": "Inbound"
+    }
+  ],
+  "green": [
+    {
+      "stopId": 1,
+      "location": "Walmart at Hwy 49",
+      "lat": 31.308033,
+      "lng": -89.319435,
+      "direction": "Station"
+    },
+    {
+      "stopId": 2,
+      "location": "Washington St at Live Well Center",
+      "lat": 31.309506,
+      "lng": -89.320719,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 3,
+      "location": "N 26th Ave and Quinn St",
+      "lat": 31.327441,
+      "lng": -89.328696,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 4,
+      "location": "W 7th St at Hillcrest Lot",
+      "lat": 31.33539,
+      "lng": -89.329729,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 5,
+      "location": "W 4th St and Eagle Walk",
+      "lat": 31.332083,
+      "lng": -89.330511,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 6,
+      "location": "W 4th St and Reed Green Coliseum",
+      "lat": 31.332306,
+      "lng": -89.337716,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 7,
+      "location": "W 4th St and Virginia Dr",
+      "lat": 31.334746,
+      "lng": -89.344094,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 8,
+      "location": "ThornHill Dr at Mark IV Apartments",
+      "lat": 31.334777,
+      "lng": -89.34925,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 9,
+      "location": "Grand Dr at Grand Theatre",
+      "lat": 31.330487,
+      "lng": -89.350777,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 10,
+      "location": "N 40th Ave and Montague Blvd",
+      "lat": 31.328446,
+      "lng": -89.348019,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 11,
+      "location": "N 38th Ave and Pearl St",
+      "lat": 31.326927,
+      "lng": -89.34563,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 12,
+      "location": "Hardy St at Midtown Market Shopping Center",
+      "lat": 31.324832,
+      "lng": -89.344507,
+      "direction": "Station"
+    },
+    {
+      "stopId": 13,
+      "location": "Hardy St and 34th Ave",
+      "lat": 31.32474,
+      "lng": -89.340518,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 14,
+      "location": "Hardy St and 30th Ave",
+      "lat": 31.324663,
+      "lng": -89.334437,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 15,
+      "location": "S 29th Ave and Hardy St",
+      "lat": 31.323811,
+      "lng": -89.332622,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 16,
+      "location": "Midtown stop 28th st",
+      "lat": 31.321003,
+      "lng": -89.330978,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 17,
+      "location": "Mamie St at Forrest General Hospital",
+      "lat": 31.319276,
+      "lng": -89.329721,
+      "direction": "Inbound"
+    }
+  ],
+  "brown": [
+    {
+      "stopId": 1,
+      "location": "Train Depot",
+      "lat": 31.329904,
+      "lng": -89.283736,
+      "direction": "Station"
+    },
+    {
+      "stopId": 2,
+      "location": "E 2nd St at Briarfield Apartments",
+      "lat": 31.330694,
+      "lng": -89.287491,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 3,
+      "location": "E 2nd St and Mobile St",
+      "lat": 31.330019,
+      "lng": -89.289925,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 4,
+      "location": "Mobile St and E 4th St",
+      "lat": 31.332037,
+      "lng": -89.289925,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 5,
+      "location": "Mobile St and E 7th St",
+      "lat": 31.33569,
+      "lng": -89.289952,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 6,
+      "location": "E 7th St and Fairley St",
+      "lat": 31.335636,
+      "lng": -89.284418,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 7,
+      "location": "E 9th St and Bouie St",
+      "lat": 31.338452,
+      "lng": -89.287203,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 8,
+      "location": "E 9th St and Mobile St",
+      "lat": 31.338283,
+      "lng": -89.289898,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 9,
+      "location": "E 9th St and Memphis St",
+      "lat": 31.338291,
+      "lng": -89.292378,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 10,
+      "location": "Coit St and Lula Ave",
+      "lat": 31.340592,
+      "lng": -89.294345,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 11,
+      "location": "Hwy 42 and Coit St",
+      "lat": 31.342902,
+      "lng": -89.29439,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 12,
+      "location": "Hwy 42 and Redus St",
+      "lat": 31.342526,
+      "lng": -89.301334,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 13,
+      "location": "Hwy 42 and Glendale Ave",
+      "lat": 31.342603,
+      "lng": -89.307352,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 14,
+      "location": "Hwy 42 and Pritchard St",
+      "lat": 31.346469,
+      "lng": -89.31497,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 15,
+      "location": "Hwy 42 and Cahal St",
+      "lat": 31.346799,
+      "lng": -89.324483,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 16,
+      "location": "Hwy 42 at Health Department",
+      "lat": 31.347359,
+      "lng": -89.331535,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 17,
+      "location": "Service Dr and N 31st Ave",
+      "lat": 31.348449,
+      "lng": -89.33511,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 18,
+      "location": "N 31st and Hwy 49",
+      "lat": 31.347689,
+      "lng": -89.335317,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 19,
+      "location": "Campbell Dr at Mark Apartments",
+      "lat": 31.346776,
+      "lng": -89.337644,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 20,
+      "location": "Campbell Dr at Overlook Apartments",
+      "lat": 31.346753,
+      "lng": -89.343222,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 21,
+      "location": "Beverly Hills Rd at Plantation Apartments",
+      "lat": 31.345633,
+      "lng": -89.348396,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 22,
+      "location": "Beverly Hills Rd and N 37th Ave",
+      "lat": 31.33958,
+      "lng": -89.343995,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 23,
+      "location": "W 7th St and N 31st Ave",
+      "lat": 31.335659,
+      "lng": -89.335551,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 24,
+      "location": "W 7th St and Service Dr at Hillcrest Lot",
+      "lat": 31.335598,
+      "lng": -89.329577,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 25,
+      "location": "W 7th St and 25th Ave",
+      "lat": 31.335644,
+      "lng": -89.32787,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 26,
+      "location": "W 7th St and N 19th Ave",
+      "lat": 31.33569,
+      "lng": -89.319588,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 27,
+      "location": "W 7th St and Oliver Ave",
+      "lat": 31.335705,
+      "lng": -89.313686,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 28,
+      "location": "W 7th St and North St",
+      "lat": 31.335705,
+      "lng": -89.305879,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 29,
+      "location": "W 7th St and Main St",
+      "lat": 31.335651,
+      "lng": -89.299259,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 30,
+      "location": "Main St and 4th St",
+      "lat": 31.332168,
+      "lng": -89.296752,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 31,
+      "location": "Main St and Eaton St",
+      "lat": 31.327817,
+      "lng": -89.291839,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 32,
+      "location": "Main St and Short St",
+      "lat": 31.325968,
+      "lng": -89.289224,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 33,
+      "location": "Train Depot (return)",
+      "lat": 31.329904,
+      "lng": -89.283736,
+      "direction": "Station"
+    }
+  ],
+  "orange": [
+    {
+      "stopId": 1,
+      "location": "Train Depot",
+      "lat": 31.329904,
+      "lng": -89.283736,
+      "direction": "Station"
+    },
+    {
+      "stopId": 2,
+      "location": "River Ave and Williams St",
+      "lat": 31.325177,
+      "lng": -89.284374,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 3,
+      "location": "McInnis Ave and S Tipton St",
+      "lat": 31.32408,
+      "lng": -89.28016,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 4,
+      "location": "S Tipton St and Rebecca Ave",
+      "lat": 31.319207,
+      "lng": -89.280143,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 5,
+      "location": "S Tipton St and Alcorn Ave",
+      "lat": 31.31583,
+      "lng": -89.280089,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 6,
+      "location": "James St and Alcorn Ave",
+      "lat": 31.315784,
+      "lng": -89.282981,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 7,
+      "location": "Edwards St and Katie Ave",
+      "lat": 31.315761,
+      "lng": -89.285191,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 8,
+      "location": "Edwards St and Duke Ave",
+      "lat": 31.311939,
+      "lng": -89.285146,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 9,
+      "location": "Edwards St and Tuscan Ave",
+      "lat": 31.306306,
+      "lng": -89.285146,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 10,
+      "location": "Tuscan Ave and William Carey Parkway",
+      "lat": 31.30636,
+      "lng": -89.29403,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 11,
+      "location": "Penton St and Cypress Ave",
+      "lat": 31.310128,
+      "lng": -89.294066,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 12,
+      "location": "Main St and Short St",
+      "lat": 31.325968,
+      "lng": -89.289224,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 13,
+      "location": "Hall Ave and Dabbs St",
+      "lat": 31.317427,
+      "lng": -89.293096,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 14,
+      "location": "6th Ave and W Pine St",
+      "lat": 31.318923,
+      "lng": -89.299304,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 15,
+      "location": "Broadway Dr and Corinne St",
+      "lat": 31.316728,
+      "lng": -89.303768,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 16,
+      "location": "Broadway Dr and Timothy Ln",
+      "lat": 31.314042,
+      "lng": -89.309203,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 17,
+      "location": "Bartur St and Broadway Dr",
+      "lat": 31.311417,
+      "lng": -89.313111,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 18,
+      "location": "Service Rd at Walmart",
+      "lat": 31.308033,
+      "lng": -89.319435,
+      "direction": "Station"
+    },
+    {
+      "stopId": 19,
+      "location": "Service Road and Cloverleaf Dr",
+      "lat": 31.311486,
+      "lng": -89.318393,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 20,
+      "location": "Roosevelt St before Lincoln Rd",
+      "lat": 31.304955,
+      "lng": -89.322265,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 21,
+      "location": "Lincoln Rd and Hill St",
+      "lat": 31.304072,
+      "lng": -89.318069,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 22,
+      "location": "W Pine St and Service Dr",
+      "lat": 31.305592,
+      "lng": -89.313183,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 23,
+      "location": "W Pine St and 6th Ave",
+      "lat": 31.318823,
+      "lng": -89.299411,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 24,
+      "location": "Timothy Ln and Broadway Dr",
+      "lat": 31.313889,
+      "lng": -89.309005,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 25,
+      "location": "Broadway Dr and W Florence St",
+      "lat": 31.316053,
+      "lng": -89.305637,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 26,
+      "location": "W Pine St and 1st Ave",
+      "lat": 31.32352,
+      "lng": -89.294004,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 27,
+      "location": "John St and Willis Ave",
+      "lat": 31.312783,
+      "lng": -89.294632,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 28,
+      "location": "Front St and Forrest St at City Hall",
+      "lat": 31.325477,
+      "lng": -89.29077,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 29,
+      "location": "Train Depot (return)",
+      "lat": 31.329904,
+      "lng": -89.283736,
+      "direction": "Station"
+    }
+  ],
+  "red": [
+    {
+      "stopId": 1,
+      "location": "Bartur St and Broadway Dr",
+      "lat": 31.311302,
+      "lng": -89.313129,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 2,
+      "location": "Cloverleaf Dr and Service Rd",
+      "lat": 31.310957,
+      "lng": -89.319956,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 3,
+      "location": "Service Dr and W Pine St",
+      "lat": 31.305346,
+      "lng": -89.31365,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 4,
+      "location": "Lincoln Rd and Hill St",
+      "lat": 31.30421,
+      "lng": -89.317926,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 5,
+      "location": "Lincoln Rd and Roosevelt St",
+      "lat": 31.304226,
+      "lng": -89.323064,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 6,
+      "location": "S 28th Ave and McInnis Loop",
+      "lat": 31.299091,
+      "lng": -89.330825,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 7,
+      "location": "McInnis Loop and Broadway Dr",
+      "lat": 31.299106,
+      "lng": -89.324115,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 8,
+      "location": "McInnis Loop and Sherwood Dr",
+      "lat": 31.299091,
+      "lng": -89.328481,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 9,
+      "location": "McInnis Loop and Country Club Rd",
+      "lat": 31.298108,
+      "lng": -89.316929,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 10,
+      "location": "Country Club Rd at Bonhomie Apartments",
+      "lat": 31.302215,
+      "lng": -89.31427,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 11,
+      "location": "Country Club Rd at Pineview Apartments",
+      "lat": 31.304349,
+      "lng": -89.311063,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 12,
+      "location": "Country Club Rd at Vernon Dahmer Park",
+      "lat": 31.307327,
+      "lng": -89.307613,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 13,
+      "location": "Country Club Rd and Killingsworth Dr",
+      "lat": 31.310136,
+      "lng": -89.304379,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 14,
+      "location": "Dumas Ave and Martin Luther King Ave",
+      "lat": 31.311732,
+      "lng": -89.299555,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 15,
+      "location": "Martin Luther King Ave and Tuscan Ave",
+      "lat": 31.306413,
+      "lng": -89.299582,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 16,
+      "location": "William Carey Pkwy and Dosset St",
+      "lat": 31.29926,
+      "lng": -89.301531,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 17,
+      "location": "William Carey Pkwy at Wisteria Apartments",
+      "lat": 31.299421,
+      "lng": -89.296339,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 18,
+      "location": "William Carey Pkwy and Toney Dr",
+      "lat": 31.300219,
+      "lng": -89.29483,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 19,
+      "location": "Tuscan Ave and William Carey Pkwy",
+      "lat": 31.306206,
+      "lng": -89.294165,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 20,
+      "location": "William Carey Pkwy and Hwy 49 Frontage Rd",
+      "lat": 31.299229,
+      "lng": -89.307694,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 21,
+      "location": "Service Dr and Broadway Dr",
+      "lat": 31.309798,
+      "lng": -89.31356,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 22,
+      "location": "Service Dr and Broadway Dr (return)",
+      "lat": 31.309621,
+      "lng": -89.313587,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 23,
+      "location": "Walmart (return)",
+      "lat": 31.308877,
+      "lng": -89.3201,
+      "direction": "Station"
+    }
+  ],
+  "purple": [
+    {
+      "stopId": 1,
+      "location": "Train Depot",
+      "lat": 31.329904,
+      "lng": -89.283736,
+      "direction": "Station"
+    },
+    {
+      "stopId": 2,
+      "location": "Main St and Buschman St",
+      "lat": 31.324372,
+      "lng": -89.287338,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 3,
+      "location": "Bay St and Rebecca Ave",
+      "lat": 31.319077,
+      "lng": -89.286305,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 4,
+      "location": "Katie Ave and Arnold St",
+      "lat": 31.315664,
+      "lng": -89.290204,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 5,
+      "location": "Edwards St and Katie Ave",
+      "lat": 31.315761,
+      "lng": -89.285191,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 6,
+      "location": "Edwards St and Duke Ave",
+      "lat": 31.311939,
+      "lng": -89.285146,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 7,
+      "location": "Edwards St and Tuscan Ave",
+      "lat": 31.306306,
+      "lng": -89.285146,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 8,
+      "location": "Lilac St and Hattiesburg St",
+      "lat": 31.301179,
+      "lng": -89.282748,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 9,
+      "location": "Edwards St and Dixie Pine Rd",
+      "lat": 31.296435,
+      "lng": -89.286332,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 10,
+      "location": "Edwards St and Duke Ave (return)",
+      "lat": 31.311947,
+      "lng": -89.284993,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 11,
+      "location": "Edwards St and Barkley Rd",
+      "lat": 31.28839,
+      "lng": -89.284715,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 12,
+      "location": "Edwards St and Central School Rd",
+      "lat": 31.281013,
+      "lng": -89.288057,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 13,
+      "location": "Old Airport Rd and Edwards St",
+      "lat": 31.277343,
+      "lng": -89.288748,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 14,
+      "location": "Old Airport Rd at Hattiesburg Family Health Center",
+      "lat": 31.27735,
+      "lng": -89.28299,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 15,
+      "location": "Old Airport Rd and Chancellor Rd",
+      "lat": 31.27732,
+      "lng": -89.275759,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 16,
+      "location": "Old Airport Rd and Hattiesburg Ave",
+      "lat": 31.277274,
+      "lng": -89.271617,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 17,
+      "location": "Tatum Rd and Hood Rd",
+      "lat": 31.27818,
+      "lng": -89.262814,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 18,
+      "location": "Tatum Rd and Stepts Ave",
+      "lat": 31.279239,
+      "lng": -89.258825,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 19,
+      "location": "Travillion Rd and Stepts Ave",
+      "lat": 31.276015,
+      "lng": -89.256175,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 20,
+      "location": "JM Tatum Industrial Dr at Kohler",
+      "lat": 31.266931,
+      "lng": -89.269767,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 21,
+      "location": "JM Tatum Industrial Dr at DMV",
+      "lat": 31.266617,
+      "lng": -89.281544,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 22,
+      "location": "Sullivan Dr at Lowery A Woodall Tech Center",
+      "lat": 31.261948,
+      "lng": -89.273118,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 23,
+      "location": "Southhill Dr and JM Tatum Industrial Dr",
+      "lat": 31.266379,
+      "lng": -89.277744,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 24,
+      "location": "JM Tatum Industrial Dr and WL Runnels Industrial Dr",
+      "lat": 31.269089,
+      "lng": -89.265518,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 25,
+      "location": "Edwards St and Central School Rd (return)",
+      "lat": 31.28079,
+      "lng": -89.288353,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 26,
+      "location": "Edwards St and Barkley Rd (return)",
+      "lat": 31.288183,
+      "lng": -89.28573,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 27,
+      "location": "McCall St and Collins Rd",
+      "lat": 31.292052,
+      "lng": -89.284176,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 28,
+      "location": "McCall St and Dixie Pine Rd",
+      "lat": 31.295537,
+      "lng": -89.284149,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 29,
+      "location": "Lilac St and Hattiesburg St (return)",
+      "lat": 31.301186,
+      "lng": -89.282837,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 30,
+      "location": "Edwards St and Tuscan Ave (return)",
+      "lat": 31.306122,
+      "lng": -89.284984,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 31,
+      "location": "Edwards St and Katie Ave (return)",
+      "lat": 31.315761,
+      "lng": -89.285029,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 32,
+      "location": "Edwards St and Katie St (return)",
+      "lat": 31.315761,
+      "lng": -89.285191,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 33,
+      "location": "Bay St and Rebecca Ave (return)",
+      "lat": 31.319069,
+      "lng": -89.286377,
+      "direction": "Outbound"
+    },
+    {
+      "stopId": 34,
+      "location": "Main St and Buschman St (return)",
+      "lat": 31.324487,
+      "lng": -89.287212,
+      "direction": "Inbound"
+    },
+    {
+      "stopId": 35,
+      "location": "Train Depot (return)",
+      "lat": 31.329904,
+      "lng": -89.283736,
+      "direction": "Station"
+    }
+  ]
+}

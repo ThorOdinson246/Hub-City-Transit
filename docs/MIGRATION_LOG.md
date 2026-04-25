@@ -77,8 +77,8 @@
 
 ### Risks/Notes
 - Exact visual parity requires custom Flutter widgets for the web sidebar/bottom-sheet behavior.
-- Flutter now targets the same Next.js host as the web app via `NEXT_PUBLIC_SITE_URL` (with `HCT_BASE_API_URL` available only as an explicit override).
-- ArcGIS and Google Directions remain server-side behind the Next.js `/api/*` endpoints for parity with the web app.
+- Flutter is moving to standalone runtime behavior with bundled route/stop/schedule data.
+- Live bus location uses `ARCGIS_URL`, and ETA uses `GOOGLE_MAPS_API_KEY`, matching the web app's upstream service env names.
 - Build blocker detail: `sdkmanager` is not available on PATH in this environment, so NDK license acceptance must be done via Android Studio SDK Manager or machine-level SDK tooling before APK builds can pass.
 
 ### Handoff Continuation Instructions
@@ -88,3 +88,25 @@
 4. Implement `flutter_map` page layers.
 5. Port schedule adjustment logic and write unit tests against known scenarios.
 6. Update this log and parity matrix after each milestone.
+
+## 2026-04-24 - Standalone data/runtime migration
+
+### Completed
+- Generated Flutter-bundled stops and schedules directly from the web source of truth using `tool/extract_web_data.mjs`.
+- Added `assets/data/stops.json` and `assets/data/schedules.json` to the Flutter asset bundle.
+- Reworked `TransitRepositoryImpl` to:
+  - load routes, stops, and schedules from bundled assets
+  - call ArcGIS directly for live bus positions using `ARCGIS_URL`
+  - compute ETA directly against Google Directions using `GOOGLE_MAPS_API_KEY`
+- Added `RouteScheduleModel` and `selectedRouteScheduleProvider`.
+- Upgraded the schedule page from a basic stop list to a timed, GPS-aware schedule view with transfer chips.
+- Re-aligned env/docs to the standalone architecture.
+
+### Validation
+- `dart run build_runner build --delete-conflicting-outputs`
+- `flutter analyze`
+- `flutter test`
+
+### Notes
+- The Flutter app no longer requires the Next.js `/api/*` layer for routes, stops, schedules, bus polling, or ETA.
+- Remaining work is primarily UX parity and release-device verification, not core backend parity.

@@ -4,7 +4,7 @@
 - [x] Add core dependencies and lint setup
 - [x] Create modular architecture structure
 - [x] Port core route/bus constants and metadata
-- [x] Set up repository abstraction and initial API client
+- [x] Set up repository abstraction and standalone data client
 - [x] Wire Riverpod + go_router app shell
 - [x] Implement flutter_map polylines and bus markers
 - [x] Port schedule adjustment algorithm (`identifyTripByBusPosition`, GPS snap)
@@ -13,6 +13,8 @@
 - [x] Build stop detail parity views
 - [x] Add search + transfer chip behavior parity
 - [x] Add search behavior parity on schedule page
+- [x] Bundle stops and schedules from web source into Flutter assets
+- [x] Replace Next.js API dependency with direct ArcGIS + in-app ETA logic
 - [x] Add unit tests for schedule math and mapping
 - [ ] Add integration/golden tests for key screens
 - [x] Harden Android config for release

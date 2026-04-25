@@ -7,6 +7,7 @@ import '../core/constants/transit_ids.dart';
 import '../core/network/dio_provider.dart';
 import '../data/models/bus_location_model.dart';
 import '../data/models/route_polyline_model.dart';
+import '../data/models/route_schedule_model.dart';
 import '../data/models/stop_model.dart';
 import '../data/repositories/transit_repository_impl.dart';
 import '../domain/repositories/transit_repository.dart';
@@ -46,6 +47,14 @@ final allStopsByRouteProvider = FutureProvider<Map<RouteId, List<StopModel>>>((
   return Map<RouteId, List<StopModel>>.fromEntries(entries);
 });
 
+final selectedRouteScheduleProvider = FutureProvider<RouteScheduleModel?>((
+  ref,
+) async {
+  final repository = ref.watch(transitRepositoryProvider);
+  final route = ref.watch(selectedRouteProvider);
+  return repository.getSchedule(route.value);
+});
+
 final busLocationPollingProvider = StreamProvider<BusLocationModel?>((
   ref,
 ) async* {
@@ -65,6 +74,24 @@ final busStatusProvider = Provider<BusStatus>((ref) {
   return deriveBusStatus(
     latest: busAsync.asData?.value,
     isLoading: busAsync.isLoading,
+    now: DateTime.now(),
+  );
+});
+
+final selectedRouteAdjustmentProvider = Provider<AdjustmentResult?>((ref) {
+  final schedule = ref.watch(selectedRouteScheduleProvider).asData?.value;
+  final gpsStops = ref.watch(stopsBySelectedRouteProvider).asData?.value;
+  final busLocation = ref.watch(busLocationPollingProvider).asData?.value;
+
+  if (schedule == null || gpsStops == null || gpsStops.isEmpty) {
+    return null;
+  }
+
+  final useCase = const ScheduleAdjustmentUseCase();
+  return useCase.adjust(
+    schedule: RouteSchedule(stops: schedule.stops, trips: schedule.trips),
+    gpsStops: gpsStops,
+    busLocation: busLocation,
     now: DateTime.now(),
   );
 });
