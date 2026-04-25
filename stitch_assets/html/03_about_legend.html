@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About - Hub City Transit</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#201b17",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#d1e4ff",
+                    "on-background": "#1b1b1e",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed": "#1a1c1e",
+                    "primary-container": "#1a1c1e",
+                    "on-secondary-fixed-variant": "#00497d",
+                    "on-primary-fixed-variant": "#454749",
+                    "inverse-primary": "#c6c6c9",
+                    "surface-tint": "#5d5e61",
+                    "on-secondary-fixed": "#001d36",
+                    "inverse-surface": "#303033",
+                    "surface-container-low": "#f5f3f7",
+                    "outline-variant": "#c5c6ca",
+                    "tertiary": "#010100",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#75777a",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1b1b1e",
+                    "surface-container": "#efedf1",
+                    "surface-dim": "#dbd9dd",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-container": "#838486",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ebe0da",
+                    "on-tertiary-fixed-variant": "#4c4641",
+                    "background": "#faf9fc",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e9e7eb",
+                    "tertiary-container": "#201b17",
+                    "surface-variant": "#e3e2e6",
+                    "inverse-on-surface": "#f2f0f4",
+                    "on-surface-variant": "#44474a",
+                    "on-secondary-container": "#00477b",
+                    "secondary": "#0061a4",
+                    "surface": "#faf9fc",
+                    "secondary-fixed-dim": "#9fcaff",
+                    "primary": "#000101",
+                    "on-tertiary-container": "#8b837d",
+                    "primary-fixed-dim": "#c6c6c9",
+                    "tertiary-fixed-dim": "#cfc5be",
+                    "primary-fixed": "#e2e2e5",
+                    "secondary-container": "#77b7ff",
+                    "surface-container-highest": "#e3e2e6",
+                    "surface-bright": "#faf9fc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-spacing-sm": "12px",
+                    "stack-spacing-md": "24px",
+                    "component-padding-y": "16px",
+                    "margin-horizontal": "24px",
+                    "component-padding-x": "20px",
+                    "stack-spacing-lg": "40px",
+                    "gutter": "16px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "label-lg": ["Manrope"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "title-lg": ["Plus Jakarta Sans"],
+                    "body-lg": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-sm": ["Manrope"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600"}],
+                    "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                    "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                    "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "label-sm": ["11px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- TopAppBar Shared Component -->
+<header class="bg-slate-50 dark:bg-zinc-900 text-zinc-900 dark:text-slate-50 font-['Plus_Jakarta_Sans'] font-bold tracking-tight full-width top-0 sticky border-b border-zinc-200 dark:border-zinc-800 shadow-sm flex justify-between items-center w-full px-6 h-16 z-40">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions_bus</span>
+<h1 class="text-lg font-extrabold text-zinc-900 dark:text-white">Hub City Transit</h1>
+</div>
+<button aria-label="Account" class="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors active:opacity-70 transition-opacity rounded-full p-2 -mr-2 flex items-center justify-center">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</header>
+<main class="w-full max-w-4xl mx-auto px-margin-horizontal pt-stack-spacing-md flex flex-col gap-stack-spacing-lg">
+<!-- Page Header -->
+<div class="flex flex-col gap-stack-spacing-sm">
+<h2 class="font-headline-lg text-headline-lg text-on-background">About</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                Providing reliable, accessible, and efficient public transportation services to the greater metropolitan area. We connect communities and empower riders every single day.
+            </p>
+</div>
+<!-- Route Legend Bento Grid -->
+<section class="flex flex-col gap-stack-spacing-sm">
+<h3 class="font-title-lg text-title-lg text-on-background mb-2">Route Legend</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+<!-- Functional route colors use explicit styling as they represent physical infrastructure beyond the digital theme palette -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-surface-variant">
+<div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-inner" style="background-color: #0061a4;">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">route</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Blue Line</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-surface-variant">
+<div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-inner" style="background-color: #DAA520;">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">route</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Gold Line</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-surface-variant">
+<div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-inner" style="background-color: #2E8B57;">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">route</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Green Line</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-surface-variant">
+<div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-inner" style="background-color: #8B4513;">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">route</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Brown Line</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-surface-variant">
+<div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-inner" style="background-color: #FF8C00;">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">route</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Orange Line</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-surface-variant">
+<div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-inner" style="background-color: #ba1a1a;">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">route</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Red Line</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4 shadow-sm border border-surface-variant">
+<div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-inner" style="background-color: #800080;">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">route</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface">Purple Line</span>
+</div>
+</div>
+</section>
+<!-- App Info & Support Section -->
+<section class="bg-surface-container rounded-2xl p-6 md:p-8 flex flex-col md:flex-row gap-8 justify-between items-start md:items-center relative overflow-hidden">
+<!-- Decorative Background Element -->
+<div class="absolute -right-12 -top-12 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">directions_transit</span>
+</div>
+<div class="flex flex-col gap-4 z-10">
+<div class="flex flex-col gap-1">
+<h3 class="font-title-lg text-title-lg text-on-surface">Application Info</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Version 4.2.1 (Build 8902)</p>
+</div>
+<div class="flex items-start gap-3 mt-2">
+<span class="material-symbols-outlined text-outline mt-0.5">database</span>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">
+                        Live transit data provided by the Hub City Open Data Portal and Regional Transit Authority API.
+                    </p>
+</div>
+</div>
+<button class="bg-primary text-on-primary font-label-lg text-label-lg py-4 px-8 rounded-full shadow-sm hover:opacity-90 active:scale-95 transition-all z-10 w-full md:w-auto flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+                Contact Support
+            </button>
+</section>
+</main>
+<!-- BottomNavBar Shared Component -->
+<nav class="bg-white/90 dark:bg-zinc-900/95 backdrop-blur-md text-zinc-900 dark:text-slate-50 font-['Plus_Jakarta_Sans'] text-[12px] font-semibold full-width bottom-0 rounded-t-2xl border-t border-zinc-100 dark:border-zinc-800 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-3 pb-8 md:hidden">
+<!-- Inactive -->
+<button class="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl active:scale-95 duration-200 ease-out p-2 flex-1">
+<span class="material-symbols-outlined mb-1">map</span>
+<span>Map</span>
+</button>
+<!-- Inactive -->
+<button class="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl active:scale-95 duration-200 ease-out p-2 flex-1">
+<span class="material-symbols-outlined mb-1">calendar_today</span>
+<span>Schedule</span>
+</button>
+<!-- Active -->
+<div class="flex flex-col items-center justify-center bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-full px-6 py-1.5 transition-all active:scale-95 duration-200 ease-out mx-1 shadow-sm">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">info</span>
+<span>About</span>
+</div>
+<!-- Inactive -->
+<button class="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl active:scale-95 duration-200 ease-out p-2 flex-1">
+<span class="material-symbols-outlined mb-1">settings</span>
+<span>Settings</span>
+</button>
+</nav>
+</body></html>
