@@ -11,20 +11,11 @@ Android-first Flutter migration of the Hub City Transit application.
 
 ## Runtime Configuration
 
-Flutter should point at the same deployed Next.js host used by the web app.
-It consumes the web app's `/api/*` endpoints; it does not call ArcGIS or Google
-Directions directly.
-
-Preferred:
+The standalone Flutter app uses direct upstream services for live bus location
+and ETA, while keeping routes, stops, and schedules bundled inside the app.
 
 ```bash
-flutter run --dart-define=NEXT_PUBLIC_SITE_URL=https://your-official-web-host
-```
-
-Optional override:
-
-```bash
-flutter run --dart-define=HCT_BASE_API_URL=https://your-official-web-host
+flutter run --dart-define=ARCGIS_URL=... --dart-define=GOOGLE_MAPS_API_KEY=...
 ```
 
 ## Release Signing Setup (Play Store)
@@ -44,8 +35,8 @@ If not present, release builds fall back to debug signing for local smoke tests 
 ## Build Commands
 
 ```bash
-flutter build appbundle --release --dart-define=NEXT_PUBLIC_SITE_URL=https://your-official-web-host
-flutter build apk --release --dart-define=NEXT_PUBLIC_SITE_URL=https://your-official-web-host
+flutter build appbundle --release --dart-define=ARCGIS_URL=... --dart-define=GOOGLE_MAPS_API_KEY=...
+flutter build apk --release --dart-define=ARCGIS_URL=... --dart-define=GOOGLE_MAPS_API_KEY=...
 ```
 
 ## Production Readiness Checklist

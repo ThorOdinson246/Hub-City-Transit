@@ -1,4 +1,4 @@
 {
-  "NEXT_PUBLIC_SITE_URL": "",
-  "HCT_BASE_API_URL": ""
+  "ARCGIS_URL": "",
+  "GOOGLE_MAPS_API_KEY": ""
 }
