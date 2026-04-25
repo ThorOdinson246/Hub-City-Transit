@@ -31,43 +31,34 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     return SafeArea(
       child: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFC5C6CA)),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Schedule',
+                style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
+              ),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: routeColors[route],
-                  child: const Icon(
-                    Icons.schedule_rounded,
-                    color: Colors.white,
-                    size: 18,
+                Icon(Icons.alt_route_rounded, color: routeColors[route], size: 18),
+                const SizedBox(width: 6),
+                Text(
+                  routeNames[route] ?? route.value,
+                  style: TextStyle(
+                    color: routeColors[route],
+                    fontWeight: FontWeight.w700,
+                    fontSize: 19,
                   ),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Route Schedule',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                      Text(
-                        routeNames[route] ?? route.value,
-                        style: TextStyle(
-                          color: routeColors[route],
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
+                const SizedBox(width: 8),
+                const Text(
+                  '• Inbound',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
                 ),
               ],
             ),
@@ -97,6 +88,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
               children: [
                 FilterChip(
                   selected: transferOnly,
+                  showCheckmark: false,
                   onSelected: (value) {
                     setState(() {
                       transferOnly = value;
@@ -107,6 +99,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                 const SizedBox(width: 8),
                 if (adjustment != null)
                   Chip(
+                    backgroundColor: const Color(0xFFBFDBFE),
                     avatar: Icon(
                       adjustment.isLiveAdjusted
                           ? Icons.gps_fixed_rounded
@@ -210,111 +203,153 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+      padding: const EdgeInsets.fromLTRB(14, 6, 14, 16),
       itemCount: entries.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final entry = entries[index];
         final colorScheme = Theme.of(context).colorScheme;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: entry.isCurrent
-                ? colorScheme.primaryContainer
-                : Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: entry.isCurrent
-                  ? routeColors[route]!
-                  : const Color(0xFFC5C6CA),
-            ),
-          ),
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: entry.isCurrent
-                      ? routeColors[route]
-                      : routeColors[route]!.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: entry.isCurrent
-                    ? const Icon(
-                        Icons.directions_bus_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      )
-                    : Text(
-                        '${entry.index + 1}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: routeColors[route],
-                        ),
-                      ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
+                width: 18,
+                alignment: Alignment.topCenter,
+                margin: const EdgeInsets.only(top: 8),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      entry.stopName,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: entry.isCurrent
-                            ? FontWeight.w800
-                            : FontWeight.w700,
-                        color: entry.isPast
-                            ? colorScheme.onSurfaceVariant
-                            : colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      entry.adjustedTime.isNotEmpty
-                          ? entry.adjustedTime
-                          : entry.scheduledTime,
-                      style: TextStyle(
-                        fontSize: 13,
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
                         color: entry.isCurrent
                             ? routeColors[route]
-                            : colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
+                            : Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: entry.isCurrent
+                              ? Colors.black
+                              : const Color(0xFF9CA3AF),
+                          width: 2,
+                        ),
                       ),
                     ),
-                    if (entry.transferConnections.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: entry.transferConnections
-                            .map(
-                              (connection) => Chip(
-                                visualDensity: VisualDensity.compact,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                backgroundColor: routeColors[connection.routeId]!
-                                    .withValues(alpha: 0.14),
-                                label: Text(
-                                  routeNames[connection.routeId] ??
-                                      connection.routeId.name,
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              ),
-                            )
-                            .toList(growable: false),
-                      ),
-                    ],
+                    Container(
+                      width: 2,
+                      height: 108,
+                      color: const Color(0xFFD1D5DB),
+                    ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: entry.isCurrent
+                        ? const Color(0xFFF9FAFB)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: entry.isCurrent
+                          ? routeColors[route]!
+                          : const Color(0xFFC5C6CA),
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 74,
+                        decoration: BoxDecoration(
+                          color: routeColors[route],
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.stopName,
+                              style: TextStyle(
+                                fontSize: entry.isCurrent ? 31 / 2 : 14,
+                                fontWeight: entry.isCurrent
+                                    ? FontWeight.w800
+                                    : FontWeight.w700,
+                                color: entry.isPast
+                                    ? colorScheme.onSurfaceVariant
+                                    : colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Stop ID: ${8120 + entry.index}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            if (entry.transferConnections.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: entry.transferConnections
+                                    .map(
+                                      (connection) => Chip(
+                                        visualDensity: VisualDensity.compact,
+                                        materialTapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        backgroundColor: routeColors[connection.routeId]!
+                                            .withValues(alpha: 0.14),
+                                        label: Text(
+                                          routeNames[connection.routeId] ??
+                                              connection.routeId.name,
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(growable: false),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            entry.adjustedTime.isNotEmpty
+                                ? entry.adjustedTime
+                                : entry.scheduledTime,
+                            style: TextStyle(
+                              fontSize: entry.isCurrent ? 34 / 2 : 13,
+                              fontWeight: entry.isCurrent
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                            ),
+                          ),
+                          if (entry.isCurrent)
+                            const Text(
+                              'On time',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFF6B7280),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
-          ),
         );
       },
     );

@@ -14,33 +14,13 @@ class AboutPage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFC5C6CA)),
-            ),
-            child: const Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Color(0xFF000101),
-                  child: Icon(Icons.info_rounded, color: Colors.white, size: 18),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'About Hub City Transit',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                  ),
-                ),
-              ],
-            ),
+          const Text(
+            'About',
+            style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           Text(
-            'Providing reliable, accessible, and efficient public transportation services to the greater metropolitan area.',
+            'Providing reliable, accessible, and efficient public transportation services to the greater metropolitan area. We connect communities and empower riders every day.',
             style: TextStyle(color: colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 20),
@@ -77,7 +57,7 @@ class AboutPage extends StatelessWidget {
                   Expanded(
                     child: Text(
                       routeNames[route] ?? route.name,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                     ),
                   ),
                 ],
@@ -103,6 +83,11 @@ class AboutPage extends StatelessWidget {
                 Text(
                   'Version 2.4.0 (Build 891)',
                   style: TextStyle(color: colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Live transit data provided by the Hub City Open Data Portal and regional transit authority APIs.',
+                  style: TextStyle(fontSize: 12),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
