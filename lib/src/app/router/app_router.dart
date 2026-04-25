@@ -2,9 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/about/presentation/about_page.dart';
+import '../../features/fares/presentation/fares_page.dart';
 import '../../features/launch/presentation/launch_page.dart';
 import '../../features/map/presentation/map_page.dart';
 import '../../features/onboarding/presentation/location_permission_page.dart';
+import '../../features/onboarding/presentation/onboarding_page.dart';
 import '../../features/schedule/presentation/schedule_page.dart';
 import '../../features/settings/presentation/settings_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
@@ -23,6 +25,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: LocationPermissionPage()),
       ),
+      GoRoute(
+        path: '/onboarding',
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: OnboardingPage()),
+      ),
+      GoRoute(
+        path: '/settings',
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: SettingsPage()),
+      ),
+      GoRoute(
+        path: '/about',
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: AboutPage()),
+      ),
       ShellRoute(
         builder: (context, state, child) => MainScaffold(child: child),
         routes: [
@@ -37,14 +54,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 const NoTransitionPage(child: SchedulePage()),
           ),
           GoRoute(
-            path: '/about',
+            path: '/fares',
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: AboutPage()),
-          ),
-          GoRoute(
-            path: '/settings',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: SettingsPage()),
+                const NoTransitionPage(child: FaresPage()),
           ),
         ],
       ),
