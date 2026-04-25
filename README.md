@@ -11,10 +11,20 @@ Android-first Flutter migration of the Hub City Transit application.
 
 ## Runtime Configuration
 
-The API base URL is configurable at compile time:
+Flutter should point at the same deployed Next.js host used by the web app.
+It consumes the web app's `/api/*` endpoints; it does not call ArcGIS or Google
+Directions directly.
+
+Preferred:
 
 ```bash
-flutter run --dart-define=HCT_BASE_API_URL=https://hubcitytransit.vercel.app
+flutter run --dart-define=NEXT_PUBLIC_SITE_URL=https://your-official-web-host
+```
+
+Optional override:
+
+```bash
+flutter run --dart-define=HCT_BASE_API_URL=https://your-official-web-host
 ```
 
 ## Release Signing Setup (Play Store)
@@ -34,8 +44,8 @@ If not present, release builds fall back to debug signing for local smoke tests 
 ## Build Commands
 
 ```bash
-flutter build appbundle --release --dart-define=HCT_BASE_API_URL=https://hubcitytransit.vercel.app
-flutter build apk --release --dart-define=HCT_BASE_API_URL=https://hubcitytransit.vercel.app
+flutter build appbundle --release --dart-define=NEXT_PUBLIC_SITE_URL=https://your-official-web-host
+flutter build apk --release --dart-define=NEXT_PUBLIC_SITE_URL=https://your-official-web-host
 ```
 
 ## Production Readiness Checklist
