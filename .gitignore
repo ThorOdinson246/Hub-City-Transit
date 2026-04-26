@@ -62,3 +62,11 @@ assets/data/routes_wgs84.json
 
 # Scratch / one-off assets
 stitch_assets/
+# build_runner generated code — regenerate with:
+#   flutter pub run build_runner build --delete-conflicting-outputs
+**/*.freezed.dart
+**/*.g.dart
+
+# scratch test files (not real tests)
+test_arcgis.dart
+test_camera.dart
