@@ -180,6 +180,30 @@ final themeModeProvider =
   (ref) => ThemeModeController(),
 );
 
+// ─── Dark basemap toggle ──────────────────────────────────────────────────────
+class DarkBasemapController extends StateNotifier<bool> {
+  DarkBasemapController() : super(true) {
+    _load();
+  }
+  static const _key = 'dark_basemap';
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getBool(_key) ?? true; // on by default
+  }
+
+  Future<void> toggle(bool value) async {
+    state = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_key, value);
+  }
+}
+
+final darkBasemapProvider =
+    StateNotifierProvider<DarkBasemapController, bool>(
+  (ref) => DarkBasemapController(),
+);
+
 // ─── Onboarding seen flag ─────────────────────────────────────────────────────
 final onboardingSeenProvider = FutureProvider<bool>((ref) async {
   final prefs = await SharedPreferences.getInstance();

@@ -14,6 +14,7 @@ class SettingsPage extends ConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
     final themeMode = ref.watch(themeModeProvider);
+    final darkBasemap = ref.watch(darkBasemapProvider);
 
     return SafeArea(
       child: ListView(
@@ -46,10 +47,7 @@ class SettingsPage extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Theme',
-                            style: tt.titleMedium,
-                          ),
+                          Text('Theme', style: tt.titleMedium),
                           const SizedBox(height: 2),
                           Text(
                             'Choose light, dark, or follow system',
@@ -63,7 +61,10 @@ class SettingsPage extends ConsumerWidget {
                   ],
                 ),
               ),
-              Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
+              Divider(
+                height: 1,
+                color: cs.outlineVariant.withValues(alpha: 0.5),
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
                 child: Row(
@@ -100,6 +101,27 @@ class SettingsPage extends ConsumerWidget {
                   ],
                 ),
               ),
+              Divider(
+                height: 1,
+                color: cs.outlineVariant.withValues(alpha: 0.5),
+              ),
+              SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                title: Text('Dark Map Tiles', style: tt.titleMedium),
+                subtitle: Text(
+                  'Use dark map tiles in dark mode',
+                  style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                ),
+                value: darkBasemap,
+                activeThumbColor: cs.primary,
+                onChanged: (val) =>
+                    ref.read(darkBasemapProvider.notifier).toggle(val),
+                secondary: Icon(
+                  Icons.map_outlined,
+                  color: cs.onSurfaceVariant,
+                  size: 22,
+                ),
+              ),
             ],
           ),
 
@@ -119,7 +141,14 @@ class SettingsPage extends ConsumerWidget {
                 title: 'Alerts & Notifications',
                 subtitle: 'Route changes and delay updates',
                 isFirst: true,
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Notifications coming soon!'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
               ),
               _SettingsTile(
                 cs: cs,
@@ -127,7 +156,14 @@ class SettingsPage extends ConsumerWidget {
                 icon: Icons.location_on_outlined,
                 title: 'Location Services',
                 subtitle: 'Manage GPS usage and permissions',
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Location settings coming soon!'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
               ),
               _SettingsTile(
                 cs: cs,
@@ -143,23 +179,60 @@ class SettingsPage extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          // ── Route Legend preview ───────────────────────────────────────────
-          _SectionLabel(label: 'Routes', cs: cs),
-          const SizedBox(height: 8),
+          // ── Fares ──────────────────────────────────────────────────────────
+          _SectionLabel(label: 'Fares', cs: cs),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              'Most rides are 50¢. Reduced and free fares are available for eligible riders with ID.',
+              style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+            ),
+          ),
+          const SizedBox(height: 12),
 
-          _SettingsCard(
+          _FareCard(
             cs: cs,
-            children: RouteId.values.asMap().entries.map((entry) {
-              final i = entry.key;
-              final route = entry.value;
-              return _RouteLegendTile(
-                cs: cs,
-                tt: tt,
-                route: route,
-                isFirst: i == 0,
-                isLast: i == RouteId.values.length - 1,
-              );
-            }).toList(),
+            tt: tt,
+            icon: Icons.credit_card_rounded,
+            title: 'Standard fare',
+            price: '\$0.50',
+            subtitle: 'All riders unless eligible for reduced or free fare.',
+          ),
+          const SizedBox(height: 12),
+          _FareCard(
+            cs: cs,
+            tt: tt,
+            icon: Icons.people_alt_rounded,
+            title: 'Reduced fare',
+            price: '\$0.25',
+            checks: const [
+              'Children (ages 5–high school)',
+              'Seniors (62+)',
+              'Disabled with ID',
+              'HCT ID and Medicare',
+            ],
+          ),
+          const SizedBox(height: 12),
+          _FareCard(
+            cs: cs,
+            tt: tt,
+            icon: Icons.school_rounded,
+            title: 'Free fare',
+            price: '\$0.00',
+            checks: const ['Southern Miss ID', 'City of Hattiesburg employees'],
+          ),
+          const SizedBox(height: 12),
+          _FareCard(
+            cs: cs,
+            tt: tt,
+            icon: Icons.info_outline_rounded,
+            title: 'How to pay',
+            price: null,
+            checks: const [
+              'Have exact change ready',
+              'Drivers do not carry change',
+            ],
           ),
         ],
       ),
@@ -230,12 +303,12 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             child: Row(
               children: [
                 Icon(icon, color: cs.onSurfaceVariant, size: 22),
@@ -245,7 +318,7 @@ class _SettingsTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(title, style: tt.titleMedium),
-                      const SizedBox(height: 1),
+                      const SizedBox(height: 2),
                       Text(
                         subtitle,
                         style: tt.bodySmall?.copyWith(
@@ -263,14 +336,106 @@ class _SettingsTile extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        if (!isLast)
-          Divider(
-            height: 1,
-            indent: 52,
-            color: cs.outlineVariant.withValues(alpha: 0.5),
+          if (!isLast)
+            Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.5)),
+        ],
+      ),
+    );
+  }
+}
+
+class _FareCard extends StatelessWidget {
+  const _FareCard({
+    required this.cs,
+    required this.tt,
+    required this.icon,
+    required this.title,
+    this.price,
+    this.subtitle,
+    this.checks,
+  });
+  final ColorScheme cs;
+  final TextTheme tt;
+  final IconData icon;
+  final String title;
+  final String? price;
+  final String? subtitle;
+  final List<String>? checks;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: cs.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: cs.primary, size: 16),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                title,
+                style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ],
           ),
-      ],
+          if (price != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              price!,
+              style: tt.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                fontSize: 36,
+              ),
+            ),
+          ],
+          if (subtitle != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              subtitle!,
+              style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
+            ),
+          ],
+          if (checks != null) ...[
+            const SizedBox(height: 16),
+            ...checks!.map(
+              (c) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline_rounded,
+                      color: Colors.green,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        c,
+                        style: tt.bodyMedium?.copyWith(
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -328,81 +493,3 @@ class _ThemePill extends StatelessWidget {
   }
 }
 
-class _RouteLegendTile extends StatelessWidget {
-  const _RouteLegendTile({
-    required this.cs,
-    required this.tt,
-    required this.route,
-    this.isFirst = false,
-    this.isLast = false,
-  });
-  final ColorScheme cs;
-  final TextTheme tt;
-  final RouteId route;
-  final bool isFirst;
-  final bool isLast;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = routeColors[route]!;
-    final name = routeNames[route]!;
-    final desc = routeDescriptions[route]!;
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: color.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Icon(
-                  Icons.directions_bus_rounded,
-                  color: color,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: tt.titleMedium),
-                    Text(
-                      desc,
-                      style: tt.bodySmall?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (!isLast)
-          Divider(
-            height: 1,
-            indent: 64,
-            color: cs.outlineVariant.withValues(alpha: 0.5),
-          ),
-      ],
-    );
-  }
-}

@@ -68,7 +68,6 @@ void main() {
 
     expect(find.text('Map'), findsWidgets);
     expect(find.text('Schedule'), findsWidgets);
-    expect(find.text('About'), findsWidgets);
     expect(find.text('Settings'), findsWidgets);
   });
 }
