@@ -11,16 +11,14 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+
 # IntelliJ related
 *.iml
 *.ipr
 *.iws
 .idea/
-docs/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
+# VSCode — uncomment if you don't want to share launch configs
 #.vscode/
 
 # Flutter/Dart/Pub related
@@ -33,21 +31,34 @@ docs/
 /build/
 /coverage/
 
-# Symbolication related
+# Symbolication / obfuscation
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android build artifacts
 /android/app/debug
 /android/app/profile
 /android/app/release
 
-# Release signing
+# Signing keys — never commit these
 key.properties
 *.jks
 *.keystore
+
+# Environment / secrets — never commit
 env/
 .env
+.env.*
+
+# Internal docs — kept off GitHub to maintain exclusivity
+docs/
+
+# Route data — proprietary, not for public repo
+# The app ships these baked into the APK/IPA, but we don't
+# want the raw JSON walking around on GitHub
+assets/data/stops.json
+assets/data/schedules.json
+assets/data/routes_wgs84.json
+
+# Scratch / one-off assets
 stitch_assets/
