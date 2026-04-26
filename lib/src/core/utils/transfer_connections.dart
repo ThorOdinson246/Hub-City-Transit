@@ -14,10 +14,6 @@ class TransferStopConnection {
   final String location;
 }
 
-/// Hardcoded transfer map ported exactly from the Next.js `lib/stops.ts`
-/// `TRANSFER_MAP`. Using explicit stop IDs instead of proximity-based
-/// detection avoids false positives (e.g., Blue and Green on opposite sides
-/// of Hardy St being incorrectly flagged as transfers).
 const _kTransferMap = <String, List<(String routeId, int stopId, String location)>>{
   // ===== TRAIN DEPOT — Brown ↔ Orange ↔ Purple =====
   'brown-1': [('orange', 1, 'Train Depot'), ('purple', 1, 'Train Depot')],

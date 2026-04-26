@@ -118,7 +118,7 @@ final userLocationProvider = StreamProvider<Position?>((ref) async* {
     return;
   }
 
-  // Yield current position immediately so the map starts centered
+  // get current position immediately so the map doesn't start at [0,0]
   try {
     final current = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
@@ -131,7 +131,6 @@ final userLocationProvider = StreamProvider<Position?>((ref) async* {
     yield null;
   }
 
-  // Then stream live updates
   yield* Geolocator.getPositionStream(
     locationSettings: const LocationSettings(
       accuracy: LocationAccuracy.high,

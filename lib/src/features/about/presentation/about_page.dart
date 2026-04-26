@@ -53,7 +53,7 @@ class AboutPage extends StatelessWidget {
                     children: [
                       Text('Hub City Transit', style: tt.titleLarge),
                       Text(
-                        'v2.4.0 (Build 891)',
+                        'v1.2.0 (Build 1)',
                         style: tt.bodySmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),

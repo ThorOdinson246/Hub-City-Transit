@@ -432,7 +432,7 @@ class _StatCell extends StatelessWidget {
   );
 }
 
-// ── Stop Detail Draggable Sheet ───────────────────────────────────────────────
+
 class _StopDetailSheet extends ConsumerWidget {
   const _StopDetailSheet({
     required this.stop,
@@ -815,8 +815,7 @@ class _NextArrivalsSection extends ConsumerWidget {
 
     final nowMinutes = now.hour * 60 + now.minute.toDouble();
 
-    // Apply the delta uniformly to ALL trips — matches Next.js getAdjustedUpcoming().
-    // delta is 0 when bus is offline, so we gracefully fall back to pure schedule.
+    // delta = 0 when bus is offline so we fall back to pure schedule
     final delta = adjustment?.isLiveAdjusted == true ? adjustment!.appliedDelta : 0.0;
 
     final upcoming = <Map<String, dynamic>>[];
@@ -840,7 +839,7 @@ class _NextArrivalsSection extends ConsumerWidget {
       }
     }
 
-    // Fallback: show first trips of day with "Next service" label (matches Next.js)
+    // nothing left today, show first few trips for tomorrow
     final isTomorrow = upcoming.isEmpty;
     if (isTomorrow) {
       for (final trip in schedule.trips) {
@@ -1062,9 +1061,8 @@ class _MenuIcon extends StatelessWidget {
   );
 }
 
-// ── Typewriter Brand Bar ───────────────────────────────────────────────────────
-/// Cycles through hint phrases with a typewriter effect to indicate the search bar
-/// is interactive. Shows "Hub City Transit" as the anchor, then types/erases hints.
+// cycles through search hint phrases with typewriter effect
+// shows anchor text first then types/erases hints so users know the bar is interactive
 class _TypewriterBrandBar extends StatefulWidget {
   const _TypewriterBrandBar({required this.cs});
   final ColorScheme cs;
@@ -1168,11 +1166,8 @@ class _TypewriterBrandBarState extends State<_TypewriterBrandBar> with SingleTic
   }
 }
 
-// ── Animated Bus Marker ────────────────────────────────────────────────────────
-/// Renders the bus on the map with:
-/// - A rotating direction arrow based on GPS heading
-/// - Pulsing amber ring when connecting (stale GPS)
-/// - Greyed-out ghost style when offline
+// bus marker — shows route pill + icon circle with directional arrow
+// status drives color: live = route color, connecting = amber pulse, offline = greyed out
 Widget buildBusMarker({
   required BusLocationModel busLocation,
   required BusStatus busStatus,

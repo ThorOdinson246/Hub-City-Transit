@@ -38,7 +38,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   String _searchQuery = '';
   double _currentZoom = 13.0;
 
-  // ETA state
   bool _etaLoading = false;
   bool _etaInFlight = false;
   bool _etaRequested = false;
@@ -46,12 +45,9 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   int? _etaMinutes;
   String? _etaNearestStop;
 
-  // Bus info panel default open
   bool _busInfoExpanded = true;
 
   Timer? _gestureTimer;
-
-  // Active Trip
   TripResult? _activeTrip;
 
   void _animatedMapMove(LatLng destLocation, double destZoom) {
@@ -86,11 +82,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       LatLng(trip.destStop.lat, trip.destStop.lng),
     ];
     final bounds = LatLngBounds.fromPoints(points);
-    
-    // Animate bounds
     final fit = CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50));
     final targetCamera = fit.fit(_mapController.camera);
-    
     _animatedMapMove(targetCamera.center, targetCamera.zoom);
   }
 
