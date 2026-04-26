@@ -65,7 +65,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           itemCount: RouteId.values.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 6),
+          separatorBuilder: (_, _) => const SizedBox(width: 6),
           itemBuilder: (_, i) {
             final r = RouteId.values[i];
             final sel = r == route;

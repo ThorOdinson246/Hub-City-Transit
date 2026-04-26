@@ -35,31 +35,90 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/about',
         pageBuilder: (context, state) => const MaterialPage(child: AboutPage()),
       ),
-      ShellRoute(
-        builder: (context, state, child) => MainScaffold(child: child),
-        routes: [
-          GoRoute(
-            path: '/map',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: MapPage()),
+      // StatefulShellRoute keeps each branch widget alive in an IndexedStack,
+      // so the MapPage camera position, selected stop, and bus info panel are
+      // preserved when the user navigates to Schedule or Settings and back.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return _StatefulScaffold(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/map',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: MapPage()),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/schedule',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: SchedulePage()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/schedule',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: SchedulePage()),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/settings',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: SettingsPage()),
-          ),
-          GoRoute(
-            path: '/fares',
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: FaresPage()),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/settings',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: SettingsPage()),
+              ),
+              GoRoute(
+                path: '/fares',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: FaresPage()),
+              ),
+            ],
           ),
         ],
       ),
     ],
   );
 });
+
+/// Scaffold wrapper for StatefulShellRoute that uses the NavigationBar
+/// from MainScaffold to switch between branches without rebuilding.
+class _StatefulScaffold extends StatelessWidget {
+  const _StatefulScaffold({required this.navigationShell});
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: navigationShell,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: navigationShell.currentIndex,
+        animationDuration: const Duration(milliseconds: 300),
+        onDestinationSelected: (index) {
+          navigationShell.goBranch(
+            index,
+            // Go back to initial route if already on this branch
+            initialLocation: index == navigationShell.currentIndex,
+          );
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map_rounded),
+            label: 'Map',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_today_outlined),
+            selectedIcon: Icon(Icons.calendar_today_rounded),
+            label: 'Schedule',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded),
+            label: 'Settings',
+          ),
+        ],
+      ),
+    );
+  }
+}

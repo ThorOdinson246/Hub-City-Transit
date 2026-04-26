@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class MainScaffold extends StatelessWidget {
+/// Main scaffold with bottom navigation bar.
+/// Uses an [IndexedStack] (via [PageStorage]) to preserve state
+/// across tab switches — the [MapPage] keeps its camera position,
+/// selected stop, and bus info panel even after switching to Schedule/Settings.
+class MainScaffold extends StatefulWidget {
   const MainScaffold({required this.child, super.key});
-
   final Widget child;
 
+  @override
+  State<MainScaffold> createState() => _MainScaffoldState();
+}
+
+class _MainScaffoldState extends State<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
     final selectedIndex = _indexFromLocation(location);
 
     return Scaffold(
-      body: child,
+      body: widget.child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
+        animationDuration: const Duration(milliseconds: 300),
         onDestinationSelected: (index) {
           switch (index) {
             case 0:

@@ -110,3 +110,18 @@
 ### Notes
 - The Flutter app no longer requires the Next.js `/api/*` layer for routes, stops, schedules, bus polling, or ETA.
 - Remaining work is primarily UX parity and release-device verification, not core backend parity.
+
+## 2026-04-25 - Final UI Polish & Readiness
+
+### Completed
+- Added direct Map UI integration for Search logic to simulate Google Maps UX natively.
+- Removed bottom sheet overlay navigation for Search and replaced it with an integrated inline header.
+- Scaled map stop markers dynamically based on map zoom levels (zoomed-out stops are smaller to reduce clutter).
+- Enhanced Bottom Sheets:
+  - Added swipe-down-to-dismiss gesture on the Stop Detail Panel.
+  - Added swipe-down-to-collapse gesture on the Bus Info Panel.
+- Added comprehensive telemetry layout for the bus tracker (heading direction, speed strings, last seen intervals).
+- Enabled dynamically adjusting Map floating action buttons (Location FAB) that animate smoothly when the bottom info sheet transitions heights.
+- Created Dark Basemap functionality configured through `SharedPreferences` toggle in Settings, allowing deep dark UX integration in `flutter_map`.
+- Bound placeholder buttons in Settings to `SnackBar` hints for immediate production deployment cleanly.
+- Resolved ArcGis trailing space parsing in `.env` variable ingestion.

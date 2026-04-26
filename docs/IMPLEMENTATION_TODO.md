@@ -16,6 +16,8 @@
 - [x] Bundle stops and schedules from web source into Flutter assets
 - [x] Replace Next.js API dependency with direct ArcGIS + in-app ETA logic
 - [x] Add unit tests for schedule math and mapping
-- [ ] Add integration/golden tests for key screens
+- [x] Add integration/golden tests for key screens
 - [x] Harden Android config for release
-- [ ] Analyze, test, and release build verification (build is environment-blocked by local NDK license acceptance)
+- [x] Finalize UI Parity (swipe-to-dismiss, inline map search, adaptive FAB)
+- [x] Dark mode adaptive basemaps
+- [ ] Analyze, test, and release build verification
