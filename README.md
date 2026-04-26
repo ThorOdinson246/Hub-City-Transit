@@ -6,39 +6,35 @@ A mobile companion to the [Hub City Transit web app](https://hubcitytransitv2.mu
 
 ---
 
-## What is this
+## Technical Architecture
 
-Hub City Transit is a community transit tracker for the Hattiesburg Metro Area. The web version has been live for a while now; this repo is the Flutter mobile port of that same experience.
+The app is built using a modern, reactive stack with a focus on performance and state persistence.
 
-Both apps share the same live data pipeline — ArcGIS for real-time GPS, and a locally bundled schedule that gets adjusted based on where the bus actually is.
-
----
-
-## Features
-
-- **Live bus tracking** on an interactive map (OpenStreetMap tiles via flutter_map)
-- **Real-time arrival estimates** — not just the printed schedule. If the bus is running 4 minutes late, the arrivals reflect that
-- **Trip planner** — type any address or landmark, and the app figures out which stop to walk to, which bus to take, and where to get off. Draws the full walk + ride route on the map
-- **All 6 routes** — Blue, Green, Red, Orange, Purple, Brown
-- **Transfer detection** at shared stops (tap the chip to switch routes)
-- **Dark mode** + dark map basemap toggle
-- **Schedule view** with live status badge
-- Map state persists across tab switches — camera position, selected stop, active trip all stay put
+### Tech Stack
+- **State Management:** [Riverpod](https://riverpod.dev/) — utilized for reactive data binding and provider-to-provider dependency chaining (e.g., `AdjustmentResult` derived from `BusLocation` + `Schedule`).
+- **Routing:** [GoRouter](https://pub.dev/packages/go_router) — implementing `StatefulShellRoute` to maintain independent widget trees (and map state) across navigation tabs.
+- **Mapping:** [flutter_map](https://pub.dev/packages/flutter_map) — leverages OpenStreetMap (CARTO tiles) with custom `CustomPainter` implementations for high-performance marker rendering.
 
 ---
 
-## How the arrival estimates work
+## The Schedule Adjustment Engine
 
-This is probably the most interesting part of the app.
+The core logic of the app is a real-time "Delta Engine" that predicts arrivals based on live GPS movement:
 
-The printed schedule tells you when a bus *should* be at each stop. But if the bus is running behind, all the future arrivals shift too. The app does this automatically:
+1.  **Spatial Snapping:** The latest GPS coordinate from the ArcGIS FeatureServer is snapped to the nearest stop using the **Haversine formula**.
+2.  **State Identification:** The engine identifies which scheduled trip the bus is currently serving based on the current time and stop sequence.
+3.  **Delta Computation:** 
+    `appliedDelta = currentTime - scheduledArrivalAtSnappedStop`
+4.  **Uniform Propagation:** This delta is smoothed (0.85x coefficient) and applied to all future stops in the trip. If a bus is running 5 minutes late, every upcoming arrival time in the UI is shifted by +5 minutes.
+5.  **Fallback Logic:** When GPS heartbeats exceed the `staleThreshold` (180s), the app marks the bus as `offline` and reverts to the static timetable.
 
-1. Snaps the bus's current GPS position to the nearest stop on its route
-2. Compares where the bus *is* vs where it *should be* at this time (based on the schedule)
-3. Computes a time delta (e.g. +4 mins late)
-4. Applies that delta to every upcoming stop on that trip
+---
 
-When the bus GPS goes offline, the delta drops to zero and it falls back to the printed schedule gracefully. This mirrors exactly what the web app does.
+## API & Data Integration
+
+- **Real-time GPS:** Polled via the ArcGIS REST API (`FeatureServer/1/query`).
+- **Geocoding:** Nominatim (OpenStreetMap) implementation with 600ms debouncing to respect rate limits.
+- **Navigation:** Custom routing algorithm that computes the "Optimal Boarding Stop" by minimizing the sum of walking distance and transit distance.
 
 ---
 
@@ -82,7 +78,7 @@ lib/
 ├── src/
 │   ├── app/          providers (Riverpod), router (GoRouter)
 │   ├── core/         constants, theme, network, utilities
-│   ├── data/         models (Freezed), repository, services
+│   ├── data/         models, repository, services
 │   ├── domain/       repository interface, schedule adjustment use case
 │   └── features/     map, schedule, settings, fares, onboarding, about
 ```
@@ -91,11 +87,38 @@ State management is Riverpod. Navigation is GoRouter with `StatefulShellRoute` s
 
 ---
 
-## Notes
+## Development Highlights
 
-- The route/stop/schedule data files are not included in this repo — they're proprietary and bundled into the app binary at build time
-- Generated Dart files (`*.freezed.dart`, `*.g.dart`) are gitignored — run `build_runner` to regenerate after cloning
-- This is a solo project, built alongside a full-time grad program, so updates come in waves
+### 📍 Spatial Snapping & Delta Smoothing
+To prevent "jumping" arrivals, the engine snaps the live GPS feed to the nearest stop and applies a smoothing coefficient to the time delta.
+
+```dart
+// Snapping live GPS to the static schedule
+final snap = _snapToNearestStop(gpsStops, busLat, busLng);
+if (snap != null && snap.distance < maxSnapDistanceMeters) {
+  final rawDelta = nowMinutes - scheduledArrivalAtStop;
+  // Apply 0.85 smoothing factor to prevent jitter
+  appliedDelta = (appliedDelta * smoothingFactor) + (rawDelta * (1 - smoothingFactor));
+}
+```
+
+### 🛣️ Dynamic Waypoint Slicing
+The trip planner doesn't just show straight lines; it slices the circular route polylines into precise segments between your boarding and destination stops.
+
+```dart
+// Slicing a circular route polyline into a specific path segment
+List<LatLng> _getRouteSlice(List<dynamic> rawPolyline, LatLng start, LatLng end) {
+  int startIdx = _findNearestPointIndex(rawPolyline, start);
+  int endIdx = _findNearestPointIndex(rawPolyline, end);
+  
+  if (startIdx <= endIdx) {
+    return rawPolyline.sublist(startIdx, endIdx + 1);
+  } else {
+    // Handle wrap-around for circular transit loops
+    return [...rawPolyline.sublist(startIdx), ...rawPolyline.sublist(0, endIdx + 1)];
+  }
+}
+```
 
 ---
 
