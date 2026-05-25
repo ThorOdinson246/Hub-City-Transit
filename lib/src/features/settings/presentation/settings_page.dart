@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -132,43 +133,46 @@ class SettingsPage extends ConsumerWidget {
           _SettingsCard(
             cs: cs,
             children: [
-              _SettingsTile(
-                cs: cs,
-                tt: tt,
-                icon: Icons.notifications_outlined,
-                title: 'Alerts & Notifications',
-                subtitle: 'Route changes and delay updates',
-                isFirst: true,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Notifications coming soon!'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-              ),
-              _SettingsTile(
-                cs: cs,
-                tt: tt,
-                icon: Icons.location_on_outlined,
-                title: 'Location Services',
-                subtitle: 'Manage GPS usage and permissions',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Location settings coming soon!'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-              ),
+              if (!kIsWeb) ...[
+                _SettingsTile(
+                  cs: cs,
+                  tt: tt,
+                  icon: Icons.notifications_outlined,
+                  title: 'Alerts & Notifications',
+                  subtitle: 'Route changes and delay updates',
+                  isFirst: true,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Notifications coming soon!'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                ),
+                _SettingsTile(
+                  cs: cs,
+                  tt: tt,
+                  icon: Icons.location_on_outlined,
+                  title: 'Location Services',
+                  subtitle: 'Manage GPS usage and permissions',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Location settings coming soon!'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                ),
+              ],
               _SettingsTile(
                 cs: cs,
                 tt: tt,
                 icon: Icons.info_outline_rounded,
                 title: 'About',
                 subtitle: 'Route legend, app info, and support',
+                isFirst: kIsWeb,
                 isLast: true,
                 onTap: () => context.push('/about'),
               ),
