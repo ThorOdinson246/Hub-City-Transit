@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/about/presentation/about_page.dart';
-import '../../features/fares/presentation/fares_page.dart';
 import '../../features/launch/presentation/launch_page.dart';
 import '../../features/map/presentation/map_page.dart';
-import '../../features/onboarding/presentation/location_permission_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
 import '../../features/schedule/presentation/schedule_page.dart';
 import '../../features/settings/presentation/settings_page.dart';
@@ -25,11 +23,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: OnboardingPage()),
       ),
-      GoRoute(
-        path: '/location-permission',
-        pageBuilder: (context, state) =>
-            const NoTransitionPage(child: LocationPermissionPage()),
-      ),
+
       GoRoute(
         path: '/about',
         pageBuilder: (context, state) => const MaterialPage(child: AboutPage()),
@@ -66,11 +60,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: '/settings',
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: SettingsPage()),
-              ),
-              GoRoute(
-                path: '/fares',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: FaresPage()),
               ),
             ],
           ),

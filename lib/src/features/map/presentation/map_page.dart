@@ -13,7 +13,7 @@ import '../../../core/constants/transit_ids.dart';
 import '../../../core/utils/transfer_connections.dart';
 import '../../../data/models/bus_location_model.dart';
 import '../../../data/models/stop_model.dart';
-import '../../../domain/usecases/schedule_adjustment_use_case.dart' hide BusStatus, deriveBusStatus;
+import '../../../domain/usecases/schedule_adjustment_use_case.dart';
 import '../../../data/services/nominatim_service.dart';
 
 part 'map_page_stop_sheet.dart';

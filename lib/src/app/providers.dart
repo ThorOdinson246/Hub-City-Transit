@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_constants.dart';
 import '../core/constants/transit_ids.dart';
+import '../core/utils/haversine.dart';
 import '../core/network/dio_provider.dart';
 import '../data/models/bus_location_model.dart';
 import '../data/models/route_polyline_model.dart';
@@ -229,15 +229,3 @@ BusStatus deriveBusStatus({
   return BusStatus.live;
 }
 
-// ─── Haversine (local helper — avoids import from data layer) ─────────────────
-double haversineMeters(double lat1, double lng1, double lat2, double lng2) {
-  const r = 6371000.0;
-  final dLat = (lat2 - lat1) * pi / 180;
-  final dLng = (lng2 - lng1) * pi / 180;
-  final a = sin(dLat / 2) * sin(dLat / 2) +
-      cos(lat1 * pi / 180) *
-          cos(lat2 * pi / 180) *
-          sin(dLng / 2) *
-          sin(dLng / 2);
-  return r * 2 * atan2(sqrt(a), sqrt(1 - a));
-}

@@ -21,16 +21,20 @@ class NominatimPlace {
 }
 
 class NominatimService {
+  NominatimService({Dio? dio})
+      : _dio = dio ??
+            Dio(BaseOptions(
+              baseUrl: _baseUrl,
+              headers: {'User-Agent': 'HubCityTransitApp/1.0'},
+            ));
+
   static const String _baseUrl = 'https://nominatim.openstreetmap.org/search';
   
   // Hattiesburg bounding box roughly:
   // minLon, minLat, maxLon, maxLat
   static const String _viewbox = '-89.4,31.4,-89.2,31.2';
   
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: _baseUrl,
-    headers: {'User-Agent': 'HubCityTransitApp/1.0'},
-  ));
+  final Dio _dio;
 
   Future<List<NominatimPlace>> search(String query) async {
     try {

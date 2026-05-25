@@ -1,4 +1,3 @@
-import '../../core/constants/app_constants.dart';
 import '../../core/utils/haversine.dart';
 import '../../data/models/bus_location_model.dart';
 import '../../data/models/stop_model.dart';
@@ -315,24 +314,4 @@ String minutesToTimeString(double value) {
   return '$hours12:${minutes.toString().padLeft(2, "0")} $period';
 }
 
-enum BusStatus { live, connecting, offline }
 
-BusStatus deriveBusStatus({
-  required BusLocationModel? latest,
-  required bool isLoading,
-  required DateTime now,
-}) {
-  if (isLoading && latest == null) {
-    return BusStatus.connecting;
-  }
-  if (latest == null) {
-    return BusStatus.offline;
-  }
-
-  final staleThreshold = busStaleThreshold.inMilliseconds;
-  final age = now.difference(latest.lastSeen).inMilliseconds;
-  if (age > staleThreshold) {
-    return BusStatus.offline;
-  }
-  return BusStatus.live;
-}
