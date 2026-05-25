@@ -1,19 +1,21 @@
 # Hub City Transit — Flutter App
 
-A mobile companion to the [Hub City Transit web app](https://hubcitytransitv2.mukeshpoudel.com.np/), bringing real-time bus tracking for Hattiesburg, MS to Android (and eventually iOS).
+A native mobile companion to the [Hub City Transit web app](https://hubcitytransitv2.mukeshpoudel.com.np/), bringing real-time bus tracking, trip planning, schedules, and fares for Hattiesburg, MS to Android and iOS.
 
-> **Work in progress** — Play Store release coming soon.
+> **Status:** Flutter migration completed. Testing in beta on Android (Pixel).
 
 ---
 
 ## Technical Architecture
 
-The app is built using a modern, reactive stack with a focus on performance and state persistence.
+The app is built using a modern, reactive stack with a focus on performance and offline-tolerant state persistence.
 
-### Tech Stack
-- **State Management:** [Riverpod](https://riverpod.dev/) — utilized for reactive data binding and provider-to-provider dependency chaining (e.g., `AdjustmentResult` derived from `BusLocation` + `Schedule`).
-- **Routing:** [GoRouter](https://pub.dev/packages/go_router) — implementing `StatefulShellRoute` to maintain independent widget trees (and map state) across navigation tabs.
-- **Mapping:** [flutter_map](https://pub.dev/packages/flutter_map) — leverages OpenStreetMap (CARTO tiles) with custom `CustomPainter` implementations for high-performance marker rendering.
+### Tech Stack / Key Libraries
+- **State Management:** [flutter_riverpod](https://pub.dev/packages/flutter_riverpod) — Realtime polling, GPS tracking, theme tracking.
+- **Routing:** [go_router](https://pub.dev/packages/go_router) — `StatefulShellRoute` maintains independent memory states for Map, Schedule, and Fares tabs.
+- **Mapping:** [flutter_map](https://pub.dev/packages/flutter_map) — Custom tile URLs resolving offline/dark-mode styles, and dynamic waypoint route slicing.
+- **Storage:** [shared_preferences](https://pub.dev/packages/shared_preferences) — Caches user themes and map settings.
+- **Location:** [geolocator](https://pub.dev/packages/geolocator) — Handles dynamic tracking with OS permission lifecycle APIs.
 
 ---
 

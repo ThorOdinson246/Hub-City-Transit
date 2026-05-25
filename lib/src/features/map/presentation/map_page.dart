@@ -386,7 +386,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 
     final LatLng mapCenter;
     if (busLocValid) {
-      mapCenter = LatLng(busLat!, busLng!);
+      mapCenter = LatLng(busLat, busLng);
     } else {
       mapCenter = const LatLng(31.3271, -89.2903); // Hattiesburg, MS
     }

@@ -121,9 +121,9 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
       walkMinsToOrigin: (walkDistToOrigin / 80).round().clamp(1, 99),
       walkMetersFromDest: walkDistFromDest.round(),
       walkMinsFromDest: (walkDistFromDest / 80).round().clamp(1, 99),
-      boardStop: bestBoardStop!,
-      destStop: bestDestStop!,
-      route: bestRoute!,
+      boardStop: bestBoardStop,
+      destStop: bestDestStop,
+      route: bestRoute,
       destinationName: destName,
       destinationPoint: LatLng(destLat, destLng),
     );
@@ -262,7 +262,7 @@ class TripResult {
 }
 
 class TripActiveCard extends StatelessWidget {
-  const TripActiveCard({required this.result, required this.onClose, required this.cs, required this.tt});
+  const TripActiveCard({super.key, required this.result, required this.onClose, required this.cs, required this.tt});
   final TripResult result;
   final VoidCallback onClose;
   final ColorScheme cs;

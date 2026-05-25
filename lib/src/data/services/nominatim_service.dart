@@ -1,6 +1,14 @@
 import 'package:dio/dio.dart';
 
 class NominatimPlace {
+
+  factory NominatimPlace.fromJson(Map<String, dynamic> json) {
+    return NominatimPlace(
+      displayName: json['display_name'] as String,
+      lat: double.parse(json['lat'] as String),
+      lon: double.parse(json['lon'] as String),
+    );
+  }
   const NominatimPlace({
     required this.displayName,
     required this.lat,
@@ -10,14 +18,6 @@ class NominatimPlace {
   final String displayName;
   final double lat;
   final double lon;
-
-  factory NominatimPlace.fromJson(Map<String, dynamic> json) {
-    return NominatimPlace(
-      displayName: json['display_name'] as String,
-      lat: double.parse(json['lat'] as String),
-      lon: double.parse(json['lon'] as String),
-    );
-  }
 }
 
 class NominatimService {

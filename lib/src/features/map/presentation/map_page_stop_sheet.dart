@@ -1313,7 +1313,7 @@ class _PulsingRingState extends State<_PulsingRing> with SingleTickerProviderSta
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _controller,
-    builder: (_, __) => Transform.scale(
+    builder: (_, _) => Transform.scale(
       scale: _scale.value,
       child: Container(
         width: 48,

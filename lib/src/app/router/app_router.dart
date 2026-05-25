@@ -10,7 +10,6 @@ import '../../features/onboarding/presentation/location_permission_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
 import '../../features/schedule/presentation/schedule_page.dart';
 import '../../features/settings/presentation/settings_page.dart';
-import '../../shared/widgets/main_scaffold.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(

@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
-import '../../../core/constants/route_metadata.dart';
-import '../../../core/constants/transit_ids.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
