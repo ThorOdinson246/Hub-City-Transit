@@ -3,7 +3,7 @@ part of 'map_page.dart';
 // ── Trip Planner Sheet ────────────────────────────────────────────────────────
 class TripPlannerSheet extends ConsumerStatefulWidget {
   const TripPlannerSheet({super.key, this.userPos, required this.onTripCalculated});
-  final dynamic userPos;
+  final Position? userPos;
   final void Function(TripResult) onTripCalculated;
 
   @override
@@ -16,7 +16,6 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
   bool _loading = false;
   String? _error;
   List<dynamic> _suggestions = [];
-  TripResult? _result;
 
   Timer? _debounce;
 
@@ -64,7 +63,7 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
     final allStops = ref.read(allStopsByRouteProvider).asData?.value;
     if (allStops == null) return;
 
-    setState(() { _loading = true; _error = null; _result = null; });
+    setState(() { _loading = true; _error = null; });
 
     // 1. Geocode the destination
     final destLat = place.lat;
@@ -162,7 +161,7 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
                 border: Border.all(color: cs.outlineVariant),
               ),
               child: Row(children: [
-                Icon(Icons.my_location_rounded, size: 18, color: const Color(0xFF1976D2)),
+                const Icon(Icons.my_location_rounded, size: 18, color: Color(0xFF1976D2)),
                 const SizedBox(width: 10),
                 Expanded(child: Text(
                   _fromLabel ?? 'Enable location to auto-fill',

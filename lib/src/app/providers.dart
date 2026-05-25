@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_constants.dart';
 import '../core/constants/transit_ids.dart';
-import '../core/utils/haversine.dart';
+
 import '../core/network/dio_provider.dart';
 import '../data/models/bus_location_model.dart';
 import '../data/models/route_polyline_model.dart';
@@ -91,7 +91,7 @@ final selectedRouteAdjustmentProvider = Provider<AdjustmentResult?>((ref) {
     return null;
   }
 
-  final useCase = const ScheduleAdjustmentUseCase();
+  const useCase = ScheduleAdjustmentUseCase();
   return useCase.adjust(
     schedule: RouteSchedule(stops: schedule.stops, trips: schedule.trips),
     gpsStops: gpsStops,

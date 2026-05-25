@@ -45,10 +45,11 @@ class _BusInfoPanel extends ConsumerWidget {
       final diff = now.difference(busLocation.lastSeen);
       if (diff.inSeconds < 60) {
         lastSeenStr = '${diff.inSeconds}s ago';
-      } else if (diff.inMinutes < 60)
+      } else if (diff.inMinutes < 60) {
         lastSeenStr = '${diff.inMinutes}m ago';
-      else
+      } else {
         lastSeenStr = '${diff.inHours}h ago';
+      }
     }
 
     final routeBuses = routeBusMap[selectedRoute] ?? [];
@@ -453,7 +454,7 @@ class _StopDetailSheet extends ConsumerWidget {
 
   final StopModel stop;
   final RouteId selectedRoute;
-  final dynamic userPos;
+  final Position? userPos;
   final AsyncValue<Map<RouteId, List<StopModel>>> allStopsAsync;
   final AsyncValue<List<StopModel>> stopsAsync;
   final BusId selectedBus;
@@ -514,10 +515,14 @@ class _StopDetailSheet extends ConsumerWidget {
               GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onVerticalDragEnd: (details) {
-                  if ((details.primaryVelocity ?? 0) > 200) onClose();
+                  if ((details.primaryVelocity ?? 0) > 200) {
+                    onClose();
+                  }
                 },
                 onVerticalDragUpdate: (details) {
-                  if (details.delta.dy > 12) onClose();
+                  if (details.delta.dy > 12) {
+                    onClose();
+                  }
                 },
                 child: Center(
                   child: Container(
@@ -1195,7 +1200,7 @@ Widget buildBusMarker({
         children: [
           // Pulsing ring — only when connecting
           if (isConnecting)
-            _PulsingRing(color: const Color(0xFFF59E0B)),
+            const _PulsingRing(color: Color(0xFFF59E0B)),
 
           // Direction arrow — only when live and heading available
           if (!isOffline && !isConnecting && busLocation.heading != null)
@@ -1393,7 +1398,7 @@ class _UserDirectionPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
-    final path = Path()
+    final path = ui.Path()
       ..moveTo(size.width / 2, size.height) // bottom center (points to dot)
       ..lineTo(0, 0) // top left
       ..quadraticBezierTo(size.width / 2, size.height * 0.2, size.width, 0) // curved top

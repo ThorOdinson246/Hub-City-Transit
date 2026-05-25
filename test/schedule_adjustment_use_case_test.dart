@@ -2,14 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hubcity_transit_flutter/src/data/models/bus_location_model.dart';
 import 'package:hubcity_transit_flutter/src/data/models/stop_model.dart';
 import 'package:hubcity_transit_flutter/src/domain/usecases/schedule_adjustment_use_case.dart';
+import 'package:hubcity_transit_flutter/src/app/providers.dart';
 
 void main() {
   group('ScheduleAdjustmentUseCase', () {
     const useCase = ScheduleAdjustmentUseCase();
 
-    final schedule = RouteSchedule(
-      stops: const ['A', 'B', 'C'],
-      trips: const [
+    const schedule = RouteSchedule(
+      stops: ['A', 'B', 'C'],
+      trips: [
         ['8:00 AM', '8:10 AM', '8:20 AM'],
         ['8:30 AM', '8:40 AM', '8:50 AM'],
       ],

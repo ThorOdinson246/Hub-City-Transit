@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../app/providers.dart';
 import '../../../core/constants/route_metadata.dart';
 import '../../../core/constants/transit_ids.dart';
+import '../../../core/utils/haversine.dart';
 import '../../../core/utils/transfer_connections.dart';
 import '../../../data/models/bus_location_model.dart';
 import '../../../data/models/stop_model.dart';
@@ -87,7 +88,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     _animatedMapMove(targetCamera.center, targetCamera.zoom);
   }
 
-  List<LatLng> _getRouteSlice(List<dynamic> rawPolyline, LatLng start, LatLng end) {
+  List<LatLng> _getRouteSlice(List<List<double>> rawPolyline, LatLng start, LatLng end) {
     if (rawPolyline.isEmpty) return [start, end];
     
     int startIdx = 0;
@@ -390,8 +391,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         ? (allStopsAsync.asData?.value.entries.expand((e) =>
             e.value.where((s) => s.location.toLowerCase().contains(_searchQuery.toLowerCase()))
               .map((s) => (route: e.key, stop: s))
-          ).take(12).toList() ?? [])
-        : [];
+          ).take(12).toList() ?? <({RouteId route, StopModel stop})>[])
+        : <({RouteId route, StopModel stop})>[];
 
     return Stack(children: [
       // Map
@@ -433,9 +434,9 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                       ),
                       child: const Icon(Icons.directions_walk_rounded, color: Colors.white, size: 13),
                     ),
-                    CustomPaint(
-                      size: const Size(10, 7),
-                      painter: _TrianglePainter(color: const Color(0xFF1976D2)),
+                    const CustomPaint(
+                      size: Size(10, 7),
+                      painter: _TrianglePainter(color: Color(0xFF1976D2)),
                     ),
                   ]),
                 ),
@@ -446,16 +447,16 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     Container(
                       padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF16A34A),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF16A34A),
                         shape: BoxShape.circle,
-                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
                       ),
                       child: const Icon(Icons.location_on_rounded, color: Colors.white, size: 14),
                     ),
-                    CustomPaint(
-                      size: const Size(10, 7),
-                      painter: _TrianglePainter(color: const Color(0xFF16A34A)),
+                    const CustomPaint(
+                      size: Size(10, 7),
+                      painter: _TrianglePainter(color: Color(0xFF16A34A)),
                     ),
                   ]),
                 ),
