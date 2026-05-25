@@ -1,6 +1,8 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 const String appName = 'Hub City Transit';
+const String appVersion = '1.0.0';
+const int appBuild = 1;
 const Duration busRefreshInterval = Duration(seconds: 3);
 const Duration etaRefreshInterval = Duration(seconds: 30);
 const Duration busStaleThreshold = Duration(seconds: 90);

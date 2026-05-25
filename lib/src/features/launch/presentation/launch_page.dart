@@ -5,6 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/constants/app_constants.dart';
+
 class LaunchPage extends StatefulWidget {
   const LaunchPage({super.key});
 
@@ -145,7 +147,7 @@ class _LaunchPageState extends State<LaunchPage> {
                     ),
                     const SizedBox(height: 40),
                     Text(
-                      'v2.4.0 (Build 891)',
+                      'v$appVersion (Build $appBuild)',
                       style: tt.bodySmall,
                     ),
                   ],

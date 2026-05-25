@@ -185,10 +185,20 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       if (_query.isNotEmpty && !name.toLowerCase().contains(_query)) continue;
       final conn = _connectionsFor(name, stops, transferMap);
       if (_transferOnly && conn.isEmpty) continue;
+      final n = _norm(name);
+      int? realStopId;
+      for (final s in stops) {
+        if (_norm(s.location).contains(n) || n.contains(_norm(s.location))) {
+          realStopId = s.stopId;
+          break;
+        }
+      }
+
       final adj = adjustment != null && i < adjustment.stops.length ? adjustment.stops[i] : null;
       entries.add(_Entry(
         index: i,
         name: name,
+        realStopId: realStopId,
         scheduled: adj?.scheduledTime ?? '',
         adjusted: adj?.adjustedTime ?? '',
         isPast: adj?.isPast ?? false,
@@ -227,10 +237,11 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 }
 
 class _Entry {
-  const _Entry({required this.index, required this.name, required this.scheduled,
+  const _Entry({required this.index, required this.name, this.realStopId, required this.scheduled,
     required this.adjusted, required this.isPast, required this.isCurrent, required this.connections});
   final int index;
   final String name, scheduled, adjusted;
+  final int? realStopId;
   final bool isPast, isCurrent;
   final List<TransferStopConnection> connections;
 }
@@ -313,8 +324,9 @@ class _StopRow extends StatelessWidget {
                       ]),
                     ),
                 ]),
-                Text('Stop ID: ${8120 + entry.index}',
-                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
+                if (entry.realStopId != null)
+                  Text('Stop ID: ${entry.realStopId}',
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
                 if (entry.connections.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Wrap(spacing: 5, runSpacing: 5, children: entry.connections.map((c) => Container(
