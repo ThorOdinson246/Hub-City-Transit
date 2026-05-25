@@ -1330,3 +1330,79 @@ class _PulsingRingState extends State<_PulsingRing> with SingleTickerProviderSta
   );
 }
 
+// ── User Location Direction Marker ─────────────────────────────────────────────
+Widget buildUserLocationMarker(Position position) {
+  // We use the heading from the GPS position for the direction cone.
+  // Note: Position.heading is the direction of travel in degrees (0-359.9).
+  // If heading is 0 or negative (not available), we just show the dot.
+  final hasHeading = position.heading > 0;
+  final rads = position.heading * (3.1415926535897932 / 180.0);
+
+  return Stack(
+    alignment: Alignment.center,
+    children: [
+      // The blue dot (halo + center)
+      Container(
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1976D2).withValues(alpha: 0.22),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 2),
+        ),
+      ),
+      Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1976D2),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 1.5),
+        ),
+      ),
+      // The directional cone
+      if (hasHeading)
+        Transform.rotate(
+          angle: rads,
+          child: Transform.translate(
+            offset: const Offset(0, -18),
+            child: CustomPaint(
+              size: const Size(30, 24),
+              painter: _UserDirectionPainter(color: const Color(0xFF1976D2)),
+            ),
+          ),
+        ),
+    ],
+  );
+}
+
+class _UserDirectionPainter extends CustomPainter {
+  _UserDirectionPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [
+          color.withValues(alpha: 0.6),
+          color.withValues(alpha: 0.0),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
+
+    final path = Path()
+      ..moveTo(size.width / 2, size.height) // bottom center (points to dot)
+      ..lineTo(0, 0) // top left
+      ..quadraticBezierTo(size.width / 2, size.height * 0.2, size.width, 0) // curved top
+      ..close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _UserDirectionPainter old) => old.color != color;
+}
+

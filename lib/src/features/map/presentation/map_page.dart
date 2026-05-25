@@ -364,18 +364,11 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     ];
 
 
-    final userCircles = userPos == null ? <CircleMarker>[] : [
-      CircleMarker(
+    final userMarkers = userPos == null ? <Marker>[] : [
+      Marker(
         point: LatLng(userPos.latitude, userPos.longitude),
-        radius: 11, useRadiusInMeter: false,
-        color: const Color(0xFF1976D2).withValues(alpha: 0.22),
-        borderColor: Colors.white, borderStrokeWidth: 2,
-      ),
-      CircleMarker(
-        point: LatLng(userPos.latitude, userPos.longitude),
-        radius: 5, useRadiusInMeter: false,
-        color: const Color(0xFF1976D2),
-        borderColor: Colors.white, borderStrokeWidth: 1.5,
+        width: 80, height: 80, // give enough room for the cone
+        child: buildUserLocationMarker(userPos),
       ),
     ];
 
@@ -420,7 +413,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
               subdomains: const ['a','b','c','d'],
               userAgentPackageName: 'com.hubcitytransit'),
             PolylineLayer(polylines: polylines),
-            CircleLayer(circles: userCircles),
+            MarkerLayer(markers: userMarkers),
             MarkerLayer(markers: stopMarkers),
             MarkerLayer(markers: busMarkers),
             // Trip waypoint markers (board stop + destination pin)
