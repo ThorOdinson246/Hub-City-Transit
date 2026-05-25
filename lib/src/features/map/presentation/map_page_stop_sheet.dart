@@ -970,101 +970,7 @@ class _NextArrivalsSection extends ConsumerWidget {
 }
 
 
-// ── FAB Menu Sheet ────────────────────────────────────────────────────────────
-class _FabMenuSheet extends StatelessWidget {
-  const _FabMenuSheet({
-    required this.onShowAllRoutes,
-    required this.onNearbyStops,
-    required this.onPlanTrip,
-  });
-  final VoidCallback onShowAllRoutes, onNearbyStops, onPlanTrip;
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: cs.outlineVariant,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-            Text('Map Options', style: tt.titleMedium),
-            const SizedBox(height: 12),
-            ListTile(
-              onTap: onShowAllRoutes,
-              leading: _MenuIcon(icon: Icons.layers_rounded, cs: cs),
-              title: Text('Show All Routes', style: tt.titleMedium),
-              subtitle: Text(
-                'Toggle all route polylines',
-                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-              ),
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: cs.onSurfaceVariant,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-            ),
-            ListTile(
-              onTap: onNearbyStops,
-              leading: _MenuIcon(icon: Icons.location_on_rounded, cs: cs),
-              title: Text('Nearby Stops', style: tt.titleMedium),
-              subtitle: Text(
-                'Stops closest to your location',
-                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-              ),
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: cs.onSurfaceVariant,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-            ),
-            ListTile(
-              onTap: onPlanTrip,
-              leading: _MenuIcon(icon: Icons.directions_rounded, cs: cs),
-              title: Text('Plan a Trip', style: tt.titleMedium),
-              subtitle: Text(
-                'Walk to stop + bus directions',
-                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
-              ),
-              trailing: Icon(
-                Icons.chevron_right_rounded,
-                color: cs.onSurfaceVariant,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
-class _MenuIcon extends StatelessWidget {
-  const _MenuIcon({required this.icon, required this.cs});
-  final IconData icon;
-  final ColorScheme cs;
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 40,
-    height: 40,
-    decoration: BoxDecoration(
-      color: cs.surfaceContainerLow,
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Icon(icon, color: cs.primary, size: 20),
-  );
-}
 
 // cycles through search hint phrases with typewriter effect
 // shows anchor text first then types/erases hints so users know the bar is interactive
@@ -1336,78 +1242,68 @@ class _PulsingRingState extends State<_PulsingRing> with SingleTickerProviderSta
 }
 
 // ── User Location Direction Marker ─────────────────────────────────────────────
-Widget buildUserLocationMarker(Position position) {
-  // We use the heading from the GPS position for the direction cone.
-  // Note: Position.heading is the direction of travel in degrees (0-359.9).
-  // If heading is 0 or negative (not available), we just show the dot.
-  final hasHeading = position.heading > 0;
-  final rads = position.heading * (3.1415926535897932 / 180.0);
+Widget buildUserLocationMarker(Position position, double? heading) {
+  // We use the heading from flutter_compass for the direction cone.
+  // If heading is null (not available), we just show the dot.
+  final hasHeading = heading != null;
+  final rads = hasHeading ? (heading * (3.1415926535897932 / 180.0)) : 0.0;
 
-  return Stack(
-    alignment: Alignment.center,
-    children: [
-      // The blue dot (halo + center)
-      Container(
-        width: 22,
-        height: 22,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1976D2).withValues(alpha: 0.22),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2),
-        ),
+  return Transform.rotate(
+    angle: rads,
+    child: CustomPaint(
+      size: const Size(80, 80),
+      painter: _UserDirectionPainter(
+        color: const Color(0xFF1976D2),
+        hasHeading: hasHeading,
       ),
-      Container(
-        width: 10,
-        height: 10,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1976D2),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 1.5),
-        ),
-      ),
-      // The directional cone
-      if (hasHeading)
-        Transform.rotate(
-          angle: rads,
-          child: Transform.translate(
-            offset: const Offset(0, -18),
-            child: CustomPaint(
-              size: const Size(30, 24),
-              painter: _UserDirectionPainter(color: const Color(0xFF1976D2)),
-            ),
-          ),
-        ),
-    ],
+    ),
   );
 }
 
 class _UserDirectionPainter extends CustomPainter {
-  _UserDirectionPainter({required this.color});
+  _UserDirectionPainter({required this.color, required this.hasHeading});
   final Color color;
+  final bool hasHeading;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
-        colors: [
-          color.withValues(alpha: 0.6),
-          color.withValues(alpha: 0.0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.fill;
+    final center = Offset(size.width / 2, size.height / 2);
 
-    final path = ui.Path()
-      ..moveTo(size.width / 2, size.height) // bottom center (points to dot)
-      ..lineTo(0, 0) // top left
-      ..quadraticBezierTo(size.width / 2, size.height * 0.2, size.width, 0) // curved top
-      ..close();
+    if (hasHeading) {
+      final paint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.center,
+          end: Alignment.topCenter,
+          colors: [
+            color.withValues(alpha: 0.35), // softer cone gradient
+            color.withValues(alpha: 0.0),
+          ],
+        ).createShader(Rect.fromLTRB(0, 0, size.width, size.height / 2))
+        ..style = PaintingStyle.fill;
 
-    canvas.drawPath(path, paint);
+      final path = ui.Path()
+        ..moveTo(center.dx, center.dy) // Starts inside the dot
+        ..lineTo(center.dx - 22, 4) // Top left flare
+        ..quadraticBezierTo(center.dx, 16, center.dx + 22, 4) // Smooth curve
+        ..close();
+
+      canvas.drawPath(path, paint);
+    }
+
+    // Halo
+    final haloPaint = Paint()..color = color.withValues(alpha: 0.22)..style = PaintingStyle.fill;
+    final haloBorder = Paint()..color = Colors.white..strokeWidth = 2..style = PaintingStyle.stroke;
+    canvas.drawCircle(center, 15, haloPaint);
+    canvas.drawCircle(center, 15, haloBorder);
+
+    // Inner dot
+    final dotPaint = Paint()..color = color..style = PaintingStyle.fill;
+    final dotBorder = Paint()..color = Colors.white..strokeWidth = 1.5..style = PaintingStyle.stroke;
+    canvas.drawCircle(center, 7, dotPaint);
+    canvas.drawCircle(center, 7, dotBorder);
   }
 
   @override
-  bool shouldRepaint(covariant _UserDirectionPainter old) => old.color != color;
+  bool shouldRepaint(covariant _UserDirectionPainter old) => old.color != color || old.hasHeading != hasHeading;
 }
 

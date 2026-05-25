@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../app/providers.dart';
 import '../../../core/constants/route_metadata.dart';
 import '../../../core/constants/transit_ids.dart';
+import '../../../core/utils/geo_utils.dart';
 import '../../../core/utils/haversine.dart';
 import '../../../core/utils/transfer_connections.dart';
 import '../../../data/models/bus_location_model.dart';
@@ -76,12 +77,22 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   }
 
   void _fitTripBounds(TripResult trip, Position? userPos) {
-    final points = [
-      if (userPos != null) LatLng(userPos.latitude, userPos.longitude),
-      trip.destinationPoint,
-      LatLng(trip.boardStop.lat, trip.boardStop.lng),
-      LatLng(trip.destStop.lat, trip.destStop.lng),
-    ];
+    final points = <LatLng>[];
+    if (userPos != null && GeoUtils.isValidLatLng(userPos.latitude, userPos.longitude)) {
+      points.add(LatLng(userPos.latitude, userPos.longitude));
+    }
+    if (GeoUtils.isValidLatLng(trip.destinationPoint.latitude, trip.destinationPoint.longitude)) {
+      points.add(trip.destinationPoint);
+    }
+    if (GeoUtils.isValidLatLng(trip.boardStop.lat, trip.boardStop.lng)) {
+      points.add(LatLng(trip.boardStop.lat, trip.boardStop.lng));
+    }
+    if (GeoUtils.isValidLatLng(trip.destStop.lat, trip.destStop.lng)) {
+      points.add(LatLng(trip.destStop.lat, trip.destStop.lng));
+    }
+    
+    if (points.isEmpty) return;
+    
     final bounds = LatLngBounds.fromPoints(points);
     final fit = CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50));
     final targetCamera = fit.fit(_mapController.camera);
@@ -110,14 +121,20 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final points = <LatLng>[];
     if (startIdx <= endIdx) {
       for (int i=startIdx; i<=endIdx; i++) {
-        points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
+        if (GeoUtils.isValidLatLng(rawPolyline[i][0], rawPolyline[i][1])) {
+          points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
+        }
       }
     } else {
       for (int i=startIdx; i<rawPolyline.length; i++) {
-        points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
+        if (GeoUtils.isValidLatLng(rawPolyline[i][0], rawPolyline[i][1])) {
+          points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
+        }
       }
       for (int i=0; i<=endIdx; i++) {
-        points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
+        if (GeoUtils.isValidLatLng(rawPolyline[i][0], rawPolyline[i][1])) {
+          points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
+        }
       }
     }
     return points;
@@ -210,33 +227,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     }
   }
 
-  void _showFabMenu(BuildContext ctx, dynamic userPos) {
-    final cs = Theme.of(ctx).colorScheme;
-    showModalBottomSheet(
-      context: ctx,
-      backgroundColor: cs.surfaceContainerLowest,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (_) => _FabMenuSheet(
-        onPlanTrip: () {
-          Navigator.pop(ctx);
-          _openTripPlanner(ctx, userPos);
-        },
-        onNearbyStops: () {
-          Navigator.pop(ctx);
-          if (userPos != null) {
-            _flyToUser(userPos);
-          } else {
-            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Enable location first')));
-          }
-        },
-        onShowAllRoutes: () {
-          Navigator.pop(ctx);
-          // Zoom out to see all of Hattiesburg
-          _animatedMapMove(const LatLng(31.3271, -89.2903), 12);
-        },
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -304,14 +294,14 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       polylines = routesAsync.asData?.value.map((r) {
         final rId = RouteId.fromValue(r.routeId);
         return Polyline(
-          points: r.polyline.where((p) => p.length == 2).map((p) => LatLng(p[0], p[1])).toList(),
+          points: r.polyline.where((p) => p.length == 2 && GeoUtils.isValidLatLng(p[0], p[1])).map((p) => LatLng(p[0], p[1])).toList(),
           strokeWidth: rId == selectedRoute ? 4.5 : 2,
           color: routeColors[rId]!.withValues(alpha: rId == selectedRoute ? 0.9 : 0.2),
         );
       }).toList() ?? [];
     }
 
-    final stopMarkers = stopsAsync.asData?.value.map((stop) => Marker(
+    final stopMarkers = stopsAsync.asData?.value.where((stop) => GeoUtils.isValidLatLng(stop.lat, stop.lng)).map((stop) => Marker(
       point: LatLng(stop.lat, stop.lng),
       width: markerRadius * 2 + 10,
       height: markerRadius * 2 + 10,
@@ -347,7 +337,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final busLocation = busAsync.asData?.value;
     // Use last-known location for offline state (ghost marker)
     final effectiveBusLocation = busLocation;
-    final busMarkers = effectiveBusLocation == null ? <Marker>[] : [
+    final busMarkers = (effectiveBusLocation == null || !GeoUtils.isValidLatLng(effectiveBusLocation.lat, effectiveBusLocation.lng)) ? <Marker>[] : [
       Marker(
         point: LatLng(effectiveBusLocation.lat, effectiveBusLocation.lng),
         width: 80, height: 80,
@@ -365,22 +355,25 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     ];
 
 
-    final userMarkers = userPos == null ? <Marker>[] : [
+    final compassEvent = ref.watch(compassProvider).asData?.value;
+    final heading = compassEvent?.heading;
+
+    final userMarkers = (userPos == null || !GeoUtils.isValidLatLng(userPos.latitude, userPos.longitude)) ? <Marker>[] : [
       Marker(
         point: LatLng(userPos.latitude, userPos.longitude),
         width: 80, height: 80, // give enough room for the cone
-        child: buildUserLocationMarker(userPos),
+        child: buildUserLocationMarker(userPos, heading),
       ),
     ];
 
     // Guard against NaN/null GPS coordinates
     final busLat = busLocation?.lat;
     final busLng = busLocation?.lng;
-    final busLocValid = busLat != null && busLng != null && !busLat.isNaN && !busLng.isNaN;
+    final busLocValid = GeoUtils.isValidLatLng(busLat, busLng);
 
     final LatLng mapCenter;
     if (busLocValid) {
-      mapCenter = LatLng(busLat, busLng);
+      mapCenter = LatLng(busLat!, busLng!);
     } else {
       mapCenter = const LatLng(31.3271, -89.2903); // Hattiesburg, MS
     }
@@ -569,7 +562,9 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                             title: Text(r.stop.location, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: cs.onSurface)),
                             subtitle: Text(routeNames[r.route] ?? '', style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
                             onTap: () {
-                              _animatedMapMove(LatLng(r.stop.lat, r.stop.lng), 15);
+                              if (GeoUtils.isValidLatLng(r.stop.lat, r.stop.lng)) {
+                                _animatedMapMove(LatLng(r.stop.lat, r.stop.lng), 15);
+                              }
                               ref.read(selectedRouteProvider.notifier).state = r.route;
                               ref.read(selectedBusProvider.notifier).state = routeBusMap[r.route]!.first;
                               setState(() {
@@ -602,7 +597,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           right: 12,
           bottom: _selectedStop != null ? 380 : (_busInfoExpanded ? 280 : 100),
         child: GestureDetector(
-          onLongPress: () => _showFabMenu(context, userPos),
           child: FloatingActionButton.small(
             heroTag: 'loc-fab',
             backgroundColor: cs.surfaceContainerLowest,

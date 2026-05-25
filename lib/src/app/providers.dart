@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 import '../core/constants/app_constants.dart';
 import '../core/constants/transit_ids.dart';
@@ -16,6 +18,11 @@ import '../data/models/stop_model.dart';
 import '../data/repositories/transit_repository_impl.dart';
 import '../domain/repositories/transit_repository.dart';
 import '../domain/usecases/schedule_adjustment_use_case.dart';
+
+// ─── Location & Sensors ───────────────────────────────────────────────────────
+final compassProvider = StreamProvider<CompassEvent>((ref) {
+  return FlutterCompass.events ?? const Stream.empty();
+});
 
 // ─── Route / bus selection ────────────────────────────────────────────────────
 final selectedRouteProvider = StateProvider<RouteId>((ref) => RouteId.blue);

@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../../app/providers.dart';
 
@@ -141,14 +143,7 @@ class SettingsPage extends ConsumerWidget {
                   title: 'Alerts & Notifications',
                   subtitle: 'Route changes and delay updates',
                   isFirst: true,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Notifications coming soon!'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
+                  onTap: () => Geolocator.openAppSettings(),
                 ),
                 _SettingsTile(
                   cs: cs,
@@ -156,14 +151,7 @@ class SettingsPage extends ConsumerWidget {
                   icon: Icons.location_on_outlined,
                   title: 'Location Services',
                   subtitle: 'Manage GPS usage and permissions',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Location settings coming soon!'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
+                  onTap: () => Geolocator.openLocationSettings(),
                 ),
               ],
               _SettingsTile(
@@ -175,6 +163,36 @@ class SettingsPage extends ConsumerWidget {
                 isFirst: kIsWeb,
                 isLast: true,
                 onTap: () => context.push('/about'),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Legal ──────────────────────────────────────────────────────────
+          _SectionLabel(label: 'Legal', cs: cs),
+          const SizedBox(height: 8),
+
+          _SettingsCard(
+            cs: cs,
+            children: [
+              _SettingsTile(
+                cs: cs,
+                tt: tt,
+                icon: Icons.privacy_tip_outlined,
+                title: 'Privacy Policy',
+                subtitle: 'How we handle your data',
+                isFirst: true,
+                onTap: () => launchUrl(Uri.parse('https://www.hattiesburgms.com/hubcitytransit/')),
+              ),
+              _SettingsTile(
+                cs: cs,
+                tt: tt,
+                icon: Icons.description_outlined,
+                title: 'Terms of Service',
+                subtitle: 'Rules for using the app',
+                isLast: true,
+                onTap: () => launchUrl(Uri.parse('https://www.hattiesburgms.com/hubcitytransit/')),
               ),
             ],
           ),
