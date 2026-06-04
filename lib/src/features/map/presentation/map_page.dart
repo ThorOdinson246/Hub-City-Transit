@@ -17,6 +17,7 @@ import '../../../data/models/bus_location_model.dart';
 import '../../../data/models/stop_model.dart';
 import '../../../domain/usecases/schedule_adjustment_use_case.dart';
 import '../../../data/services/nominatim_service.dart';
+import '../../../core/utils/analytics_service.dart';
 
 part 'map_page_stop_sheet.dart';
 part 'map_page_navigation.dart';
@@ -174,6 +175,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   }
 
   void _openTripPlanner(BuildContext ctx, dynamic userPos) {
+    ref.read(analyticsProvider).logEvent('open_trip_planner');
     final cs = Theme.of(ctx).colorScheme;
     showModalBottomSheet(
       context: ctx,
@@ -468,8 +470,12 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             offset: _headerVisible ? Offset.zero : const Offset(0, -1.8),
             duration: const Duration(milliseconds: 260),
             curve: Curves.easeInOut,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
               child: Column(children: [
                 // Search / brand bar
                 Container(
@@ -567,6 +573,12 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                               }
                               ref.read(selectedRouteProvider.notifier).state = r.route;
                               ref.read(selectedBusProvider.notifier).state = routeBusMap[r.route]!.first;
+                              
+                              ref.read(analyticsProvider).logEvent('stop_search_selected', {
+                                'stop_id': r.stop.stopId,
+                                'route': r.route.name,
+                              });
+
                               setState(() {
                                 _selectedStop = r.stop;
                                 _isSearching = false;
@@ -581,13 +593,13 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                     ),
                   ),
                 ],
-
-
               ]),
             ),
           ),
         ),
       ),
+    ),
+  ),
 
       // ── Location FAB ─────────────────────────────────────────────────────
       if (_activeTrip == null)
@@ -624,11 +636,17 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         Positioned(
           bottom: 24, left: 16, right: 16,
           child: SafeArea(
-            child: TripActiveCard(
-              result: _activeTrip!,
-              cs: cs,
-              tt: Theme.of(context).textTheme,
-              onClose: () => setState(() => _activeTrip = null),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: TripActiveCard(
+                  result: _activeTrip!,
+                  cs: cs,
+                  tt: Theme.of(context).textTheme,
+                  onClose: () => setState(() => _activeTrip = null),
+                ),
+              ),
             ),
           ),
         )
@@ -647,9 +665,11 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           etaError: _etaError,
           onClose: () => setState(() { _selectedStop = null; }),
           onGetEta: () {
+            ref.read(analyticsProvider).logEvent('get_eta_clicked');
             if (userPos != null) _fetchEta(selectedBus, userPos);
           },
           onSwitchRoute: (r) {
+            ref.read(analyticsProvider).logEvent('route_switched_from_stop', {'new_route': r.name});
             ref.read(selectedRouteProvider.notifier).state = r;
             ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
             setState(() => _selectedStop = null);
@@ -664,6 +684,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           expanded: _busInfoExpanded,
           onToggleExpanded: () => setState(() => _busInfoExpanded = !_busInfoExpanded),
           onRouteChange: (r) {
+            ref.read(analyticsProvider).logEvent('route_switched_from_panel', {'new_route': r.name});
             ref.read(selectedRouteProvider.notifier).state = r;
             ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
           },

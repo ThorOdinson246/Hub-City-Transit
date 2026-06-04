@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// Hub City Transit — Design Token Reference
 /// Light surface hierarchy (M3):
@@ -232,69 +231,75 @@ class AppTheme {
       ),
 
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.plusJakartaSans(
+        displayLarge: TextStyle(
           fontSize: 56,
           height: 1.0,
           fontWeight: FontWeight.w800,
           color: colorScheme.onSurface,
         ),
-        displayMedium: GoogleFonts.plusJakartaSans(
+        displayMedium: TextStyle(
           fontSize: 45,
           height: 1.1,
           fontWeight: FontWeight.w800,
           color: colorScheme.onSurface,
           letterSpacing: -0.5,
         ),
-        headlineLarge: GoogleFonts.plusJakartaSans(
+        headlineLarge: TextStyle(
           fontSize: 32,
           height: 1.15,
           fontWeight: FontWeight.w800,
           color: colorScheme.onSurface,
         ),
-        headlineMedium: GoogleFonts.plusJakartaSans(
+        headlineMedium: TextStyle(
           fontSize: 26,
           height: 1.2,
           fontWeight: FontWeight.w700,
           color: colorScheme.onSurface,
         ),
-        titleLarge: GoogleFonts.plusJakartaSans(
+        titleLarge: TextStyle(
           fontSize: 20,
           height: 1.25,
           fontWeight: FontWeight.w700,
           color: colorScheme.onSurface,
         ),
-        titleMedium: GoogleFonts.plusJakartaSans(
+        titleMedium: TextStyle(
           fontSize: 16,
           height: 1.3,
           fontWeight: FontWeight.w600,
           color: colorScheme.onSurface,
         ),
-        bodyLarge: GoogleFonts.manrope(
+        bodyLarge: TextStyle(
+          fontFamily: 'Manrope',
           fontSize: 16,
           height: 1.4,
           color: colorScheme.onSurface,
         ),
-        bodyMedium: GoogleFonts.manrope(
+        bodyMedium: TextStyle(
+          fontFamily: 'Manrope',
           fontSize: 14,
           height: 1.35,
           color: colorScheme.onSurface,
         ),
-        bodySmall: GoogleFonts.manrope(
+        bodySmall: TextStyle(
+          fontFamily: 'Manrope',
           fontSize: 12,
           height: 1.3,
           color: colorScheme.onSurfaceVariant,
         ),
-        labelLarge: GoogleFonts.manrope(
+        labelLarge: TextStyle(
+          fontFamily: 'Manrope',
           fontSize: 14,
           fontWeight: FontWeight.w700,
           color: colorScheme.onSurface,
         ),
-        labelMedium: GoogleFonts.manrope(
+        labelMedium: TextStyle(
+          fontFamily: 'Manrope',
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: colorScheme.onSurfaceVariant,
         ),
-        labelSmall: GoogleFonts.manrope(
+        labelSmall: TextStyle(
+          fontFamily: 'Manrope',
           fontSize: 10,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.4,

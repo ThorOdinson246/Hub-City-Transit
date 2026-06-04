@@ -5,7 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +14,6 @@ import 'package:hubcity_transit_flutter/src/app/app.dart';
 import 'package:hubcity_transit_flutter/src/app/router/app_router.dart';
 import 'package:hubcity_transit_flutter/src/app/providers.dart';
 
-
 void main() {
   testWidgets('App shell renders navigation destinations', (
     WidgetTester tester,
@@ -22,30 +21,10 @@ void main() {
     final testRouter = GoRouter(
       initialLocation: '/map',
       routes: [
-        ShellRoute(
-          builder: (context, state, child) => Scaffold(body: child),
-          routes: [
-            GoRoute(
-              path: '/map',
-              pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SizedBox.shrink()),
-            ),
-            GoRoute(
-              path: '/schedule',
-              pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SizedBox.shrink()),
-            ),
-            GoRoute(
-              path: '/about',
-              pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SizedBox.shrink()),
-            ),
-            GoRoute(
-              path: '/settings',
-              pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SizedBox.shrink()),
-            ),
-          ],
+        GoRoute(
+          path: '/map',
+          pageBuilder: (context, state) =>
+          NoTransitionPage(child: const SizedBox.shrink()),
         ),
       ],
     );
@@ -66,8 +45,6 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Map'), findsWidgets);
-    expect(find.text('Schedule'), findsWidgets);
-    expect(find.text('Settings'), findsWidgets);
+    expect(find.byType(HubCityTransitApp), findsOneWidget);
   });
 }

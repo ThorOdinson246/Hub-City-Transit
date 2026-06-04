@@ -147,7 +147,7 @@ class _LaunchPageState extends State<LaunchPage> {
                     ),
                     const SizedBox(height: 40),
                     Text(
-                      'v$appVersion (Build $appBuild)',
+                      'v1.0.0',
                       style: tt.bodySmall,
                     ),
                   ],

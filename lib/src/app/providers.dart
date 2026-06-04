@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,6 +22,7 @@ import '../domain/usecases/schedule_adjustment_use_case.dart';
 
 // ─── Location & Sensors ───────────────────────────────────────────────────────
 final compassProvider = StreamProvider<CompassEvent>((ref) {
+  if (kIsWeb) return const Stream.empty();
   return FlutterCompass.events ?? const Stream.empty();
 });
 

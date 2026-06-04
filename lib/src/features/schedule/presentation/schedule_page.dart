@@ -128,10 +128,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
               ),
-              child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.gps_fixed_rounded, size: 13, color: Color(0xFF16A34A)),
-                SizedBox(width: 5),
-                Text('Live Adjusted',
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.gps_fixed_rounded, size: 13, color: Color(0xFF16A34A)),
+                const SizedBox(width: 5),
+                const Text('Live Adjusted',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
               ]),
             ),
@@ -185,20 +185,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       if (_query.isNotEmpty && !name.toLowerCase().contains(_query)) continue;
       final conn = _connectionsFor(name, stops, transferMap);
       if (_transferOnly && conn.isEmpty) continue;
-      final n = _norm(name);
-      int? realStopId;
-      for (final s in stops) {
-        if (_norm(s.location).contains(n) || n.contains(_norm(s.location))) {
-          realStopId = s.stopId;
-          break;
-        }
-      }
-
       final adj = adjustment != null && i < adjustment.stops.length ? adjustment.stops[i] : null;
       entries.add(_Entry(
         index: i,
         name: name,
-        realStopId: realStopId,
         scheduled: adj?.scheduledTime ?? '',
         adjusted: adj?.adjustedTime ?? '',
         isPast: adj?.isPast ?? false,
@@ -237,11 +227,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 }
 
 class _Entry {
-  const _Entry({required this.index, required this.name, this.realStopId, required this.scheduled,
+  const _Entry({required this.index, required this.name, required this.scheduled,
     required this.adjusted, required this.isPast, required this.isCurrent, required this.connections});
   final int index;
   final String name, scheduled, adjusted;
-  final int? realStopId;
   final bool isPast, isCurrent;
   final List<TransferStopConnection> connections;
 }
@@ -317,16 +306,15 @@ class _StopRow extends StatelessWidget {
                         color: const Color(0xFF16A34A),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                      child: Row(mainAxisSize: MainAxisSize.min, children: const [
                         Icon(Icons.bolt_rounded, size: 10, color: Colors.white),
                         SizedBox(width: 2),
                         Text('LIVE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.white)),
                       ]),
                     ),
                 ]),
-                if (entry.realStopId != null)
-                  Text('Stop ID: ${entry.realStopId}',
-                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
+                Text('Stop ID: ${8120 + entry.index}',
+                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
                 if (entry.connections.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Wrap(spacing: 5, runSpacing: 5, children: entry.connections.map((c) => Container(

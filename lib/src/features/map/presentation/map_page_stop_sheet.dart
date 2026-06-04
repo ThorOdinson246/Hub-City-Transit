@@ -69,8 +69,12 @@ class _BusInfoPanel extends ConsumerWidget {
         child: AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.fastOutSlowIn,
-          child: Container(
-            decoration: BoxDecoration(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Container(
+                decoration: BoxDecoration(
               color: cs.surfaceContainerLowest,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(22),
@@ -392,7 +396,9 @@ class _BusInfoPanel extends ConsumerWidget {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   String _headingLabel(double deg) {
@@ -485,260 +491,266 @@ class _StopDetailSheet extends ConsumerWidget {
       child: AnimatedSize(
         duration: const Duration(milliseconds: 300),
         curve: Curves.fastOutSlowIn,
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.65,
-          ),
-          decoration: BoxDecoration(
-            color: cs.surfaceContainerLowest,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(24),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.16),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.65,
               ),
-            ],
-          ),
-          child: ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.fromLTRB(
-              16,
-              0,
-              16,
-              MediaQuery.of(context).padding.bottom + 16,
-            ),
-            children: [
-              // Drag handle — swipe down here to dismiss
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onVerticalDragEnd: (details) {
-                  if ((details.primaryVelocity ?? 0) > 200) {
-                    onClose();
-                  }
-                },
-                onVerticalDragUpdate: (details) {
-                  if (details.delta.dy > 12) {
-                    onClose();
-                  }
-                },
-                child: Center(
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: cs.outlineVariant,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerLowest,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.16),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
-                // Header
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            stop.location,
-                            style: tt.titleLarge,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Wrap(
-                            spacing: 6,
-                            children: [
-                              _InfoChip(label: stop.direction, cs: cs),
-                              _InfoChip(label: 'Stop #${stop.stopId}', cs: cs),
-                              if (walkMins != null)
-                                _InfoChip(
-                                  label: '~$walkMins min walk',
-                                  icon: Icons.directions_walk_rounded,
-                                  cs: cs,
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: routeColors[selectedRoute],
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        routeNames[selectedRoute] ?? selectedRoute.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
+              child: ListView(
+                shrinkWrap: true,
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  0,
+                  16,
+                  MediaQuery.of(context).padding.bottom + 16,
+                ),
+                children: [
+                  // Drag handle — swipe down here to dismiss
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onVerticalDragEnd: (details) {
+                      if ((details.primaryVelocity ?? 0) > 200) {
+                        onClose();
+                      }
+                    },
+                    onVerticalDragUpdate: (details) {
+                      if (details.delta.dy > 12) {
+                        onClose();
+                      }
+                    },
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: cs.outlineVariant,
+                          borderRadius: BorderRadius.circular(999),
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: onClose,
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: cs.onSurfaceVariant,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                // ETA
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: cs.outlineVariant.withValues(alpha: 0.6),
-                    ),
                   ),
-                  child: _NextArrivalsSection(
-                    stop: stop,
-                    routeColor: routeColors[selectedRoute]!,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                // Transfer chips
-                allStopsAsync.when(
-                  data: (allStops) {
-                    final conns = findTransferConnections(
-                      selectedRoute: selectedRoute,
-                      stop: stop,
-                      allStopsByRoute: allStops,
-                    );
-                    if (conns.isEmpty) return const SizedBox.shrink();
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Transfers', style: tt.labelLarge),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: conns
-                              .map(
-                                (c) => ActionChip(
-                                  avatar: CircleAvatar(
-                                    radius: 6,
-                                    backgroundColor: routeColors[c.routeId],
-                                  ),
-                                  backgroundColor: routeColors[c.routeId]!
-                                      .withValues(alpha: 0.12),
-                                  side: BorderSide(
-                                    color: routeColors[c.routeId]!.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                  ),
-                                  label: Text(
-                                    routeNames[c.routeId] ?? c.routeId.name,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: routeColors[c.routeId],
-                                    ),
-                                  ),
-                                  onPressed: () => onSwitchRoute(c.routeId),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                        const SizedBox(height: 14),
-                      ],
-                    );
-                  },
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, _) => const SizedBox.shrink(),
-                ),
-                // Next stops
-                stopsAsync.when(
-                  data: (routeStops) {
-                    final idx = routeStops.indexWhere(
-                      (s) => s.stopId == stop.stopId,
-                    );
-                    final next = idx < 0
-                        ? <StopModel>[]
-                        : routeStops.skip(idx + 1).take(3).toList();
-                    if (next.isEmpty) return const SizedBox.shrink();
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                  // Header
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.alt_route_rounded,
-                              size: 15,
-                              color: cs.onSurfaceVariant,
+                            Text(
+                              stop.location,
+                              style: tt.titleLarge,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(width: 5),
-                            Text('Next Stops', style: tt.labelLarge),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        ...next.asMap().entries.map(
-                          (e) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Row(
+                            const SizedBox(height: 4),
+                            Wrap(
+                              spacing: 6,
                               children: [
-                                Column(
-                                  children: [
-                                    Container(
-                                      width: 10,
-                                      height: 10,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: routeColors[selectedRoute]!,
-                                          width: 2,
-                                        ),
-                                        color: cs.surfaceContainerLowest,
-                                      ),
-                                    ),
-                                    if (e.key < next.length - 1)
-                                      Container(
-                                        width: 2,
-                                        height: 22,
-                                        color: cs.outlineVariant,
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    e.value.location,
-                                    style: tt.bodyMedium,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                _InfoChip(label: stop.direction, cs: cs),
+                                _InfoChip(label: 'Stop #${stop.stopId}', cs: cs),
+                                if (walkMins != null)
+                                  _InfoChip(
+                                    label: '~$walkMins min walk',
+                                    icon: Icons.directions_walk_rounded,
+                                    cs: cs,
                                   ),
-                                ),
                               ],
                             ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: routeColors[selectedRoute],
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          routeNames[selectedRoute] ?? selectedRoute.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                      ],
-                    );
-                  },
-                  loading: () => const SizedBox.shrink(),
-                  error: (_, _) => const SizedBox.shrink(),
-                ),
-              ],
+                      ),
+                      IconButton(
+                        onPressed: onClose,
+                        icon: Icon(
+                          Icons.close_rounded,
+                          color: cs.onSurfaceVariant,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  // ETA
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: cs.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: cs.outlineVariant.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    child: _NextArrivalsSection(
+                      stop: stop,
+                      routeColor: routeColors[selectedRoute]!,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // Transfer chips
+                  allStopsAsync.when(
+                    data: (allStops) {
+                      final conns = findTransferConnections(
+                        selectedRoute: selectedRoute,
+                        stop: stop,
+                        allStopsByRoute: allStops,
+                      );
+                      if (conns.isEmpty) return const SizedBox.shrink();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Transfers', style: tt.labelLarge),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: conns
+                                .map(
+                                  (c) => ActionChip(
+                                    avatar: CircleAvatar(
+                                      radius: 6,
+                                      backgroundColor: routeColors[c.routeId],
+                                    ),
+                                    backgroundColor: routeColors[c.routeId]!
+                                        .withValues(alpha: 0.12),
+                                    side: BorderSide(
+                                      color: routeColors[c.routeId]!.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
+                                    label: Text(
+                                      routeNames[c.routeId] ?? c.routeId.name,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: routeColors[c.routeId],
+                                      ),
+                                    ),
+                                    onPressed: () => onSwitchRoute(c.routeId),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                          const SizedBox(height: 14),
+                        ],
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, _) => const SizedBox.shrink(),
+                  ),
+                  // Next stops
+                  stopsAsync.when(
+                    data: (routeStops) {
+                      final idx = routeStops.indexWhere(
+                        (s) => s.stopId == stop.stopId,
+                      );
+                      final next = idx < 0
+                          ? <StopModel>[]
+                          : routeStops.skip(idx + 1).take(3).toList();
+                      if (next.isEmpty) return const SizedBox.shrink();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.alt_route_rounded,
+                                size: 15,
+                                color: cs.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 5),
+                              Text('Next Stops', style: tt.labelLarge),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ...next.asMap().entries.map(
+                            (e) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Container(
+                                        width: 10,
+                                        height: 10,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: routeColors[selectedRoute]!,
+                                            width: 2,
+                                          ),
+                                          color: cs.surfaceContainerLowest,
+                                        ),
+                                      ),
+                                      if (e.key < next.length - 1)
+                                        Container(
+                                          width: 2,
+                                          height: 22,
+                                          color: cs.outlineVariant,
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      e.value.location,
+                                      style: tt.bodyMedium,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, _) => const SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
 

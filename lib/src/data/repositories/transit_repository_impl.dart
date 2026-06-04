@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/constants/app_constants.dart';
-import '../../core/utils/haversine.dart';
 import '../../domain/repositories/transit_repository.dart';
 import '../models/bus_location_model.dart';
 import '../models/eta_result_model.dart';
@@ -16,17 +16,14 @@ final class TransitRepositoryImpl implements TransitRepository {
   TransitRepositoryImpl(this._dio);
 
   final Dio _dio;
-  List<RoutePolylineModel>? _routesCache;
   Map<String, List<StopModel>>? _stopsCache;
   Map<String, RouteScheduleModel>? _scheduleCache;
 
   @override
   Future<List<RoutePolylineModel>> getRoutes() async {
-    if (_routesCache != null) return _routesCache!;
     final text = await rootBundle.loadString(localRouteAssetPath);
     final dynamic decoded = jsonDecode(text);
-    _routesCache = parseRoutePolylines(decoded);
-    return _routesCache!;
+    return parseRoutePolylines(decoded);
   }
 
   @override
@@ -287,7 +284,7 @@ final class TransitRepositoryImpl implements TransitRepository {
 
     for (var i = 0; i < stops.length; i++) {
       final stop = stops[i];
-      final distance = haversineMeters(lat, lng, stop.lat, stop.lng);
+      final distance = _haversineMeters(lat, lng, stop.lat, stop.lng);
       if (distance < minDistance) {
         minDistance = distance;
         minIndex = i;
@@ -382,6 +379,25 @@ final class TransitRepositoryImpl implements TransitRepository {
     }
   }
 
+  double _haversineMeters(
+    double lat1,
+    double lng1,
+    double lat2,
+    double lng2,
+  ) {
+    const earthRadiusMeters = 6371000;
+    final dLat = _degreesToRadians(lat2 - lat1);
+    final dLng = _degreesToRadians(lng2 - lng1);
+    final a =
+        (sin(dLat / 2) * sin(dLat / 2)) +
+        cos(_degreesToRadians(lat1)) *
+            cos(_degreesToRadians(lat2)) *
+            (sin(dLng / 2) * sin(dLng / 2));
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return earthRadiusMeters * c;
+  }
+
+  double _degreesToRadians(double degrees) => degrees * (pi / 180);
 }
 
 List<RoutePolylineModel> parseRoutePolylines(dynamic decoded) {
