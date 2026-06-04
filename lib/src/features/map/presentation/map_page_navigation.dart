@@ -203,8 +203,58 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
               ),
             ],
 
-            // Autocomplete suggestions
-            if (_suggestions.isNotEmpty) ...[
+            // Favorite destinations (when empty)
+            if (_toCtrl.text.trim().isEmpty) ...[
+              Consumer(builder: (context, ref, _) {
+                final favIds = ref.watch(favoritesProvider);
+                if (favIds.isEmpty) return const SizedBox.shrink();
+                final allStopsData = ref.watch(allStopsByRouteProvider).asData?.value;
+                if (allStopsData == null) return const SizedBox.shrink();
+                
+                final favStops = <StopModel>[];
+                for (final stops in allStopsData.values) {
+                  for (final s in stops) {
+                    if (favIds.contains(s.stopId.toString()) && !favStops.any((f) => f.stopId == s.stopId)) {
+                      favStops.add(s);
+                    }
+                  }
+                }
+                
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Text('Favorite Destinations', style: tt.labelSmall?.copyWith(color: cs.primary, fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: cs.surfaceContainerLowest,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: cs.outlineVariant),
+                      ),
+                      child: Column(
+                        children: favStops.map((stop) {
+                          return ListTile(
+                            leading: const Icon(Icons.favorite_rounded, color: Colors.red),
+                            title: Text(stop.location),
+                            minLeadingWidth: 20,
+                            subtitle: Text('Stop #${stop.stopId}'),
+                            onTap: () {
+                              final place = NominatimPlace(lat: stop.lat, lon: stop.lng, displayName: stop.location);
+                              _toCtrl.text = stop.location;
+                              _plan(place);
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ] else if (_suggestions.isNotEmpty) ...[
               const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(

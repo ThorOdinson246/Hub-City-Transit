@@ -592,6 +592,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                               cursor: SystemMouseCursors.click,
                               child: ListTile(
                                 dense: true,
+                                minLeadingWidth: 20,
                                 leading: Icon(r.isFav ? Icons.favorite_rounded : Icons.location_on_rounded, color: r.isFav ? Colors.red : cs.primary),
                                 title: Text(r.stop.location, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                                 subtitle: Text('Route ${r.route.name}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),

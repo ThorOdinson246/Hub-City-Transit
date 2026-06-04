@@ -136,57 +136,54 @@ class _BusInfoPanel extends ConsumerWidget {
 
                 if (expanded) ...[
                   // Route selector
-                  SizedBox(
-                    height: 42,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                      itemCount: RouteId.values.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 8),
-                      itemBuilder: (_, i) {
-                        final r = RouteId.values[i];
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: RouteId.values.map((r) {
                         final sel = r == selectedRoute;
                         return MouseRegion(
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
                             onTap: () => onRouteChange(r),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: sel ? routeColors[r] : cs.surfaceContainer,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: sel ? Colors.white : routeColors[r],
-                                    shape: BoxShape.circle,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: sel ? routeColors[r] : cs.surfaceContainer,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: BoxDecoration(
+                                      color: sel ? Colors.white : routeColors[r],
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  routeNames[r]?.replaceAll(' Route', '') ??
-                                      r.value,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: sel ? Colors.white : cs.onSurface,
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    routeNames[r]?.replaceAll(' Route', '') ??
+                                        r.value,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: sel ? Colors.white : cs.onSurface,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      }).toList(),
                     ),
                   ),
 
@@ -194,7 +191,10 @@ class _BusInfoPanel extends ConsumerWidget {
                   if (routeBuses.length > 1) ...[
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                      child: Row(
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             'Bus:',
@@ -202,34 +202,32 @@ class _BusInfoPanel extends ConsumerWidget {
                               color: cs.onSurfaceVariant,
                             ),
                           ),
-                          const SizedBox(width: 8),
                           ...routeBuses.map((b) {
                             final sel = b == selectedBus;
                             return MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
                                 onTap: () => onBusChange(b),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                margin: const EdgeInsets.only(right: 8),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: sel
-                                      ? routeColors[selectedRoute]
-                                      : cs.surfaceContainer,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  b.value.toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: sel ? Colors.white : cs.onSurface,
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 6,
                                   ),
-                                ),
+                                  decoration: BoxDecoration(
+                                    color: sel
+                                        ? routeColors[selectedRoute]
+                                        : cs.surfaceContainer,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    b.value.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: sel ? Colors.white : cs.onSurface,
+                                    ),
+                                  ),
                                 ),
                               ),
                             );
