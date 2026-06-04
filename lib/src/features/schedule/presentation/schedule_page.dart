@@ -128,10 +128,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
               ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.gps_fixed_rounded, size: 13, color: Color(0xFF16A34A)),
-                const SizedBox(width: 5),
-                const Text('Live Adjusted',
+              child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.gps_fixed_rounded, size: 13, color: Color(0xFF16A34A)),
+                SizedBox(width: 5),
+                Text('Live Adjusted',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
               ]),
             ),
@@ -306,7 +306,7 @@ class _StopRow extends StatelessWidget {
                         color: const Color(0xFF16A34A),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: const [
+                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.bolt_rounded, size: 10, color: Colors.white),
                         SizedBox(width: 2),
                         Text('LIVE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.white)),

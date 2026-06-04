@@ -1,4 +1,4 @@
-package com.hubcitytransit.hubcity_transit_flutter
+package com.mukeshpoudel.hctransit
 
 import io.flutter.embedding.android.FlutterActivity
 

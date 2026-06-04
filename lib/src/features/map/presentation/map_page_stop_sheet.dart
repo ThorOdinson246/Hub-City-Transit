@@ -138,7 +138,9 @@ class _BusInfoPanel extends ConsumerWidget {
                   // Route selector
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    child: Wrap(
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: RouteId.values.map((r) {
@@ -185,13 +187,16 @@ class _BusInfoPanel extends ConsumerWidget {
                         );
                       }).toList(),
                     ),
+                    ),
                   ),
 
                   // Bus picker
                   if (routeBuses.length > 1) ...[
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                      child: Wrap(
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Wrap(
                         spacing: 8,
                         runSpacing: 8,
                         crossAxisAlignment: WrapCrossAlignment.center,
@@ -233,6 +238,7 @@ class _BusInfoPanel extends ConsumerWidget {
                             );
                           }),
                         ],
+                      ),
                       ),
                     ),
                   ],
@@ -1131,65 +1137,77 @@ Widget buildBusMarker({
     onTap: onTap,
     child: SizedBox(
       width: 80,
-      height: 80,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Pulsing ring — only when connecting
-          if (isConnecting)
-            const _PulsingRing(color: Color(0xFFF59E0B)),
-
-          // Direction arrow — only when live and heading available
-          if (!isOffline && !isConnecting && busLocation.heading != null)
-            Transform.rotate(
-              angle: (busLocation.heading! * 3.14159265 / 180),
-              child: Icon(
-                Icons.navigation_rounded,
-                color: color.withValues(alpha: 0.28),
-                size: 52,
-              ),
-            ),
-
-          // Main marker column
-          Opacity(
-            opacity: isOffline ? 0.55 : 1.0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Route/bus label pill
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
-                  ),
-                  child: Text(
-                    selectedBus.value.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
+      height: 90,
+      child: Center(
+        child: Opacity(
+          opacity: isOffline ? 0.55 : 1.0,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Route/bus label pill
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: statusColor,
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
                 ),
-                const SizedBox(height: 3),
-                // Bus icon circle
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
+                child: Text(
+                  selectedBus.value.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
                     color: Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: statusColor, width: 2.5),
-                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)],
-                  ),
-                  child: Icon(
-                    Icons.directions_bus_rounded,
-                    size: 14,
-                    color: statusColor,
                   ),
                 ),
+              ),
+              const SizedBox(height: 3),
+              // Bus icon circle with pulsing ring and direction pointer
+              SizedBox(
+                width: 50,
+                height: 50,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Pulsing ring — when live or connecting
+                    if (!isOffline)
+                      _PulsingRing(color: statusColor),
+                    
+                    // Direction arrow — only when heading available
+                    if (!isOffline && busLocation.heading != null)
+                      Transform.rotate(
+                        angle: (busLocation.heading! * 3.14159265 / 180),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: CustomPaint(
+                              size: const Size(10, 10),
+                              painter: _PointerPainter(color: statusColor),
+                            ),
+                          ),
+                        ),
+                      ),
+                    
+                    // Bus icon circle
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: statusColor, width: 2.5),
+                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                      ),
+                      child: Icon(
+                        Icons.directions_bus_rounded,
+                        size: 14,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
                 // Status sub-label (offline / connecting)
                 if (isOffline)
                   Padding(
@@ -1216,12 +1234,41 @@ Widget buildBusMarker({
                     ),
                   ),
               ],
-            ),
           ),
-        ],
+        ),
       ),
     ),
   );
+}
+
+class _PointerPainter extends CustomPainter {
+  _PointerPainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final fillPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = ui.Path()
+      ..moveTo(size.width / 2, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+
+    canvas.drawPath(path, fillPaint);
+    canvas.drawPath(path, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PointerPainter oldDelegate) => color != oldDelegate.color;
 }
 
 // ── Pulsing Ring Animation ─────────────────────────────────────────────────────
@@ -1262,10 +1309,7 @@ class _PulsingRingState extends State<_PulsingRing> with SingleTickerProviderSta
         height: 48,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-            color: widget.color.withValues(alpha: _opacity.value),
-            width: 3,
-          ),
+          color: widget.color.withValues(alpha: _opacity.value * 0.4),
         ),
       ),
     ),

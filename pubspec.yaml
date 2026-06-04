@@ -41,4 +41,4 @@ flutter:
     - assets/data/routes_wgs84.json
     - assets/data/stops.json
     - assets/data/schedules.json
-    - .env
+    - env.txt

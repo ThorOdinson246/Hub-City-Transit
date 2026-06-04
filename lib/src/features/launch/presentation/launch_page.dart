@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/constants/app_constants.dart';
+
 
 class LaunchPage extends StatefulWidget {
   const LaunchPage({super.key});

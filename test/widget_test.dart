@@ -24,7 +24,7 @@ void main() {
         GoRoute(
           path: '/map',
           pageBuilder: (context, state) =>
-          NoTransitionPage(child: const SizedBox.shrink()),
+          const NoTransitionPage(child: SizedBox.shrink()),
         ),
       ],
     );

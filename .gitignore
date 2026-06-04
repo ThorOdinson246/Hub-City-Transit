@@ -70,3 +70,4 @@ stitch_assets/
 # scratch test files (not real tests)
 test_arcgis.dart
 test_camera.dart
+env.txt

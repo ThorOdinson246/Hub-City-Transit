@@ -25,14 +25,14 @@ part 'map_page_navigation.dart';
 
 abstract class SearchResultItem {}
 class StopResult extends SearchResultItem {
+  StopResult({required this.route, required this.stop, required this.isFav});
   final RouteId route;
   final StopModel stop;
   final bool isFav;
-  StopResult({required this.route, required this.stop, required this.isFav});
 }
 class LandmarkResult extends SearchResultItem {
-  final NominatimPlace place;
   LandmarkResult(this.place);
+  final NominatimPlace place;
 }
 
 class MapPage extends ConsumerStatefulWidget {
@@ -77,7 +77,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   final _nominatim = NominatimService();
   List<dynamic> _landmarkResults = [];
   Timer? _searchDebounce;
-  bool _landmarksLoading = false;
 
   bool _etaLoading = false;
   bool _etaInFlight = false;
@@ -87,6 +86,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   String? _etaNearestStop;
 
   bool _busInfoExpanded = true;
+  bool _isTrackingBus = false;
 
   Timer? _gestureTimer;
   TripResult? _activeTrip;
@@ -197,17 +197,19 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       return;
     }
     _searchDebounce = Timer(const Duration(milliseconds: 600), () async {
-      setState(() => _landmarksLoading = true);
       try {
         final results = await _nominatim.search(query);
-        if (mounted) setState(() { _landmarkResults = results; _landmarksLoading = false; });
+        if (mounted) setState(() { _landmarkResults = results; });
       } catch (e) {
-        if (mounted) setState(() { _landmarksLoading = false; });
+        // Ignored or handled elsewhere
       }
     });
   }
 
   void _onMapEvent(MapEvent event) {
+    if (event.source == MapEventSource.onDrag || event.source == MapEventSource.onMultiFinger) {
+      _isTrackingBus = false;
+    }
     if (event is MapEventMoveStart || event is MapEventRotateStart || event is MapEventFlingAnimation) {
       _gestureTimer?.cancel();
       if (_headerVisible) setState(() => _headerVisible = false);
@@ -286,6 +288,22 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final stopsAsync = ref.watch(stopsBySelectedRouteProvider);
     final allStopsAsync = ref.watch(allStopsByRouteProvider);
     final busAsync = ref.watch(busLocationPollingProvider);
+    
+    ref.listen<AsyncValue<BusLocationModel?>>(busLocationPollingProvider, (previous, next) {
+      if (_isTrackingBus) {
+        final loc = next.value;
+        if (loc != null && GeoUtils.isValidLatLng(loc.lat, loc.lng)) {
+          // Calculate distance between current center and new bus location
+          final currentCenter = _mapController.camera.center;
+          final dist = haversineMeters(currentCenter.latitude, currentCenter.longitude, loc.lat, loc.lng);
+          // Only pan if it moved more than 2 meters to avoid jittering
+          if (dist > 2.0) {
+            _animatedMapMove(LatLng(loc.lat, loc.lng), _currentZoom);
+          }
+        }
+      }
+    });
+
     final busStatus = ref.watch(busStatusProvider);
     final locationAsync = ref.watch(userLocationProvider);
     final userPos = locationAsync.asData?.value;
@@ -394,7 +412,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           selectedBus: selectedBus,
           onTap: () {
             _animatedMapMove(LatLng(effectiveBusLocation.lat, effectiveBusLocation.lng), 16);
-            setState(() { _selectedStop = null; _activeTrip = null; _busInfoExpanded = true; });
+            setState(() { _selectedStop = null; _activeTrip = null; _busInfoExpanded = true; _isTrackingBus = true; });
           },
         ),
       ),
@@ -461,6 +479,13 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
               flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
             ),
             onMapEvent: _onMapEvent,
+            onTap: (_, _) {
+              _searchFocus.unfocus();
+              if (_searchQuery.isNotEmpty) {
+                setState(() => _searchQuery = '');
+                _searchCtrl.clear();
+              }
+            },
           ),
           children: [
             TileLayer(urlTemplate: tileUrl,
@@ -534,14 +559,21 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                 constraints: const BoxConstraints(maxWidth: 600),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
-              child: Column(children: [
+              child: TapRegion(
+                onTapOutside: (event) {
+                  _searchFocus.unfocus();
+                  if (_searchQuery.isNotEmpty) {
+                    setState(() => _searchQuery = '');
+                    _searchCtrl.clear();
+                  }
+                },
+                child: Column(children: [
                 // Search / brand bar
                 Container(
                   height: 52,
                   decoration: BoxDecoration(
                     color: cs.surfaceContainerLowest.withValues(alpha: 0.96),
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: cs.outlineVariant),
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 10, offset: const Offset(0, 3))],
                   ),
                   child: Row(children: [
@@ -550,17 +582,31 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                       child: Icon(Icons.search_rounded, color: cs.primary, size: 22),
                     ),
                     Expanded(
-                      child: TextField(
-                        controller: _searchCtrl,
-                        focusNode: _searchFocus,
-                        decoration: const InputDecoration(
-                          hintText: 'Search stops or destinations...',
-                          border: InputBorder.none,
-                          filled: false,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                        ),
-                        style: TextStyle(color: cs.onSurface, fontSize: 15),
-                        onChanged: _onSearchChanged,
+                      child: Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          if (!isSearchActive)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: _TypewriterBrandBar(cs: cs),
+                            ),
+                          TextField(
+                            controller: _searchCtrl,
+                            focusNode: _searchFocus,
+                            decoration: const InputDecoration(
+                              hintText: '', // Hint is handled by Typewriter
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              filled: false,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                            ),
+                            style: TextStyle(color: cs.onSurface, fontSize: 15),
+                            onChanged: _onSearchChanged,
+                          ),
+                        ],
                       ),
                     ),
                     if (_searchQuery.isNotEmpty)
@@ -664,6 +710,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           ),
         ),
       ),
+      ),
     ),
   ),
 
@@ -738,7 +785,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             ref.read(analyticsProvider).logEvent('route_switched_from_stop', {'new_route': r.name});
             ref.read(selectedRouteProvider.notifier).state = r;
             ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
-            setState(() => _selectedStop = null);
+            setState(() { _selectedStop = null; _isTrackingBus = true; });
           },
         )
       else
@@ -753,9 +800,11 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             ref.read(analyticsProvider).logEvent('route_switched_from_panel', {'new_route': r.name});
             ref.read(selectedRouteProvider.notifier).state = r;
             ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
+            setState(() => _isTrackingBus = true);
           },
           onBusChange: (b) {
             ref.read(selectedBusProvider.notifier).state = b;
+            setState(() => _isTrackingBus = true);
             // Pan to the new bus location when switching buses
             final loc = ref.read(busLocationPollingProvider).asData?.value;
             if (loc != null && !loc.lat.isNaN && !loc.lng.isNaN) {
