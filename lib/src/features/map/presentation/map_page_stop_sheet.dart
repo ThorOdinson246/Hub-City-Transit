@@ -480,6 +480,9 @@ class _StopDetailSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
+    final favorites = ref.watch(favoritesProvider);
+    final isFavorite = favorites.contains(stop.stopId.toString());
+    
     final distM = userPos != null
         ? haversineMeters(
             userPos!.latitude,
@@ -580,6 +583,18 @@ class _StopDetailSheet extends ConsumerWidget {
                               ],
                             ),
                           ],
+                        ),
+                      ),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: IconButton(
+                          icon: Icon(
+                            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                            color: isFavorite ? Colors.red : cs.onSurfaceVariant,
+                          ),
+                          onPressed: () {
+                            ref.read(favoritesProvider.notifier).toggleFavorite(stop.stopId.toString());
+                          },
                         ),
                       ),
                       Container(

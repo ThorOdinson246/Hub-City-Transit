@@ -238,3 +238,32 @@ BusStatus deriveBusStatus({
   return BusStatus.live;
 }
 
+// ─── Favorite Stops ───────────────────────────────────────────────────────────
+class FavoritesNotifier extends StateNotifier<List<String>> {
+  FavoritesNotifier() : super([]) {
+    _load();
+  }
+
+  static const _key = 'favorite_stops';
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getStringList(_key) ?? [];
+  }
+
+  Future<void> toggleFavorite(String stopId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> current = List.from(state);
+    if (current.contains(stopId)) {
+      current.remove(stopId);
+    } else {
+      current.add(stopId);
+    }
+    state = current;
+    await prefs.setStringList(_key, current);
+  }
+}
+
+final favoritesProvider = StateNotifierProvider<FavoritesNotifier, List<String>>((ref) {
+  return FavoritesNotifier();
+});

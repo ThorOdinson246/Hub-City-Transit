@@ -403,13 +403,20 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     }
 
 
-    // Search-filtered stops
+    final favoritesList = ref.watch(favoritesProvider);
+
+    // Search-filtered stops or favorites
     final searchResults = _searchQuery.length >= 2
         ? (allStopsAsync.asData?.value.entries.expand((e) =>
             e.value.where((s) => s.location.toLowerCase().contains(_searchQuery.toLowerCase()))
-              .map((s) => (route: e.key, stop: s))
-          ).take(12).toList() ?? <({RouteId route, StopModel stop})>[])
-        : <({RouteId route, StopModel stop})>[];
+              .map((s) => (route: e.key, stop: s, isFav: favoritesList.contains(s.stopId.toString())))
+          ).take(12).toList() ?? <({RouteId route, StopModel stop, bool isFav})>[])
+        : (_isSearching && _searchQuery.isEmpty && favoritesList.isNotEmpty)
+            ? (allStopsAsync.asData?.value.entries.expand((e) =>
+                e.value.where((s) => favoritesList.contains(s.stopId.toString()))
+                  .map((s) => (route: e.key, stop: s, isFav: true))
+              ).take(12).toList() ?? <({RouteId route, StopModel stop, bool isFav})>[])
+            : <({RouteId route, StopModel stop, bool isFav})>[];
 
     return Stack(children: [
       // Map
@@ -585,7 +592,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                               cursor: SystemMouseCursors.click,
                               child: ListTile(
                                 dense: true,
-                                leading: Icon(Icons.location_on_rounded, color: cs.primary),
+                                leading: Icon(r.isFav ? Icons.favorite_rounded : Icons.location_on_rounded, color: r.isFav ? Colors.red : cs.primary),
                                 title: Text(r.stop.location, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                                 subtitle: Text('Route ${r.route.name}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
                                 onTap: () {
