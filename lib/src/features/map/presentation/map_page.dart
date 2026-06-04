@@ -369,7 +369,10 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       point: LatLng(stop.lat, stop.lng),
       width: markerRadius * 2 + 10,
       height: markerRadius * 2 + 10,
-      child: GestureDetector(
+      child: Semantics(
+        button: true,
+        label: 'Stop at ${stop.location}, ID ${stop.stopId}',
+        child: GestureDetector(
         onTap: () {
           _animatedMapMove(LatLng(stop.lat, stop.lng), 16);
           setState(() {
@@ -396,6 +399,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           ),
         ),
       ),
+    ),
     )).toList() ?? [];
 
     final busLocation = busAsync.asData?.value;
@@ -737,8 +741,12 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                 }
               }
             },
-            child: Icon(
-              userPos != null ? Icons.my_location_rounded : Icons.location_searching_rounded,
+            child: Tooltip(
+              message: userPos != null ? 'Locate me' : 'Request location permission',
+              child: Icon(
+                userPos != null ? Icons.my_location_rounded : Icons.location_searching_rounded,
+                semanticLabel: userPos != null ? 'Center map on my location' : 'Request location access',
+              ),
             ),
           ),
         ),

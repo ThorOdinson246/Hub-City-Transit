@@ -1,8 +1,10 @@
 # Hub City Transit — Flutter App
 
+![Hub City Transit on Android — splash, live bus map, trip planner, and turn-by-turn trip details](image.png)
+
 A native mobile companion to the [Hub City Transit web app](https://hubcitytransitv2.mukeshpoudel.com.np/), bringing real-time bus tracking, trip planning, schedules, and fares for Hattiesburg, MS to Android and iOS.
 
-> **Status:** Flutter migration completed. Testing in beta on Android (Pixel).
+> **📣 Coming to the Play Store and App Store.** Looking for beta testers ahead of release — if you'd like to be one, get in touch (contact details are on my profile).
 
 ---
 

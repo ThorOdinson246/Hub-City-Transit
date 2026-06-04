@@ -52,6 +52,11 @@ env/
 
 # Internal docs — kept off GitHub to maintain exclusivity
 docs/
+ARCHITECTURE.md
+
+# Local tooling config — kept out of the public repo
+analysis_options.yaml
+devtools_options.yaml
 
 # Route data — proprietary, not for public repo
 # The app ships these baked into the APK/IPA, but we don't

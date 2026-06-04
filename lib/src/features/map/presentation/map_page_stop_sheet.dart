@@ -145,11 +145,15 @@ class _BusInfoPanel extends ConsumerWidget {
                       runSpacing: 8,
                       children: RouteId.values.map((r) {
                         final sel = r == selectedRoute;
-                        return MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            onTap: () => onRouteChange(r),
-                            child: AnimatedContainer(
+                        return Semantics(
+                          button: true,
+                          label: 'Switch to ${routeNames[r] ?? r.name} route',
+                          selected: sel,
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () => onRouteChange(r),
+                              child: AnimatedContainer(
                               duration: const Duration(milliseconds: 180),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 14,
@@ -184,6 +188,7 @@ class _BusInfoPanel extends ConsumerWidget {
                               ),
                             ),
                           ),
+                        ),
                         );
                       }).toList(),
                     ),
@@ -1133,9 +1138,12 @@ Widget buildBusMarker({
     BusStatus.offline => Colors.grey.shade500,
   };
 
-  return GestureDetector(
-    onTap: onTap,
-    child: SizedBox(
+  return Semantics(
+    button: true,
+    label: 'Bus ${selectedBus.value}, Status: ${busStatus.name}',
+    child: GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
       width: 80,
       height: 90,
       child: Center(
@@ -1171,19 +1179,21 @@ Widget buildBusMarker({
                   children: [
                     // Pulsing ring — when live or connecting
                     if (!isOffline)
-                      _PulsingRing(color: statusColor),
+                      ExcludeSemantics(child: _PulsingRing(color: statusColor)),
                     
                     // Direction arrow — only when heading available
                     if (!isOffline && busLocation.heading != null)
-                      Transform.rotate(
-                        angle: (busLocation.heading! * 3.14159265 / 180),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: CustomPaint(
-                              size: const Size(10, 10),
-                              painter: _PointerPainter(color: statusColor),
+                      ExcludeSemantics(
+                        child: Transform.rotate(
+                          angle: (busLocation.heading! * 3.14159265 / 180),
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: CustomPaint(
+                                size: const Size(10, 10),
+                                painter: _PointerPainter(color: statusColor),
+                              ),
                             ),
                           ),
                         ),
@@ -1236,6 +1246,7 @@ Widget buildBusMarker({
               ],
           ),
         ),
+      ),
       ),
     ),
   );
