@@ -23,6 +23,18 @@ import '../../../core/utils/analytics_service.dart';
 part 'map_page_stop_sheet.dart';
 part 'map_page_navigation.dart';
 
+abstract class SearchResultItem {}
+class StopResult extends SearchResultItem {
+  final RouteId route;
+  final StopModel stop;
+  final bool isFav;
+  StopResult({required this.route, required this.stop, required this.isFav});
+}
+class LandmarkResult extends SearchResultItem {
+  final NominatimPlace place;
+  LandmarkResult(this.place);
+}
+
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
   @override
@@ -57,11 +69,15 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   final _mapController = MapController();
   StopModel? _selectedStop;
   bool _headerVisible = true;
-  bool _isSearching = false;
   final _searchCtrl = TextEditingController();
   final _searchFocus = FocusNode();
   String _searchQuery = '';
   double _currentZoom = 13.0;
+
+  final _nominatim = NominatimService();
+  List<dynamic> _landmarkResults = [];
+  Timer? _searchDebounce;
+  bool _landmarksLoading = false;
 
   bool _etaLoading = false;
   bool _etaInFlight = false;
@@ -166,10 +182,29 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   @override
   void dispose() {
     _gestureTimer?.cancel();
+    _searchDebounce?.cancel();
     _searchCtrl.dispose();
     _searchFocus.dispose();
     _mapController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() => _searchQuery = query);
+    if (_searchDebounce?.isActive ?? false) _searchDebounce!.cancel();
+    if (query.trim().length < 3) {
+      setState(() => _landmarkResults = []);
+      return;
+    }
+    _searchDebounce = Timer(const Duration(milliseconds: 600), () async {
+      setState(() => _landmarksLoading = true);
+      try {
+        final results = await _nominatim.search(query);
+        if (mounted) setState(() { _landmarkResults = results; _landmarksLoading = false; });
+      } catch (e) {
+        if (mounted) setState(() { _landmarksLoading = false; });
+      }
+    });
   }
 
   void _onMapEvent(MapEvent event) {
@@ -191,12 +226,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     _animatedMapMove(LatLng(pos.latitude, pos.longitude), 15);
   }
 
-  void _activateSearch() {
-    setState(() => _isSearching = true);
-    Future.delayed(const Duration(milliseconds: 80), () => _searchFocus.requestFocus());
-  }
-
-  void _openTripPlanner(BuildContext ctx, dynamic userPos) {
+  void _openTripPlanner(BuildContext ctx, dynamic userPos, {NominatimPlace? defaultDestination}) {
     ref.read(analyticsProvider).logEvent('open_trip_planner');
     final cs = Theme.of(ctx).colorScheme;
     showModalBottomSheet(
@@ -205,24 +235,16 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       showDragHandle: true,
       backgroundColor: cs.surfaceContainerLowest,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (_) => TripPlannerSheet(
+      builder: (ctx) => TripPlannerSheet(
         userPos: userPos,
-        onTripCalculated: (result) {
+        defaultDestination: defaultDestination,
+        onTripCalculated: (res) {
+          setState(() { _activeTrip = res; _headerVisible = false; });
+          _fitTripBounds(res, userPos);
           Navigator.pop(ctx);
-          setState(() => _activeTrip = result);
-          _fitTripBounds(result, userPos);
         },
       ),
     );
-  }
-
-  void _cancelSearch() {
-    setState(() {
-      _isSearching = false;
-      _searchQuery = '';
-    });
-    _searchCtrl.clear();
-    _searchFocus.unfocus();
   }
 
   Future<void> _fetchEta(BusId bus, Position pos) async {
@@ -405,18 +427,25 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 
     final favoritesList = ref.watch(favoritesProvider);
 
+    final isSearchActive = _searchFocus.hasFocus || _searchQuery.isNotEmpty;
+
     // Search-filtered stops or favorites
-    final searchResults = _searchQuery.length >= 2
+    final stopResults = _searchQuery.length >= 2
         ? (allStopsAsync.asData?.value.entries.expand((e) =>
             e.value.where((s) => s.location.toLowerCase().contains(_searchQuery.toLowerCase()))
-              .map((s) => (route: e.key, stop: s, isFav: favoritesList.contains(s.stopId.toString())))
-          ).take(12).toList() ?? <({RouteId route, StopModel stop, bool isFav})>[])
-        : (_isSearching && _searchQuery.isEmpty && favoritesList.isNotEmpty)
+              .map((s) => StopResult(route: e.key, stop: s, isFav: favoritesList.contains(s.stopId.toString())))
+          ).take(12).toList() ?? <StopResult>[])
+        : (isSearchActive && _searchQuery.isEmpty && favoritesList.isNotEmpty)
             ? (allStopsAsync.asData?.value.entries.expand((e) =>
                 e.value.where((s) => favoritesList.contains(s.stopId.toString()))
-                  .map((s) => (route: e.key, stop: s, isFav: true))
-              ).take(12).toList() ?? <({RouteId route, StopModel stop, bool isFav})>[])
-            : <({RouteId route, StopModel stop, bool isFav})>[];
+                  .map((s) => StopResult(route: e.key, stop: s, isFav: true))
+              ).take(12).toList() ?? <StopResult>[])
+            : <StopResult>[];
+
+    final searchResults = <SearchResultItem>[
+      ...stopResults,
+      ..._landmarkResults.map((p) => LandmarkResult(p as NominatimPlace)),
+    ];
 
     return Stack(children: [
       // Map
@@ -516,60 +545,45 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 10, offset: const Offset(0, 3))],
                   ),
                   child: Row(children: [
-                    const SizedBox(width: 6),
-                    if (_isSearching)
-                      IconButton(
-                        icon: Icon(Icons.arrow_back_rounded, color: cs.onSurface),
-                        onPressed: _cancelSearch,
-                        visualDensity: VisualDensity.compact,
-                      )
-                    else
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Icon(Icons.directions_bus_rounded, color: cs.primary, size: 22),
-                      ),
-                    Expanded(
-                      child: _isSearching
-                          ? TextField(
-                              controller: _searchCtrl,
-                              focusNode: _searchFocus,
-                              decoration: const InputDecoration(
-                                hintText: 'Search stops or routes...',
-                                border: InputBorder.none,
-                                filled: false,
-                                contentPadding: EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                              style: TextStyle(color: cs.onSurface, fontSize: 15),
-                              onChanged: (v) => setState(() => _searchQuery = v),
-                            )
-                          : GestureDetector(
-                              onTap: () => _openTripPlanner(context, locationAsync.asData?.value),
-                              behavior: HitTestBehavior.opaque,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: _TypewriterBrandBar(cs: cs),
-                              ),
-                            ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 14),
+                      child: Icon(Icons.search_rounded, color: cs.primary, size: 22),
                     ),
-                    if (!_isSearching)
+                    Expanded(
+                      child: TextField(
+                        controller: _searchCtrl,
+                        focusNode: _searchFocus,
+                        decoration: const InputDecoration(
+                          hintText: 'Search stops or destinations...',
+                          border: InputBorder.none,
+                          filled: false,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                        style: TextStyle(color: cs.onSurface, fontSize: 15),
+                        onChanged: _onSearchChanged,
+                      ),
+                    ),
+                    if (_searchQuery.isNotEmpty)
                       IconButton(
-                        icon: Icon(Icons.search_rounded, color: cs.onSurface),
-                        onPressed: _activateSearch,
+                        icon: Icon(Icons.close_rounded, color: cs.onSurfaceVariant, size: 20),
+                        onPressed: () {
+                          _searchCtrl.clear();
+                          _onSearchChanged('');
+                        },
                         visualDensity: VisualDensity.compact,
                       ),
-                    if (!_isSearching)
-                      IconButton(
-                        icon: Icon(Icons.directions_rounded, color: cs.primary),
-                        onPressed: () => _openTripPlanner(context, locationAsync.asData?.value),
-                        visualDensity: VisualDensity.compact,
-                        tooltip: 'Plan a Trip',
-                      ),
+                    IconButton(
+                      icon: Icon(Icons.directions_rounded, color: cs.primary),
+                      onPressed: () => _openTripPlanner(context, locationAsync.asData?.value),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Plan a Trip',
+                    ),
                     const SizedBox(width: 4),
                   ]),
                 ),
 
                 // Search results inline dropdown
-                if (_isSearching && searchResults.isNotEmpty) ...[
+                if (isSearchActive && searchResults.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Container(
                     constraints: const BoxConstraints(maxHeight: 220),
@@ -587,37 +601,59 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                         itemCount: searchResults.length,
                         separatorBuilder: (_, _) => Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.4)),
                         itemBuilder: (_, i) {
-                          final r = searchResults[i];
-                          return MouseRegion(
+                          final item = searchResults[i];
+                          if (item is StopResult) {
+                            return MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: ListTile(
                                 dense: true,
                                 minLeadingWidth: 20,
-                                leading: Icon(r.isFav ? Icons.favorite_rounded : Icons.location_on_rounded, color: r.isFav ? Colors.red : cs.primary),
-                                title: Text(r.stop.location, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-                                subtitle: Text('Route ${r.route.name}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+                                leading: Icon(item.isFav ? Icons.favorite_rounded : Icons.directions_bus_rounded, color: item.isFav ? Colors.red : cs.primary),
+                                title: Text(item.stop.location, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                                subtitle: Text('Route ${item.route.name}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
                                 onTap: () {
-                              if (GeoUtils.isValidLatLng(r.stop.lat, r.stop.lng)) {
-                                _animatedMapMove(LatLng(r.stop.lat, r.stop.lng), 15);
-                              }
-                              ref.read(selectedRouteProvider.notifier).state = r.route;
-                              ref.read(selectedBusProvider.notifier).state = routeBusMap[r.route]!.first;
-                              
-                              ref.read(analyticsProvider).logEvent('stop_search_selected', {
-                                'stop_id': r.stop.stopId,
-                                'route': r.route.name,
-                              });
+                                  if (GeoUtils.isValidLatLng(item.stop.lat, item.stop.lng)) {
+                                    _animatedMapMove(LatLng(item.stop.lat, item.stop.lng), 15);
+                                  }
+                                  ref.read(selectedRouteProvider.notifier).state = item.route;
+                                  ref.read(selectedBusProvider.notifier).state = routeBusMap[item.route]!.first;
+                                  
+                                  ref.read(analyticsProvider).logEvent('stop_search_selected', {
+                                    'stop_id': item.stop.stopId,
+                                    'route': item.route.name,
+                                  });
 
-                              setState(() {
-                                _selectedStop = r.stop;
-                                _isSearching = false;
-                                _searchQuery = '';
-                              });
-                              _searchCtrl.clear();
-                              _searchFocus.unfocus();
-                            },
-                          ),
-                        );
+                                  setState(() {
+                                    _selectedStop = item.stop;
+                                    _searchQuery = '';
+                                  });
+                                  _searchCtrl.clear();
+                                  _searchFocus.unfocus();
+                                },
+                              ),
+                            );
+                          } else if (item is LandmarkResult) {
+                            final parts = item.place.displayName.split(',');
+                            final mainText = parts.first;
+                            final subText = parts.skip(1).join(',').trim();
+                            return MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: ListTile(
+                                dense: true,
+                                minLeadingWidth: 20,
+                                leading: Icon(Icons.place_rounded, color: cs.secondary),
+                                title: Text(mainText, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                                subtitle: Text(subText, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+                                onTap: () {
+                                  _openTripPlanner(context, locationAsync.asData?.value, defaultDestination: item.place);
+                                  setState(() => _searchQuery = '');
+                                  _searchCtrl.clear();
+                                  _searchFocus.unfocus();
+                                },
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
                         },
                       ),
                     ),

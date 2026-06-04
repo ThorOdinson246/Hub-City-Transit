@@ -2,9 +2,10 @@ part of 'map_page.dart';
 
 // ── Trip Planner Sheet ────────────────────────────────────────────────────────
 class TripPlannerSheet extends ConsumerStatefulWidget {
-  const TripPlannerSheet({super.key, this.userPos, required this.onTripCalculated});
+  const TripPlannerSheet({super.key, this.userPos, required this.onTripCalculated, this.defaultDestination});
   final Position? userPos;
   final void Function(TripResult) onTripCalculated;
+  final NominatimPlace? defaultDestination;
 
   @override
   ConsumerState<TripPlannerSheet> createState() => _TripPlannerSheetState();
@@ -24,6 +25,12 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
     super.initState();
     if (widget.userPos != null) {
       _fromLabel = 'Your current location';
+    }
+    if (widget.defaultDestination != null) {
+      _toCtrl.text = widget.defaultDestination!.displayName.split(',').first;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _plan(widget.defaultDestination!);
+      });
     }
   }
 
