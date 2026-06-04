@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -31,6 +32,27 @@ class MapPage extends ConsumerStatefulWidget {
 class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Hub City Transit is best experienced on our mobile app!'),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 8),
+            action: SnackBarAction(
+              label: 'Dismiss',
+              onPressed: () {},
+            ),
+          ),
+        );
+      });
+    }
+  }
 
   final _mapController = MapController();
   StopModel? _selectedStop;
@@ -559,15 +581,14 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                         separatorBuilder: (_, _) => Divider(height: 1, color: cs.outlineVariant.withValues(alpha: 0.4)),
                         itemBuilder: (_, i) {
                           final r = searchResults[i];
-                          return ListTile(
-                            dense: true,
-                            leading: CircleAvatar(
-                              radius: 8,
-                              backgroundColor: routeColors[r.route],
-                            ),
-                            title: Text(r.stop.location, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: cs.onSurface)),
-                            subtitle: Text(routeNames[r.route] ?? '', style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
-                            onTap: () {
+                          return MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: ListTile(
+                                dense: true,
+                                leading: Icon(Icons.location_on_rounded, color: cs.primary),
+                                title: Text(r.stop.location, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                                subtitle: Text('Route ${r.route.name}', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+                                onTap: () {
                               if (GeoUtils.isValidLatLng(r.stop.lat, r.stop.lng)) {
                                 _animatedMapMove(LatLng(r.stop.lat, r.stop.lng), 15);
                               }
@@ -587,7 +608,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                               _searchCtrl.clear();
                               _searchFocus.unfocus();
                             },
-                          );
+                          ),
+                        );
                         },
                       ),
                     ),

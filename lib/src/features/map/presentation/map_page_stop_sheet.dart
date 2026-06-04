@@ -146,8 +146,10 @@ class _BusInfoPanel extends ConsumerWidget {
                       itemBuilder: (_, i) {
                         final r = RouteId.values[i];
                         final sel = r == selectedRoute;
-                        return GestureDetector(
-                          onTap: () => onRouteChange(r),
+                        return MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => onRouteChange(r),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 180),
                             padding: const EdgeInsets.symmetric(
@@ -182,8 +184,9 @@ class _BusInfoPanel extends ConsumerWidget {
                               ],
                             ),
                           ),
-                        );
-                      },
+                        ),
+                      );
+                    },
                     ),
                   ),
 
@@ -202,8 +205,10 @@ class _BusInfoPanel extends ConsumerWidget {
                           const SizedBox(width: 8),
                           ...routeBuses.map((b) {
                             final sel = b == selectedBus;
-                            return GestureDetector(
-                              onTap: () => onBusChange(b),
+                            return MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: () => onBusChange(b),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 180),
                                 margin: const EdgeInsets.only(right: 8),
@@ -224,6 +229,7 @@ class _BusInfoPanel extends ConsumerWidget {
                                     fontWeight: FontWeight.w800,
                                     color: sel ? Colors.white : cs.onSurface,
                                   ),
+                                ),
                                 ),
                               ),
                             );

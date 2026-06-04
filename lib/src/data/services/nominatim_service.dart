@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class NominatimPlace {
 
@@ -25,7 +26,9 @@ class NominatimService {
       : _dio = dio ??
             Dio(BaseOptions(
               baseUrl: _baseUrl,
-              headers: {'User-Agent': 'HubCityTransitApp/1.0'},
+              headers: {
+                if (!kIsWeb) 'User-Agent': 'HubCityTransitApp/1.0',
+              },
             ));
 
   static const String _baseUrl = 'https://nominatim.openstreetmap.org/search';

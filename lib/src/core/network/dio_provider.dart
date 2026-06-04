@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../constants/app_constants.dart';
@@ -10,9 +11,9 @@ final dioProvider = Provider<Dio>((ref) {
       connectTimeout: requestTimeout,
       receiveTimeout: requestTimeout,
       sendTimeout: requestTimeout,
-      headers: const {
+      headers: {
         'Accept': 'application/json',
-        'User-Agent': 'HubCityTransit-Flutter/1.0',
+        if (!kIsWeb) 'User-Agent': 'HubCityTransit-Flutter/1.0',
       },
     ),
   );
