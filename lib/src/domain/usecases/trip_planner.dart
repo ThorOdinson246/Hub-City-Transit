@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import '../../data/models/transit_dataset.dart';
+import 'service_calendar.dart';
 
 /// Defaults come from the official site's own planner — those are calibrated
 /// against this network, so reusing them beats guessing.
@@ -112,6 +113,7 @@ class TripPlanResult {
     this.nextServiceMinutes,
     this.walkOnlyMinutes,
     this.walkOnlyMetres,
+    this.serviceStatus,
   });
 
   final List<TripItinerary> itineraries;
@@ -123,6 +125,10 @@ class TripPlanResult {
   /// Sometimes the honest answer is "just walk".
   final int? walkOnlyMinutes;
   final double? walkOnlyMetres;
+
+  /// Why buses are not running, when they are not. Carries the holiday name and
+  /// the next running day so the UI can say something specific.
+  final ServiceStatus? serviceStatus;
 
   bool get hasResults => itineraries.isNotEmpty;
 }
@@ -157,13 +163,15 @@ class TripPlanner {
         _distance(originLat, originLng, destLat, destLng) * config.walkDetourFactor;
     final walkMinutes = _walkMinutes(walkMetres);
 
+    final status = serviceStatusAt(dataset, when);
     final service = _serviceFor(dataset, when);
-    if (service == null) {
+    if (service == null || status.state == ServiceState.holiday) {
       return TripPlanResult(
         failure: TripPlanFailure.outsideServiceDays,
         nextServiceMinutes: _firstDepartureOfDay(dataset),
         walkOnlyMinutes: walkMinutes,
         walkOnlyMetres: walkMetres,
+        serviceStatus: status,
       );
     }
 
@@ -212,6 +220,7 @@ class TripPlanner {
         nextServiceMinutes: _firstDepartureOfDay(dataset),
         walkOnlyMinutes: walkMinutes,
         walkOnlyMetres: walkMetres,
+        serviceStatus: status,
       );
     }
 

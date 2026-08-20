@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../data/models/transit_dataset.dart';
+import '../../../domain/usecases/service_calendar.dart';
 import '../../../domain/usecases/trip_planner.dart';
 import '../application/active_trip.dart';
 import '../application/trip_planner_providers.dart';
@@ -236,7 +237,8 @@ class _Results extends ConsumerWidget {
                   _ => Icons.search_off_rounded,
                 },
                 title: switch (result.failure) {
-                  TripPlanFailure.outsideServiceDays => 'No service today',
+                  TripPlanFailure.outsideServiceDays =>
+                    result.serviceStatus?.holidayName ?? 'No service today',
                   TripPlanFailure.noServiceAtTime => 'No buses at that time',
                   TripPlanFailure.noNearbyStops => 'No stops nearby',
                   _ => 'No route found',
@@ -289,6 +291,32 @@ class _Results extends ConsumerWidget {
         );
   }
 
+  /// "The next available departure is Thursday at 6:00 AM" — naming the day is
+  /// the difference between a useful message and a dead end.
+  String _resumesPhrase(ServiceStatus? status, int? nextMinutes) {
+    final day = status?.nextServiceDay;
+    if (day == null || nextMinutes == null) return '';
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final delta = day.difference(today).inDays;
+    final when = switch (delta) {
+      0 => 'today',
+      1 => 'tomorrow',
+      _ => _weekdayName(day.weekday),
+    };
+    return ' The next departure is $when at ${formatClock(nextMinutes)}.';
+  }
+
+  static String _weekdayName(int weekday) => const [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ][weekday - 1];
+
   String _altLabel(TripPlanResult result, int index) {
     final here = result.itineraries[index];
     final best = result.itineraries.first;
@@ -300,13 +328,20 @@ class _Results extends ConsumerWidget {
 
   String _failureBody(TripPlanResult result) {
     final next = result.nextServiceMinutes;
+    final status = result.serviceStatus;
+    final resumes = _resumesPhrase(status, next);
+
     switch (result.failure) {
       case TripPlanFailure.outsideServiceDays:
-        return 'Hub City Transit runs weekdays only.'
-            '${next != null ? " Next buses start at ${formatClock(next)} on Monday." : ""}';
+        final reason = status?.holidayName != null
+            ? 'Hub City Transit does not run on ${status!.holidayName}.'
+            : 'Hub City Transit runs weekdays only.';
+        return '$reason$resumes';
       case TripPlanFailure.noServiceAtTime:
-        return 'Service has finished for the day.'
-            '${next != null ? " The first bus tomorrow is at ${formatClock(next)}." : ""}';
+        final reason = status?.state == ServiceState.beforeFirstBus
+            ? 'Buses have not started running yet today.'
+            : 'Service has finished for the day.';
+        return '$reason$resumes';
       case TripPlanFailure.noNearbyStops:
         return 'There is no bus stop close enough to one end of this trip.';
       default:
