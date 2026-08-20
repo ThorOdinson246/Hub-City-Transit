@@ -101,12 +101,6 @@ class _ItineraryCardState extends ConsumerState<ItineraryCard> {
                               style: text.bodySmall
                                   ?.copyWith(color: scheme.onSurfaceVariant)),
                         ]),
-                        Icon(
-                          _expanded
-                              ? Icons.keyboard_arrow_up_rounded
-                              : Icons.keyboard_arrow_down_rounded,
-                          color: scheme.onSurfaceVariant,
-                        ),
                       ],
                     ),
                   ],
@@ -122,6 +116,33 @@ class _ItineraryCardState extends ConsumerState<ItineraryCard> {
               child: Text(note,
                   style: text.bodySmall?.copyWith(color: scheme.onSurface)),
             ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(46),
+                      backgroundColor: scheme.secondaryContainer,
+                      foregroundColor: scheme.onSecondaryContainer,
+                    ),
+                    onPressed: widget.onShowOnMap,
+                    icon: const Icon(Icons.directions_rounded, size: 20),
+                    label: const Text('Show on map'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(88, 46),
+                  ),
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  child: Text(_expanded ? 'Hide steps' : 'Steps'),
+                ),
+              ],
+            ),
+          ),
           if (_expanded)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -129,20 +150,6 @@ class _ItineraryCardState extends ConsumerState<ItineraryCard> {
                 children: [
                   const Divider(height: 1),
                   for (final leg in it.legs) _LegRow(leg: leg),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.tonalIcon(
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(48),
-                        backgroundColor: scheme.secondaryContainer,
-                        foregroundColor: scheme.onSecondaryContainer,
-                      ),
-                      onPressed: widget.onShowOnMap,
-                      icon: const Icon(Icons.directions_rounded, size: 20),
-                      label: const Text('Show on map'),
-                    ),
-                  ),
                 ],
               ),
             ),

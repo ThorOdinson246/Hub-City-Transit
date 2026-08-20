@@ -159,16 +159,18 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   /// is up. The FAB previously sat at a guessed offset and ended up behind the
   /// stop sheet, which can be 65% of the screen tall.
   final GlobalKey _panelKey = GlobalKey();
-  double _panelHeight = 96;
+
+  /// A notifier, not setState: the panels animate their height, so measuring
+  /// into page state meant a full rebuild every frame of every animation, on top
+  /// of the 3-second poll. That storm is what made the map blank intermittently.
+  final ValueNotifier<double> _panelHeight = ValueNotifier<double>(96);
 
   void _measurePanel() {
     if (!mounted) return;
     final box = _panelKey.currentContext?.findRenderObject() as RenderBox?;
     final height = box?.size.height;
     if (height == null) return;
-    if ((height - _panelHeight).abs() > 1) {
-      setState(() => _panelHeight = height);
-    }
+    if ((height - _panelHeight.value).abs() > 1) _panelHeight.value = height;
   }
 
   void _animatedMapMove(LatLng destLocation, double destZoom) {
@@ -238,6 +240,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   @override
   void dispose() {
     _searchFocus.removeListener(_onSearchFocusChanged);
+    _panelHeight.dispose();
     _gestureTimer?.cancel();
     _searchDebounce?.cancel();
     _searchCtrl.dispose();
@@ -832,13 +835,14 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   ),
 
       // ── Location FAB ─────────────────────────────────────────────────────
-      AnimatedPositioned(
+      ValueListenableBuilder<double>(
+        valueListenable: _panelHeight,
+        builder: (context, panelHeight, child) => AnimatedPositioned(
           duration: const Duration(milliseconds: 250),
           curve: Curves.fastOutSlowIn,
           right: 12,
-          bottom: _panelHeight + 16,
-        child: GestureDetector(
-          child: FloatingActionButton.small(
+          bottom: panelHeight + 16,
+        child: FloatingActionButton.small(
             heroTag: 'loc-fab',
             backgroundColor: cs.surfaceContainerLowest,
             foregroundColor: cs.primary,
