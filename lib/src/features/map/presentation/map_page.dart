@@ -342,7 +342,12 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final selectedRoute = ref.watch(selectedRouteProvider);
     final activeTrip = ref.watch(activeTripProvider);
     ref.listen<PlannedTrip?>(activeTripProvider, (previous, next) {
-      if (next != null && next != previous) _fitTripBounds(next);
+      if (next == null || next == previous) return;
+      // MapController throws if touched before FlutterMap has rendered once, and
+      // this fires mid-build on arrival from the Plan tab.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _fitTripBounds(next);
+      });
     });
     final selectedBus = ref.watch(selectedBusProvider);
     final routesAsync = ref.watch(routesProvider);
@@ -434,7 +439,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final busMarkers = (effectiveBusLocation == null || !GeoUtils.isValidLatLng(effectiveBusLocation.lat, effectiveBusLocation.lng)) ? <Marker>[] : [
       Marker(
         point: LatLng(effectiveBusLocation.lat, effectiveBusLocation.lng),
-        width: 80, height: 80,
+        // buildBusMarker is 80x90; anything shorter clips the OFFLINE label.
+        width: 80, height: 92,
         child: buildBusMarker(
           busLocation: effectiveBusLocation,
           busStatus: busStatus,

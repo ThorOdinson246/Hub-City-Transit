@@ -132,10 +132,14 @@ class _ItineraryCardState extends ConsumerState<ItineraryCard> {
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
-                    height: 48,
                     child: FilledButton.tonalIcon(
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                        backgroundColor: scheme.secondaryContainer,
+                        foregroundColor: scheme.onSecondaryContainer,
+                      ),
                       onPressed: widget.onShowOnMap,
-                      icon: const Icon(Icons.map_rounded, size: 20),
+                      icon: const Icon(Icons.directions_rounded, size: 20),
                       label: const Text('Show on map'),
                     ),
                   ),
