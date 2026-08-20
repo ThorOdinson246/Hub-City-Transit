@@ -15,6 +15,19 @@ enum RouteId {
       orElse: () => RouteId.blue,
     );
   }
+
+  /// Null for anything unrecognised, including null input.
+  ///
+  /// [fromValue] falls back to blue, which is wrong for a URL parameter: absent
+  /// has to mean "no override" and a typo'd route has to mean "no override"
+  /// too, not "silently show blue".
+  static RouteId? tryParse(String? raw) {
+    if (raw == null) return null;
+    for (final item in RouteId.values) {
+      if (item.name == raw) return item;
+    }
+    return null;
+  }
 }
 
 enum BusId {

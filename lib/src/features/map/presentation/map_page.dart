@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,7 +39,14 @@ class LandmarkResult extends SearchResultItem {
 }
 
 class MapPage extends ConsumerStatefulWidget {
-  const MapPage({super.key});
+  const MapPage({this.routeId, this.stopId, super.key});
+
+  /// Route named by `?route=`, or null to leave the current selection alone.
+  final RouteId? routeId;
+
+  /// Stop named by `?stop=`, or null for no open sheet.
+  final String? stopId;
+
   @override
   ConsumerState<MapPage> createState() => _MapPageState();
 }
@@ -48,7 +56,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   bool get wantKeepAlive => true;
 
   final _mapController = MapController();
-  StopModel? _selectedStop;
   bool _headerVisible = true;
   final _searchCtrl = TextEditingController();
   final _searchFocus = FocusNode();
@@ -64,6 +71,78 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 
   Timer? _gestureTimer;
   TripResult? _activeTrip;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncRouteFromUrl();
+  }
+
+  @override
+  void didUpdateWidget(MapPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.routeId != oldWidget.routeId) _syncRouteFromUrl();
+  }
+
+  /// Points the shared route selection at whatever `?route=` names.
+  ///
+  /// Deferred to after the frame because this runs from `initState` and
+  /// `didUpdateWidget`, where writing a provider lands inside the build phase.
+  /// The selected *stop* needs no equivalent — it is derived in `build` from the
+  /// URL, so it cannot fall out of step.
+  void _syncRouteFromUrl() {
+    final routeId = widget.routeId;
+    if (routeId == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || routeId == ref.read(selectedRouteProvider)) return;
+      ref.read(selectedRouteProvider.notifier).state = routeId;
+      ref.read(selectedBusProvider.notifier).state = routeBusMap[routeId]!.first;
+    });
+  }
+
+  /// The stop named by `?stop=`, once the stop list has loaded.
+  ///
+  /// Derived rather than stored. A cold deep link arrives before the stops do,
+  /// so anything that resolved this once — in `initState` or a post-frame
+  /// callback — would give up and never retry: `ref.read` does not subscribe,
+  /// and the widget's parameters have not changed, so `didUpdateWidget` never
+  /// fires again. Resolving here means the sheet simply appears on the build
+  /// that follows the stops arriving.
+  StopModel? _resolveSelectedStop(List<StopModel>? stops) {
+    final stopId = widget.stopId;
+    if (stopId == null || stops == null) return null;
+    return stops
+        .where((candidate) => candidate.stopId.toString() == stopId)
+        .firstOrNull;
+  }
+
+  int? _flownToStopId;
+
+  /// Centres the map on a stop the first time it becomes the selected one, so a
+  /// shared link lands on the stop rather than the default camera. Skipped for
+  /// a stop the user tapped, which has already been flown to.
+  void _flyToSelectedStop(StopModel? stop) {
+    if (stop == null) {
+      _flownToStopId = null;
+      return;
+    }
+    if (_flownToStopId == stop.stopId) return;
+    _flownToStopId = stop.stopId;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _animatedMapMove(LatLng(stop.lat, stop.lng), 16);
+    });
+  }
+
+  /// Rewrites the URL to match a selection, so it can be shared and so Back
+  /// steps through selections rather than out of the app.
+  void _pushSelection({RouteId? route, StopModel? stop}) {
+    final RouteId routeId = route ?? ref.read(selectedRouteProvider);
+    final query = {
+      'route': routeId.value,
+      if (stop != null) 'stop': stop.stopId.toString(),
+    };
+    context.go(Uri(path: '/map', queryParameters: query).toString());
+  }
 
   void _animatedMapMove(LatLng destLocation, double destZoom) {
     final latTween = Tween<double>(begin: _mapController.camera.center.latitude, end: destLocation.latitude);
@@ -324,6 +403,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final selectedBus = ref.watch(selectedBusProvider);
     final routesAsync = ref.watch(routesProvider);
     final stopsAsync = ref.watch(stopsBySelectedRouteProvider);
+    final selectedStop = _resolveSelectedStop(stopsAsync.asData?.value);
+    _flyToSelectedStop(selectedStop);
     final allStopsAsync = ref.watch(allStopsByRouteProvider);
     final busAsync = ref.watch(busLocationPollingProvider);
     
@@ -413,20 +494,18 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         child: GestureDetector(
         onTap: () {
           _animatedMapMove(LatLng(stop.lat, stop.lng), 16);
-          setState(() {
-            _selectedStop = stop;
-            _activeTrip = null; // Close active trip if they tap a stop
-          });
+          setState(() => _activeTrip = null); // Close active trip if they tap a stop
+          _pushSelection(stop: stop);
         },
         child: Center(
           child: Container(
             width: markerRadius * 2,
             height: markerRadius * 2,
             decoration: BoxDecoration(
-              color: _selectedStop?.stopId == stop.stopId ? Colors.white : routeColors[selectedRoute],
+              color: selectedStop?.stopId == stop.stopId ? Colors.white : routeColors[selectedRoute],
               shape: BoxShape.circle,
               border: Border.all(
-                color: _selectedStop?.stopId == stop.stopId ? routeColors[selectedRoute]! : Colors.white,
+                color: selectedStop?.stopId == stop.stopId ? routeColors[selectedRoute]! : Colors.white,
                 width: 2,
               ),
               boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 3)],
@@ -451,7 +530,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           selectedBus: selectedBus,
           onTap: () {
             _animatedMapMove(LatLng(effectiveBusLocation.lat, effectiveBusLocation.lng), 16);
-            setState(() { _selectedStop = null; _activeTrip = null; _busInfoExpanded = true; _isTrackingBus = true; });
+            setState(() { _activeTrip = null; _busInfoExpanded = true; _isTrackingBus = true; });
+            _pushSelection();
           },
         ),
       ),
@@ -759,20 +839,15 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                                   if (GeoUtils.isValidLatLng(item.stop.lat, item.stop.lng)) {
                                     _animatedMapMove(LatLng(item.stop.lat, item.stop.lng), 15);
                                   }
-                                  ref.read(selectedRouteProvider.notifier).state = item.route;
-                                  ref.read(selectedBusProvider.notifier).state = routeBusMap[item.route]!.first;
-                                  
                                   ref.read(analyticsProvider).logEvent('stop_search_selected', {
                                     'stop_id': item.stop.stopId,
                                     'route': item.route.name,
                                   });
 
-                                  setState(() {
-                                    _selectedStop = item.stop;
-                                    _searchQuery = '';
-                                  });
+                                  setState(() => _searchQuery = '');
                                   _searchCtrl.clear();
                                   _searchFocus.unfocus();
+                                  _pushSelection(route: item.route, stop: item.stop);
                                 },
                               ),
                             );
@@ -818,7 +893,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
           right: 12,
-          bottom: _selectedStop != null ? 380 : (_busInfoExpanded ? 280 : 100),
+          bottom: selectedStop != null ? 380 : (_busInfoExpanded ? 280 : 100),
         child: GestureDetector(
           child: FloatingActionButton.small(
             heroTag: 'loc-fab',
@@ -862,20 +937,20 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             ),
           ),
         )
-      else if (_selectedStop != null)
+      else if (selectedStop != null)
         _StopDetailSheet(
-          stop: _selectedStop!,
+          stop: selectedStop,
           selectedRoute: selectedRoute,
           userPos: userPos,
           allStopsAsync: allStopsAsync,
           stopsAsync: stopsAsync,
           selectedBus: selectedBus,
-          onClose: () => setState(() { _selectedStop = null; }),
+          // Closing goes through the URL so browser Back and this button agree.
+          onClose: () => _pushSelection(),
           onSwitchRoute: (r) {
             ref.read(analyticsProvider).logEvent('route_switched_from_stop', {'new_route': r.name});
-            ref.read(selectedRouteProvider.notifier).state = r;
-            ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
-            setState(() { _selectedStop = null; _isTrackingBus = true; });
+            setState(() => _isTrackingBus = true);
+            _pushSelection(route: r);
           },
         )
       else
@@ -888,9 +963,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           onToggleExpanded: () => setState(() => _busInfoExpanded = !_busInfoExpanded),
           onRouteChange: (r) {
             ref.read(analyticsProvider).logEvent('route_switched_from_panel', {'new_route': r.name});
-            ref.read(selectedRouteProvider.notifier).state = r;
-            ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
             setState(() => _isTrackingBus = true);
+            _pushSelection(route: r);
           },
           onBusChange: (b) {
             ref.read(selectedBusProvider.notifier).state = b;

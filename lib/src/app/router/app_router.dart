@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/constants/transit_ids.dart';
 import '../../core/layout/responsive.dart';
 import '../providers.dart';
 import '../../features/about/presentation/about_page.dart';
@@ -67,8 +68,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/map',
-                pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: MapPage()),
+                // Query parameters rather than path segments so /map stays the
+                // branch's initialLocation and goBranch() can still return to a
+                // clean map without a second route.
+                pageBuilder: (context, state) => NoTransitionPage(
+                  child: MapPage(
+                    routeId: RouteId.tryParse(state.uri.queryParameters['route']),
+                    stopId: state.uri.queryParameters['stop'],
+                  ),
+                ),
               ),
             ],
           ),
