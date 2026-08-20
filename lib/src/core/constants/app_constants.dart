@@ -1,5 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 const String appName = 'Hub City Transit';
 const Duration busRefreshInterval = Duration(seconds: 3);
 const Duration busStaleThreshold = Duration(seconds: 90);
@@ -21,10 +19,14 @@ const Duration announcementsUrgentPollInterval = Duration(minutes: 1);
 /// rather than as current fact.
 const Duration announcementsStaleAfter = Duration(minutes: 30);
 
-String get arcGisUrl => dotenv.env['ARCGIS_URL'] ?? '';
-String get baseApiUrl => dotenv.env['HCT_BASE_API_URL'] ?? '';
+// Compile-time configuration, supplied with --dart-define-from-file=env/dart_defines.json.
+// Not an asset: on web a bundled asset is served at a public URL, and a value baked into the
+// binary at least cannot be swapped without a rebuild. Nothing here is secret — the app holds
+// no credential, which is what makes a static host viable at all.
+const String arcGisUrl = String.fromEnvironment('ARCGIS_URL');
+const String baseApiUrl = String.fromEnvironment('HCT_BASE_API_URL');
 
-/// Absolute URL of the announcements document. Empty until the API tier exists,
-/// in which case the app falls back to cache and then to the bundled asset —
-/// the feature degrades to "no alerts" rather than breaking.
-String get announcementsEndpoint => dotenv.env['HCT_ANNOUNCEMENTS_URL'] ?? '';
+/// Absolute URL of the announcements document. Empty until one is published, in which case the
+/// app falls back to cache and then to the bundled asset — the feature degrades to "no alerts"
+/// rather than breaking.
+const String announcementsEndpoint = String.fromEnvironment('HCT_ANNOUNCEMENTS_URL');

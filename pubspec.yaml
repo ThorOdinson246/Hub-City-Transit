@@ -23,7 +23,6 @@ dependencies:
   logger: ^2.6.2
   geolocator: ^14.0.2
   url_launcher: ^6.3.2
-  flutter_dotenv: ^6.0.1
   google_fonts: ^8.1.0
   flutter_compass: ^0.8.1
 
@@ -48,7 +47,6 @@ flutter:
     - assets/data/stops.json
     - assets/data/schedules.json
     - assets/data/announcements.json
-    - env.txt
 
 flutter_launcher_icons:
   android: "launcher_icon"

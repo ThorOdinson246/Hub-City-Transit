@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,25 +31,21 @@ class _LaunchPageState extends State<LaunchPage> {
   Future<void> _routeNext() async {
     if (!mounted) return;
 
-    // Check if onboarding has been seen
-    final prefs = await SharedPreferences.getInstance();
-    final seen = prefs.getBool('onboarding_seen') ?? false;
+    // This is the only path off the splash, so anything that throws here strands the user on it
+    // forever with no error and no retry. On web the backing store is localStorage, which throws
+    // outright when site data is blocked or the app is framed with third-party storage disabled.
+    // Treating a failed read as "onboarding already seen" costs a first-time visitor the intro;
+    // the alternative costs them the app.
+    var seen = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      seen = prefs.getBool('onboarding_seen') ?? false;
+    } catch (_) {
+      seen = true;
+    }
     if (!mounted) return;
 
-    if (!seen) {
-      context.go('/onboarding');
-      return;
-    }
-
-    final permission = await Geolocator.checkPermission();
-    if (!mounted) return;
-
-    if (permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse) {
-      context.go('/map');
-    } else {
-      context.go('/map'); // go straight to map; location FAB handles permission
-    }
+    context.go(seen ? '/map' : '/onboarding');
   }
 
   @override

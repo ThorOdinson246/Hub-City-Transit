@@ -20,17 +20,49 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Live bus tracking and trip planner for Hattiesburg, MS.">
 
+  <!-- Without this a mobile browser assumes a ~980px desktop viewport and renders the whole app
+       at roughly 37% scale. viewport-fit=cover is what lets env(safe-area-inset-*) resolve to
+       real values behind the iOS home indicator. -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <!-- Browser/PWA chrome colour. Two entries so it tracks the same system preference the Flutter
+       theme follows; without them a dark-mode user gets light chrome around a dark app. -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF9FC">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101418">
+
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Hub City Transit">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
   <link rel="icon" type="image/png" href="favicon.png">
-
-  <!-- Favicon -->
   <style>
+    /* The Flutter theme defaults to ThemeMode.system, so this splash has to follow
+       prefers-color-scheme too. Otherwise a dark-mode visitor gets a white screen for the whole
+       download-and-boot window, then a hard snap to dark on first frame. */
+    :root {
+      --splash-bg: #FAF9FC;
+      --splash-logo-bg: #F5F3F7;
+      --splash-ring: #C5C6CA;
+      --splash-ink: #000101;
+      --splash-on-ink: #FFFFFF;
+      --splash-muted: #44474A;
+      --splash-track: #C5C6CA;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --splash-bg: #101418;
+        --splash-logo-bg: #1B2026;
+        --splash-ring: #3A4048;
+        --splash-ink: #E6E9EE;
+        --splash-on-ink: #101418;
+        --splash-muted: #A8AEB6;
+        --splash-track: #3A4048;
+      }
+    }
     body {
-      background-color: #FAF9FC;
+      background-color: var(--splash-bg);
       margin: 0;
       height: 100vh;
       display: flex;
@@ -47,7 +79,7 @@
     .logo-container {
       width: 120px;
       height: 120px;
-      background-color: #F5F3F7;
+      background-color: var(--splash-logo-bg);
       border-radius: 50%;
       box-shadow: 0 12px 30px rgba(0, 1, 1, 0.12);
       display: flex;
@@ -58,14 +90,14 @@
     .logo-ring {
       width: 90px;
       height: 90px;
-      border: 3px solid #C5C6CA;
+      border: 3px solid var(--splash-ring);
       border-radius: 50%;
       position: absolute;
     }
     .logo-core {
       width: 60px;
       height: 60px;
-      background-color: #000101;
+      background-color: var(--splash-ink);
       border-radius: 50%;
       display: flex;
       justify-content: center;
@@ -73,26 +105,26 @@
       position: absolute;
     }
     .logo-core svg {
-      fill: #FFFFFF;
+      fill: var(--splash-on-ink);
       width: 28px;
       height: 28px;
     }
     .title {
       font-size: 32px;
       font-weight: 700;
-      color: #000101;
+      color: var(--splash-ink);
       margin-top: 28px;
       line-height: 1.1;
     }
     .subtitle {
       font-size: 16px;
-      color: #44474A;
+      color: var(--splash-muted);
       margin-top: 10px;
     }
     .loading-label {
       font-size: 12px;
       letter-spacing: 0.8px;
-      color: #44474A;
+      color: var(--splash-muted);
       margin-top: 48px;
       margin-bottom: 14px;
       text-transform: uppercase;
@@ -101,7 +133,7 @@
     .progress-bar {
       width: 180px;
       height: 5px;
-      background-color: #C5C6CA;
+      background-color: var(--splash-track);
       border-radius: 999px;
       overflow: hidden;
       position: relative;
@@ -111,7 +143,7 @@
       left: -100%;
       width: 50%;
       height: 100%;
-      background-color: #000101;
+      background-color: var(--splash-ink);
       border-radius: 999px;
       animation: progress-slide 1.5s ease-in-out infinite;
     }
