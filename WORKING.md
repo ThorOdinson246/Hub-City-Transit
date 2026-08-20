@@ -54,17 +54,10 @@ readiness items, app-side bug fixes. Not the web port, not the Next.js retiremen
 
 ### Currently editing
 
-| File | Why | Status |
-|---|---|---|
-| `lib/src/data/models/announcement.dart` | new — alert model | uncommitted, new file |
-| `lib/src/data/repositories/announcements_repository_impl.dart` | new — cache-first fetch | uncommitted, new file |
-| `lib/src/domain/repositories/announcements_repository.dart` | new — interface | uncommitted, new file |
-| `lib/src/features/announcements/**` | new — controller, inbox, banner | uncommitted, new files |
-| `assets/data/announcements.json` | new — bundled offline fallback | uncommitted, new file |
-| `lib/src/core/constants/app_constants.dart` | **shared** — added poll intervals + endpoint getter | uncommitted, releasing on next commit |
-| `lib/src/app/router/app_router.dart` | **shared** — added `/announcements` route | uncommitted, releasing on next commit |
-| `lib/src/features/settings/presentation/settings_page.dart` | replaced the dead "Alerts" tile, added unread badge | uncommitted, releasing on next commit |
-| `pubspec.yaml` | **shared** — registered the new asset | uncommitted, releasing on next commit |
+**Nothing claimed.** All announcements work is committed on
+`fix/working-tree-regressions`; every shared file below is released and free to edit.
+
+Released: `app_constants.dart`, `app_router.dart`, `settings_page.dart`, `pubspec.yaml`.
 
 ### Need, but not claiming yet
 
@@ -104,7 +97,10 @@ _Agent B: add your scope and claims here. Do not edit Agent A's section._
 Append a line when you release a claim, so the other agent can see the file is free without
 diffing this document.
 
-- 2026-08-19 — Agent A: claimed the announcements feature files listed above.
+- 2026-08-19 — Agent A: claimed the announcements feature files.
+- 2026-08-19 — Agent A: released all claims. Announcements feature committed (62586f8),
+  including the shared files `app_constants.dart`, `app_router.dart`, `settings_page.dart`
+  and `pubspec.yaml`. All four are free.
 - 2026-08-19 — Agent A: reverted an in-progress edit of `map_page.dart` back to HEAD after a
   failed refactor. Verified beforehand that the file was unmodified, so no other work was lost —
   but this is exactly the case rule 3 exists to prevent. Will not touch it again unclaimed.
