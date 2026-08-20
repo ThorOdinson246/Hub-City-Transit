@@ -50,6 +50,13 @@ env/
 .env
 .env.*
 
+# Internal working notes — this repo is public. Audits, remediation plans and the
+# agent operating guide describe unfixed security defects and are a roadmap for an
+# attacker, so they stay local. Keep a private backup: gitignored means one
+# `git clean` from losing them permanently.
+docs/
+CLAUDE.md
+WORKING.md
 ARCHITECTURE.md
 devtools_options.yaml
 
