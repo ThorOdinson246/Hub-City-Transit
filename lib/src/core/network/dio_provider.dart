@@ -11,6 +11,8 @@ final dioProvider = Provider<Dio>((ref) {
       connectTimeout: requestTimeout,
       receiveTimeout: requestTimeout,
       sendTimeout: requestTimeout,
+      // Browsers forbid scripts from setting User-Agent; dio's browser adapter
+      // drops it silently rather than throwing, so guard it explicitly.
       headers: {
         'Accept': 'application/json',
         if (!kIsWeb) 'User-Agent': 'HubCityTransit-Flutter/1.0',
