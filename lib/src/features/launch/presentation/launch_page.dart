@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
+import '../../../core/constants/app_constants.dart';
 import 'package:go_router/go_router.dart';
 
 
@@ -129,7 +131,7 @@ class _LaunchPageState extends State<LaunchPage> {
                     ),
                     const SizedBox(height: 40),
                     Text(
-                      'v1.0.0',
+                      'v$appVersion',
                       style: tt.bodySmall,
                     ),
                   ],

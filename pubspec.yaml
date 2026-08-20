@@ -14,7 +14,6 @@ dependencies:
   # Android or iOS compile graph.
   flutter_web_plugins:
     sdk: flutter
-  cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   dio: ^5.9.2
   go_router: ^16.2.5
@@ -22,13 +21,9 @@ dependencies:
   json_annotation: ^4.11.0
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
-  connectivity_plus: ^7.0.0
   shared_preferences: ^2.5.3
-  intl: ^0.20.2
-  logger: ^2.6.2
   geolocator: ^14.0.2
   url_launcher: ^6.3.2
-  google_fonts: ^8.1.0
   flutter_compass: ^0.8.1
 
 dev_dependencies:
@@ -57,18 +52,24 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: false
+  image_path: "assets/branding/app_icon.png"
+  adaptive_icon_background: "#FAF9FC"
+  adaptive_icon_foreground: "assets/branding/app_icon_foreground.png"
+  min_sdk_android: 24
   web:
     generate: true
-    image_path: "assets/app_icon.png"
-    background_color: "#ffffff"
-    theme_color: "#1976d2"
-  image_path: "assets/app_icon.png"
-  min_sdk_android: 21
+    image_path: "assets/branding/app_icon.png"
+    background_color: "#FAF9FC"
+    theme_color: "#000101"
 
+# Matches the in-app launch screen: same ring-and-bus mark on the same
+# background, so the native splash hands over to Flutter without a jump.
 flutter_native_splash:
-  color: "#ffffff"
-  image: "assets/app_icon.png"
+  color: "#FAF9FC"
+  color_dark: "#121214"
+  image: "assets/branding/splash_logo.png"
   android_12:
-    image: "assets/app_icon.png"
-    icon_background_color: "#ffffff"
+    image: "assets/branding/app_icon_foreground.png"
+    icon_background_color: "#FAF9FC"
+    icon_background_color_dark: "#121214"
   web: false

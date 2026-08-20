@@ -827,74 +827,53 @@ class _NextArrivalsSection extends ConsumerWidget {
     final tt = Theme.of(context).textTheme;
     final now = DateTime.now();
 
-    final schedule = ref.watch(selectedRouteScheduleProvider).asData?.value;
+    final dataset = ref.watch(transitDatasetProvider).asData?.value;
     final adjustment = ref.watch(selectedRouteAdjustmentProvider);
+    final routeId = ref.watch(selectedRouteProvider).value;
+    final pattern = dataset?.route(routeId);
 
-    if (schedule == null) {
+    if (pattern == null) {
       return Center(
-        child: Text('Schedule data not available.', style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+        child: Text('Schedule data not available.',
+            style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
       );
     }
 
-
-    final stopNameNorm = stop.location.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
-    int schedIdx = -1;
-    for (int i = 0; i < schedule.stops.length; i++) {
-      final s = schedule.stops[i].toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
-      if (s.contains(stopNameNorm) || stopNameNorm.contains(s)) {
-        schedIdx = i;
-        break;
+    // Matched on position, not name. The old fuzzy name match failed silently
+    // and showed "no schedule data" for stops that had a full timetable.
+    PatternStop? matched;
+    var bestMetres = double.infinity;
+    for (final candidate in pattern.stops) {
+      final metres = haversineMeters(
+          stop.lat, stop.lng, candidate.lat, candidate.lng);
+      if (metres < bestMetres) {
+        bestMetres = metres;
+        matched = candidate;
       }
     }
 
-    if (schedIdx == -1) {
+    if (matched == null || bestMetres > 120) {
       return Center(
-        child: Text('No schedule data for this specific stop.', style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+        child: Text('No schedule data for this stop.',
+            style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
       );
     }
 
-    final nowMinutes = now.hour * 60 + now.minute.toDouble();
-
-    // delta = 0 when bus is offline so we fall back to pure schedule
-    final delta = adjustment?.isLiveAdjusted == true ? adjustment!.appliedDelta : 0.0;
-
-    final upcoming = <Map<String, dynamic>>[];
+    final nowMinutes = (now.hour * 60 + now.minute).toDouble();
     final isLiveAdjusted = adjustment?.isLiveAdjusted == true;
+    final delta = isLiveAdjusted ? adjustment!.appliedDelta : 0.0;
 
-    for (final trip in schedule.trips) {
-      if (schedIdx >= trip.length) continue;
-      final timeStr = trip[schedIdx];
-      final rawMins = parseTimeToMinutes(timeStr);
-      if (rawMins.isNaN) continue;
-
-      final adjustedMins = rawMins + delta;
-      if (adjustedMins >= nowMinutes - 1) {
-        upcoming.add({
-          'time': minutesToTimeString(adjustedMins),
-          'scheduledTime': timeStr,
-          'minutesUntil': (adjustedMins - nowMinutes).round(),
-          'isLive': isLiveAdjusted,
-        });
-        if (upcoming.length >= 3) break;
-      }
-    }
-
-    // nothing left today, show first few trips for tomorrow
-    final isTomorrow = upcoming.isEmpty;
-    if (isTomorrow) {
-      for (final trip in schedule.trips) {
-        if (schedIdx >= trip.length) continue;
-        final timeStr = trip[schedIdx];
-        final rawMins = parseTimeToMinutes(timeStr);
-        if (rawMins.isNaN) continue;
-        upcoming.add({
-          'time': timeStr,
-          'scheduledTime': timeStr,
-          'minutesUntil': -1, // signals "next service"
-          'isLive': false,
-        });
-        if (upcoming.length >= 3) break;
-      }
+    final result = upcomingDepartures(pattern, matched.sequence, nowMinutes.round());
+    final isTomorrow = result.tomorrow;
+    final upcoming = <Map<String, dynamic>>[];
+    for (final scheduled in result.times) {
+      final adjusted = scheduled + delta;
+      upcoming.add({
+        'time': formatClock(adjusted.round()),
+        'scheduledTime': formatClock(scheduled),
+        'minutesUntil': isTomorrow ? -1 : (adjusted - nowMinutes).round(),
+        'isLive': isLiveAdjusted && !isTomorrow,
+      });
     }
 
     if (upcoming.isEmpty) {

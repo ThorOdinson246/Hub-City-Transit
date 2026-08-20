@@ -19,12 +19,13 @@ import '../../../core/utils/haversine.dart';
 import '../../../core/utils/transfer_connections.dart';
 import '../../../data/models/bus_location_model.dart';
 import '../../../data/models/stop_model.dart';
-import '../../../domain/usecases/schedule_adjustment_use_case.dart';
 import '../../../data/services/nominatim_service.dart';
 import '../../../core/utils/analytics_service.dart';
 import '../../announcements/presentation/announcement_banner.dart';
 import '../../../data/models/transit_dataset.dart';
 import '../../../domain/usecases/trip_planner.dart';
+import '../../../domain/usecases/service_calendar.dart';
+import '../../trip/application/trip_planner_providers.dart';
 import '../../trip/application/active_trip.dart';
 import '../../trip/presentation/trip_map_layers.dart';
 import '../../trip/presentation/trip_planner_sheet.dart';
@@ -545,7 +546,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 
     final favoritesList = ref.watch(favoritesProvider);
 
-    final isSearchActive = _searchFocus.hasFocus || _searchQuery.isNotEmpty;
+    final isSearchActive = _searchFocus.hasFocus;
 
     // Search-filtered stops or favorites
     final stopResults = _searchQuery.length >= 2
@@ -590,11 +591,9 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             ),
             onMapEvent: _onMapEvent,
             onTap: (_, _) {
+              // Unfocus only. Clearing here threw away what the rider typed
+              // every time they touched the map.
               _searchFocus.unfocus();
-              if (_searchQuery.isNotEmpty) {
-                setState(() => _searchQuery = '');
-                _searchCtrl.clear();
-              }
             },
           ),
           children: [
@@ -676,13 +675,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
               child: TapRegion(
-                onTapOutside: (event) {
-                  _searchFocus.unfocus();
-                  if (_searchQuery.isNotEmpty) {
-                    setState(() => _searchQuery = '');
-                    _searchCtrl.clear();
-                  }
-                },
+                onTapOutside: (event) => _searchFocus.unfocus(),
                 child: Column(children: [
                 // Search / brand bar
                 Container(

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../app/providers.dart';
 import '../../../core/layout/responsive.dart';
 import '../../announcements/application/announcements_controller.dart';
@@ -194,7 +195,8 @@ class SettingsPage extends ConsumerWidget {
                 icon: Icons.privacy_tip_outlined,
                 title: 'Privacy Policy',
                 subtitle: 'How we handle your data',
-                onTap: () => launchUrl(Uri.parse('https://www.hattiesburgms.com/hubcitytransit/')),
+                onTap: () => launchUrl(Uri.parse(privacyPolicyUrl),
+                    mode: LaunchMode.externalApplication),
               ),
               _SettingsTile(
                 cs: cs,
@@ -203,7 +205,8 @@ class SettingsPage extends ConsumerWidget {
                 title: 'Terms of Service',
                 subtitle: 'Rules for using the app',
                 isLast: true,
-                onTap: () => launchUrl(Uri.parse('https://www.hattiesburgms.com/hubcitytransit/')),
+                onTap: () => launchUrl(Uri.parse(termsUrl),
+                    mode: LaunchMode.externalApplication),
               ),
             ],
           ),

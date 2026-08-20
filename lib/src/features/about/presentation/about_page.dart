@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../core/constants/app_constants.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -63,7 +65,7 @@ class AboutPage extends StatelessWidget {
                     children: [
                       Text('Hub City Transit', style: tt.titleLarge),
                       Text(
-                        'v1.2.0 (Build 1)',
+                        'v$appVersion (Build $appBuild)',
                         style: tt.bodySmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),

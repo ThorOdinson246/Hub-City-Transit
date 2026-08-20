@@ -171,25 +171,31 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _cycleHeight,
-              onVerticalDragEnd: _onDragEnd,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 8, 4),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 8, 4),
                 child: Column(
                   children: [
-                    Center(
+                    // Only the grab handle resizes. Making the whole header a
+                    // tap target meant every touch moved the sheet.
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: _cycleHeight,
+                      onVerticalDragEnd: _onDragEnd,
                       child: Semantics(
                         label: 'Resize trip planner',
                         button: true,
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            color: scheme.outlineVariant,
-                            borderRadius: BorderRadius.circular(999),
+                        child: SizedBox(
+                          height: 28,
+                          width: double.infinity,
+                          child: Center(
+                            child: Container(
+                              width: 44,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: scheme.outlineVariant,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -213,7 +219,6 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
                     ),
                   ],
                 ),
-              ),
             ),
             // Peek shows the chosen trip rather than a cropped form, so the
             // itinerary stays readable while the map is visible behind it.

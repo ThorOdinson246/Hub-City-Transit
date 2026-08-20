@@ -1,4 +1,16 @@
 const String appName = 'Hub City Transit';
+
+/// Keep in step with `version:` in pubspec.yaml. Three hardcoded strings used to
+/// disagree with it and with each other.
+const String appVersion = '1.0.0';
+const String appBuild = '1';
+
+/// Hosted alongside the web build. Play requires a reachable policy for an app
+/// that collects precise location.
+const String privacyPolicyUrl =
+    'https://thorodinson246.github.io/Hub-City-Transit/privacy.html';
+const String termsUrl =
+    'https://thorodinson246.github.io/Hub-City-Transit/terms.html';
 const Duration busRefreshInterval = Duration(seconds: 3);
 const Duration busStaleThreshold = Duration(seconds: 90);
 const Duration requestTimeout = Duration(seconds: 12);
