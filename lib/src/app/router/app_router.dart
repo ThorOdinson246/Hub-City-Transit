@@ -136,8 +136,8 @@ class _StatefulScaffold extends StatelessWidget {
       label: 'Schedule',
     ),
     (
-      icon: Icons.alt_route_outlined,
-      selected: Icons.alt_route_rounded,
+      icon: Icons.directions_outlined,
+      selected: Icons.directions_rounded,
       label: 'Plan',
     ),
     (

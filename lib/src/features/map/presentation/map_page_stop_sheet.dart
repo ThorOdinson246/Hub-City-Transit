@@ -29,7 +29,7 @@ class _BusInfoPanel extends ConsumerWidget {
     final busLocation = busAsync.asData?.value;
 
     final statusColor = switch (busStatus) {
-      BusStatus.live => const Color(0xFF16A34A),
+      BusStatus.live => AppColors.live,
       BusStatus.connecting => const Color(0xFFF59E0B),
       BusStatus.offline => cs.onSurfaceVariant,
     };
@@ -922,7 +922,7 @@ class _NextArrivalsSection extends ConsumerWidget {
                 duration: const Duration(milliseconds: 300),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.15),
+                  color: AppColors.live.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Row(
@@ -931,12 +931,12 @@ class _NextArrivalsSection extends ConsumerWidget {
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: AppColors.live, shape: BoxShape.circle),
                     ),
                     const SizedBox(width: 4),
                     const Text(
                       'Live',
-                      style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.w700),
+                      style: TextStyle(color: AppColors.live, fontSize: 10, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -987,7 +987,7 @@ class _NextArrivalsSection extends ConsumerWidget {
                         color: isTomorrowEntry
                             ? cs.onSurfaceVariant
                             : mins <= 2
-                                ? Colors.green
+                                ? AppColors.live
                                 : cs.onSurfaceVariant,
                       ),
                     ),

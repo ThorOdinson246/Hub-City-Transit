@@ -44,7 +44,7 @@ AnnouncementStyle announcementStyle(
         icon: announcement.kind == AnnouncementKind.productUpdate
             ? Icons.auto_awesome_rounded
             : Icons.info_rounded,
-        color: scheme.primary,
+        color: scheme.secondary,
         label: announcement.kind == AnnouncementKind.productUpdate
             ? 'App update'
             : 'Notice',

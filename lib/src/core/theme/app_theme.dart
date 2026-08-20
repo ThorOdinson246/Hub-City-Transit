@@ -30,6 +30,16 @@ class AppColors {
   static const surfaceHighDark = Color(0xFF2A2A30);
   static const outlineDark = Color(0xFF3A3A42);
   static const onSurfaceVariantDark = Color(0xFFB0B0BA);
+
+  /// Service-alert warning. Distinct from `error` so a detour does not read as a
+  /// suspension.
+  static const warning = Color(0xFFB45309);
+  static const warningDark = Color(0xFFFBBF24);
+
+  /// The single "live data" green. Was previously spelled three ways across the
+  /// app with two different values.
+  static const live = Color(0xFF16A34A);
+  static const liveDark = Color(0xFF4ADE80);
 }
 
 class AppTheme {
@@ -46,7 +56,13 @@ class AppTheme {
       surfaceContainer: AppColors.surfaceHighLight,
       onSurfaceVariant: AppColors.onSurfaceVariantLight,
       outline: AppColors.outlineLight,
-      outlineVariant: AppColors.outlineLight,
+      outlineVariant: Color(0xFFD9DADF),
+      tertiary: AppColors.warning,
+      onTertiary: Colors.white,
+      tertiaryContainer: Color(0xFFFFEDD5),
+      onTertiaryContainer: Color(0xFF7C2D12),
+      secondaryContainer: Color(0xFFDCE7F5),
+      onSecondaryContainer: Color(0xFF0B2942),
       error: Color(0xFFBA1A1A),
       onError: Colors.white,
     );
@@ -67,7 +83,13 @@ class AppTheme {
       surfaceContainer: AppColors.surfaceHighDark,
       onSurfaceVariant: AppColors.onSurfaceVariantDark,
       outline: AppColors.outlineDark,
-      outlineVariant: AppColors.outlineDark,
+      outlineVariant: Color(0xFF2E2E36),
+      tertiary: AppColors.warningDark,
+      onTertiary: Color(0xFF3B2600),
+      tertiaryContainer: Color(0xFF4A3208),
+      onTertiaryContainer: Color(0xFFFFE7B8),
+      secondaryContainer: Color(0xFF1E3247),
+      onSecondaryContainer: Color(0xFFD3E4F7),
       error: Color(0xFFFFB4AB),
       onError: Color(0xFF690005),
     );
@@ -172,7 +194,7 @@ class AppTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: colorScheme.onSurfaceVariant,
+          foregroundColor: colorScheme.secondary,
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),

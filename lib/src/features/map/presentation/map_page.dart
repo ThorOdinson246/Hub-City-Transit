@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/constants/route_metadata.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/transit_ids.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/utils/haversine.dart';

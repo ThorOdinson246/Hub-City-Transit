@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/providers.dart';
 import '../../../core/layout/responsive.dart';
 import '../../../core/constants/route_metadata.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/transit_ids.dart';
 import '../../../core/utils/transfer_connections.dart';
 import '../../../data/models/route_schedule_model.dart';
@@ -94,15 +95,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: const Color(0xFF16A34A).withValues(alpha: 0.12),
+                color: AppColors.live.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: const Color(0xFF16A34A).withValues(alpha: 0.3)),
+                border: Border.all(color: AppColors.live.withValues(alpha: 0.3)),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.gps_fixed_rounded, size: 13, color: Color(0xFF16A34A)),
+                const Icon(Icons.gps_fixed_rounded, size: 13, color: AppColors.live),
                 const SizedBox(width: 5),
                 const Text('Live Adjusted',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.live)),
               ]),
             ),
           ]),
@@ -161,7 +162,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       final adj = adjustment != null && i < adjustment.stops.length ? adjustment.stops[i] : null;
       entries.add(_Entry(
         index: i,
-        stopId: matchedStop?.stopId,
+        direction: matchedStop?.direction,
         name: name,
         scheduled: adj?.scheduledTime ?? '',
         adjusted: adj?.adjustedTime ?? '',
@@ -278,14 +279,14 @@ class _RouteChips extends ConsumerWidget {
 }
 
 class _Entry {
-  const _Entry({required this.index, required this.stopId, required this.name,
+  const _Entry({required this.index, required this.direction, required this.name,
     required this.scheduled, required this.adjusted, required this.isPast,
     required this.isCurrent, required this.connections});
   final int index;
 
-  /// Real stop id from the GPS dataset, or null when this timetable entry has
-  /// no matching stop record.
-  final int? stopId;
+  /// Outbound or Inbound. Tells a rider which side of the road to wait on,
+  /// which the internal stop id never did.
+  final String? direction;
   final String name, scheduled, adjusted;
   final bool isPast, isCurrent;
   final List<TransferStopConnection> connections;
@@ -359,18 +360,18 @@ class _StopRow extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF16A34A),
+                        color: AppColors.live,
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Row(mainAxisSize: MainAxisSize.min, children: const [
                         Icon(Icons.bolt_rounded, size: 10, color: Colors.white),
                         SizedBox(width: 2),
-                        Text('LIVE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.white)),
+                        Text('Live', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.white)),
                       ]),
                     ),
                 ]),
-                if (entry.stopId case final int stopId)
-                  Text('Stop ID: $stopId',
+                if (entry.direction case final String direction)
+                  Text(direction,
                     style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
                 if (entry.connections.isNotEmpty) ...[
                   const SizedBox(height: 6),
@@ -392,7 +393,7 @@ class _StopRow extends StatelessWidget {
                       ? TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: cs.onSurface)
                       : tt.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
                 if (entry.isCurrent)
-                  Text('On time', style: tt.labelSmall?.copyWith(color: const Color(0xFF16A34A))),
+                  Text('On time', style: tt.labelSmall?.copyWith(color: AppColors.live)),
               ]),
             ]),
           ),
