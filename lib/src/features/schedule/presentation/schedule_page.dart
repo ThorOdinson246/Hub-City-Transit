@@ -183,11 +183,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     for (var i = 0; i < schedule.stops.length; i++) {
       final name = schedule.stops[i];
       if (_query.isNotEmpty && !name.toLowerCase().contains(_query)) continue;
-      final conn = _connectionsFor(name, stops, transferMap);
+      final matchedStop = _matchStop(name, stops);
+      final conn = matchedStop == null
+          ? const <TransferStopConnection>[]
+          : transferMap['${matchedStop.stopId}'] ?? const <TransferStopConnection>[];
       if (_transferOnly && conn.isEmpty) continue;
       final adj = adjustment != null && i < adjustment.stops.length ? adjustment.stops[i] : null;
       entries.add(_Entry(
         index: i,
+        stopId: matchedStop?.stopId,
         name: name,
         scheduled: adj?.scheduledTime ?? '',
         adjusted: adj?.adjustedTime ?? '',
@@ -212,24 +216,46 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     );
   }
 
-  List<TransferStopConnection> _connectionsFor(
-    String name, List<StopModel> stops, Map<String, List<TransferStopConnection>> map) {
+  /// Resolves a timetable stop name to the GPS stop record, or null when there
+  /// is no confident match.
+  ///
+  /// The two lists genuinely differ — blue has 44 GPS stops against 50 timetable
+  /// entries, and six of seven routes disagree — so a null here is a real state,
+  /// not an error. Callers must degrade rather than invent a value.
+  StopModel? _matchStop(String name, List<StopModel> stops) {
     final n = _norm(name);
+    if (n.isEmpty) return null;
     for (final s in stops) {
-      if (_norm(s.location).contains(n) || n.contains(_norm(s.location))) {
-        return map['${s.stopId}'] ?? [];
+      if (_norm(s.location) == n) return s;
+    }
+    // Fall back to containment, longest match first, so "Main" cannot claim a
+    // row that "Main St at 7th" describes better.
+    StopModel? best;
+    var bestLength = 0;
+    for (final s in stops) {
+      final candidate = _norm(s.location);
+      if (candidate.isEmpty) continue;
+      if (!candidate.contains(n) && !n.contains(candidate)) continue;
+      if (candidate.length > bestLength) {
+        best = s;
+        bestLength = candidate.length;
       }
     }
-    return [];
+    return best;
   }
 
   String _norm(String v) => v.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
 }
 
 class _Entry {
-  const _Entry({required this.index, required this.name, required this.scheduled,
-    required this.adjusted, required this.isPast, required this.isCurrent, required this.connections});
+  const _Entry({required this.index, required this.stopId, required this.name,
+    required this.scheduled, required this.adjusted, required this.isPast,
+    required this.isCurrent, required this.connections});
   final int index;
+
+  /// Real stop id from the GPS dataset, or null when this timetable entry has
+  /// no matching stop record.
+  final int? stopId;
   final String name, scheduled, adjusted;
   final bool isPast, isCurrent;
   final List<TransferStopConnection> connections;
@@ -313,8 +339,9 @@ class _StopRow extends StatelessWidget {
                       ]),
                     ),
                 ]),
-                Text('Stop ID: ${8120 + entry.index}',
-                  style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
+                if (entry.stopId case final int stopId)
+                  Text('Stop ID: $stopId',
+                    style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
                 if (entry.connections.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Wrap(spacing: 5, runSpacing: 5, children: entry.connections.map((c) => Container(
