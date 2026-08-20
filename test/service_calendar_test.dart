@@ -13,50 +13,42 @@ void main() {
   late TransitDataset data;
   setUpAll(() => data = _dataset());
 
-  group('holiday rules', () {
-    test('fixed-date holidays', () {
-      final h = holidaysForYear(2026);
-      expect(h.firstWhere((x) => x.name == "New Year's Day").date,
-          DateTime(2026, 1, 1));
-      expect(h.firstWhere((x) => x.name == 'Independence Day').date,
-          DateTime(2026, 7, 4));
-      expect(h.firstWhere((x) => x.name == 'Christmas Day').date,
-          DateTime(2026, 12, 25));
+  group('official service exceptions', () {
+    test('the dataset carries the agency closure list', () {
+      final ex = data.serviceExceptions!;
+      expect(ex.removed, hasLength(greaterThanOrEqualTo(20)));
+      expect(ex.source, contains('calendar_dates'));
     });
 
-    test('Labor Day is the first Monday in September', () {
-      for (final year in [2026, 2027, 2028]) {
-        final labor =
-            holidaysForYear(year).firstWhere((x) => x.name == 'Labor Day').date;
-        expect(labor.weekday, DateTime.monday, reason: '$year');
-        expect(labor.month, 9);
-        expect(labor.day, lessThanOrEqualTo(7));
-      }
+    test('closes for 12 days in 2026, not the 5 the website implies', () {
+      final ex = data.serviceExceptions!;
+      final in2026 = ex.removed.where((d) => d.startsWith('2026')).toList();
+      expect(in2026, hasLength(12));
     });
 
-    test('Thanksgiving is the fourth Thursday in November', () {
-      for (final year in [2026, 2027, 2028]) {
-        final day = holidaysForYear(year)
-            .firstWhere((x) => x.name == 'Thanksgiving Day')
-            .date;
-        expect(day.weekday, DateTime.thursday, reason: '$year');
-        expect(day.month, 11);
-        expect(day.day, inInclusiveRange(22, 28));
-      }
+    test('observes the weekend shift for Independence Day', () {
+      // 4 July 2026 is a Saturday, so the agency closes Friday the 3rd. The
+      // public website's rule would have marked the 4th and missed the closure.
+      final ex = data.serviceExceptions!;
+      expect(ex.removed, contains('20260703'));
+      expect(ex.removed, isNot(contains('20260704')));
     });
 
-    test('holidayOn matches only the day itself', () {
+    test('includes closures the website never lists', () {
+      final ex = data.serviceExceptions!;
+      expect(ex.removed, contains('20260119')); // MLK Day
+      expect(ex.removed, contains('20260216')); // Presidents Day
+      expect(ex.removed, contains('20260525')); // Memorial Day
+      expect(ex.removed, contains('20261111')); // Veterans Day
+      expect(ex.removed, contains('20261127')); // day after Thanksgiving
+      expect(ex.removed, contains('20261224')); // Christmas Eve
+    });
+
+    test('names a closure where a rule matches the date', () {
       expect(holidayOn(DateTime(2026, 12, 25))?.name, 'Christmas Day');
-      expect(holidayOn(DateTime(2026, 12, 24)), isNull);
-    });
-
-    test('upcomingHoliday warns within the window and not outside it', () {
-      expect(upcomingHoliday(DateTime(2026, 12, 20))?.name, 'Christmas Day');
-      expect(upcomingHoliday(DateTime(2026, 12, 1)), isNull);
-    });
-
-    test('finds New Years while still in December', () {
-      expect(upcomingHoliday(DateTime(2026, 12, 29))?.name, "New Year's Day");
+      expect(holidayOn(DateTime(2026, 5, 25))?.name, 'Memorial Day');
+      expect(holidayOn(DateTime(2026, 1, 19))?.name,
+          'Martin Luther King Jr. Day');
     });
   });
 
@@ -100,26 +92,30 @@ void main() {
       expect(status.nextServiceDay?.weekday, DateTime.monday);
     });
 
+    test('a closure the website omits still stops service', () {
+      // Memorial Day 2026: a normal Monday by the website's rules.
+      final status = serviceStatusAt(data, DateTime(2026, 5, 25, 10, 0));
+      expect(status.state, ServiceState.holiday);
+    });
+
     test('Christmas reports the holiday by name, not just "no service"', () {
       final status = serviceStatusAt(data, DateTime(2026, 12, 25, 10, 0));
       expect(status.state, ServiceState.holiday);
       expect(status.holidayName, 'Christmas Day');
     });
 
-    test('the next service day skips a holiday', () {
-      // Christmas 2026 is a Friday, so the next running day is Monday the 28th.
-      final status = serviceStatusAt(data, DateTime(2026, 12, 25, 10, 0));
+    test('the next service day skips consecutive closures', () {
+      // 24 and 25 Dec 2026 are both closed, and the 26th is a Saturday, so the
+      // next bus is Monday the 28th.
+      final status = serviceStatusAt(data, DateTime(2026, 12, 24, 10, 0));
       expect(status.nextServiceDay, DateTime(2026, 12, 28));
     });
 
-    test('a holiday on a weekday still blocks service', () {
-      final thanksgiving = holidaysForYear(2026)
-          .firstWhere((h) => h.name == 'Thanksgiving Day')
-          .date;
-      expect(thanksgiving.weekday, DateTime.thursday);
-      final status = serviceStatusAt(
-          data, DateTime(thanksgiving.year, thanksgiving.month, thanksgiving.day, 10));
-      expect(status.state, ServiceState.holiday);
+    test('Thanksgiving and the day after are both closed', () {
+      expect(serviceStatusAt(data, DateTime(2026, 11, 26, 10)).state,
+          ServiceState.holiday);
+      expect(serviceStatusAt(data, DateTime(2026, 11, 27, 10)).state,
+          ServiceState.holiday);
     });
   });
 }

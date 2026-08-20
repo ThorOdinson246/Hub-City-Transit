@@ -15,6 +15,7 @@ abstract class TransitDataset with _$TransitDataset {
     required Map<String, ServiceCalendar> services,
     required Map<String, RoutePattern> routes,
     @Default(<StopGroup>[]) List<StopGroup> stopGroups,
+    ServiceExceptions? serviceExceptions,
   }) = _TransitDataset;
 
   const TransitDataset._();
@@ -31,6 +32,34 @@ abstract class TransitDataset with _$TransitDataset {
       }
     }
   }
+}
+
+/// Days the agency has explicitly cancelled or added service, straight from the
+/// official GTFS `calendar_dates.txt`. Dates are `yyyyMMdd`.
+///
+/// This replaces a guessed holiday list. The agency closes for 12 days a year,
+/// not the 5 the public website implies, and it *does* observe weekend shifts —
+/// July 4 2026 falls on a Saturday and the closure is Friday the 3rd.
+@freezed
+abstract class ServiceExceptions with _$ServiceExceptions {
+  const factory ServiceExceptions({
+    @Default(<String>[]) List<String> removed,
+    @Default(<String>[]) List<String> added,
+    String? source,
+  }) = _ServiceExceptions;
+
+  const ServiceExceptions._();
+
+  factory ServiceExceptions.fromJson(Map<String, dynamic> json) =>
+      _$ServiceExceptionsFromJson(json);
+
+  static String key(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}'
+      '${date.month.toString().padLeft(2, '0')}'
+      '${date.day.toString().padLeft(2, '0')}';
+
+  bool isRemoved(DateTime date) => removed.contains(key(date));
+  bool isAdded(DateTime date) => added.contains(key(date));
 }
 
 @freezed

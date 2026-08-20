@@ -7,11 +7,13 @@ class TransitHoliday {
   final DateTime date;
 }
 
-/// Days Hub City Transit does not run.
+/// Fallback holiday names, used only to label a closure the agency has already
+/// declared. The authoritative list of *which days are closed* is the GTFS
+/// `calendar_dates.txt` carried on the dataset — these rules are just for
+/// putting a name on the date.
 ///
-/// Computed from rules rather than a fixed list so they hold for any year. The
-/// agency does not shift a holiday that lands on a weekend, which is unusual for
-/// US transit — worth confirming before anyone relies on it.
+/// Do not use this to decide whether service runs: the agency closes for 12 days
+/// a year, not these 5, and it observes weekend shifts.
 List<TransitHoliday> holidaysForYear(int year) {
   return [
     TransitHoliday("New Year's Day", DateTime(year, 1, 1)),
@@ -19,7 +21,21 @@ List<TransitHoliday> holidaysForYear(int year) {
     TransitHoliday('Labor Day', _nthWeekday(year, 9, DateTime.monday, 1)),
     TransitHoliday('Thanksgiving Day', _nthWeekday(year, 11, DateTime.thursday, 4)),
     TransitHoliday('Christmas Day', DateTime(year, 12, 25)),
+    TransitHoliday('Christmas Eve', DateTime(year, 12, 24)),
+    TransitHoliday("New Year's Eve", DateTime(year, 12, 31)),
+    TransitHoliday('Martin Luther King Jr. Day',
+        _nthWeekday(year, 1, DateTime.monday, 3)),
+    TransitHoliday('Presidents Day', _nthWeekday(year, 2, DateTime.monday, 3)),
+    TransitHoliday('Memorial Day', _lastWeekday(year, 5, DateTime.monday)),
+    TransitHoliday('Veterans Day', DateTime(year, 11, 11)),
+    TransitHoliday('Day after Thanksgiving',
+        _nthWeekday(year, 11, DateTime.thursday, 4).add(const Duration(days: 1))),
   ];
+}
+
+DateTime _lastWeekday(int year, int month, int weekday) {
+  final last = DateTime(year, month + 1, 0);
+  return last.subtract(Duration(days: (last.weekday - weekday + 7) % 7));
 }
 
 DateTime _nthWeekday(int year, int month, int weekday, int nth) {
@@ -128,9 +144,10 @@ ServiceStatus serviceStatusAt(TransitDataset data, DateTime now) {
     );
   }
 
-  final holiday = holidayOn(now);
-  if (holiday != null) {
-    return withNext(ServiceState.holiday, holidayName: holiday.name);
+  final exceptions = data.serviceExceptions;
+  if (exceptions != null && exceptions.isRemoved(now)) {
+    // Named where we can, but the closure itself is the agency's word.
+    return withNext(ServiceState.holiday, holidayName: holidayOn(now)?.name);
   }
 
   final runsToday = data.services.values.any((s) => s.runsOn(now));
@@ -156,17 +173,17 @@ DateTime? _nextServiceDay(TransitDataset data, DateTime from) {
   final window = networkServiceWindow(data);
 
   // Still time to catch a bus today.
-  final runsToday = data.services.values.any((s) => s.runsOn(day)) &&
-      holidayOn(day) == null &&
-      window != null &&
-      minutes < window.startMinutes;
-  if (runsToday) return day;
+  bool runs(DateTime d) {
+    if (data.serviceExceptions?.isRemoved(d) ?? false) return false;
+    if (data.serviceExceptions?.isAdded(d) ?? false) return true;
+    return data.services.values.any((s) => s.runsOn(d));
+  }
 
-  for (var i = 1; i <= 14; i++) {
+  if (runs(day) && window != null && minutes < window.startMinutes) return day;
+
+  for (var i = 1; i <= 21; i++) {
     day = DateTime(from.year, from.month, from.day + i);
-    if (!data.services.values.any((s) => s.runsOn(day))) continue;
-    if (holidayOn(day) != null) continue;
-    return day;
+    if (runs(day)) return day;
   }
   return null;
 }

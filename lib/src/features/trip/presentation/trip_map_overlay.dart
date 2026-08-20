@@ -10,15 +10,14 @@ import '../../../data/models/route_polyline_model.dart';
 import '../../../domain/usecases/trip_planner.dart';
 import '../application/active_trip.dart';
 
-/// Draws a planned trip: dashed lines for walking, the route's own colour for
-/// each ride leg.
-///
-/// Ride legs are sliced out of the full route polyline. On red and purple that
-/// polyline circles the loop about three times, so a slice can pick the wrong
-/// pass — tracked in docs/DATA_RECONCILIATION_2026-08-20.md. Walk legs fall back
-/// to a straight line when no Mapbox geometry has been fetched.
 bool _finite(LatLng p) => p.latitude.isFinite && p.longitude.isFinite;
 
+/// Draws a planned trip: dashed for walking, the route's own colour for each
+/// ride leg.
+///
+/// Ride legs are sliced from the full route polyline. On red and purple that
+/// polyline circles the loop about three times, so a slice can pick the wrong
+/// pass — see docs/DATA_RECONCILIATION_2026-08-20.md.
 List<Polyline> tripPolylines({
   required PlannedTrip trip,
   required List<RoutePolylineModel> routes,
