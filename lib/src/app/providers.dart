@@ -68,15 +68,103 @@ final selectedRouteScheduleProvider =
 });
 
 // ─── Bus location polling ─────────────────────────────────────────────────────
+
+/// Pauses work while the app is not in the foreground.
+///
+/// Without this the poll ran at its full rate in the background on Android:
+/// 1,200 requests per hour per device against a public ArcGIS feature service,
+/// for a map nobody was looking at.
+class _ForegroundGate {
+  _ForegroundGate() {
+    _listener = AppLifecycleListener(
+      onResume: _resume,
+      onPause: _suspend,
+      onHide: _suspend,
+    );
+  }
+
+  late final AppLifecycleListener _listener;
+  Completer<void>? _resumed;
+  var _disposed = false;
+
+  bool get _isForeground {
+    final state = WidgetsBinding.instance.lifecycleState;
+    // Null before the first lifecycle event — treat as foreground so the very
+    // first poll is not delayed on a cold start.
+    return state == null || state == AppLifecycleState.resumed;
+  }
+
+  Future<void> whenForeground() {
+    if (_disposed || _isForeground) return Future<void>.value();
+    return (_resumed ??= Completer<void>()).future;
+  }
+
+  void _suspend() {
+    _resumed ??= Completer<void>();
+  }
+
+  void _resume() {
+    _resumed?.complete();
+    _resumed = null;
+  }
+
+  void dispose() {
+    _disposed = true;
+    _resume();
+    _listener.dispose();
+  }
+}
+
+/// Backs off after repeated failures so a struggling upstream is not hammered
+/// at 20 requests a minute per device. Caps at a minute.
+Duration _pollBackoff(int consecutiveFailures) {
+  if (consecutiveFailures <= 0) return busRefreshInterval;
+  final seconds = busRefreshInterval.inSeconds * (1 << (consecutiveFailures - 1));
+  return Duration(seconds: seconds.clamp(1, 60));
+}
+
+/// Latest known bus position, polled while the app is in the foreground.
+///
+/// Three properties the previous implementation lacked:
+///
+///  * **A failed poll no longer ends the stream.** `getBusLocation` throws on
+///    most transport errors, and an exception inside an `async*` generator
+///    terminates it permanently. Riding through one dead-cell pocket used to
+///    leave the app reading "offline" until it was restarted.
+///  * **The last known position survives a failure**, so the marker stays on
+///    the map instead of vanishing on a single dropped request. It still ages
+///    out via `busStaleThreshold`, so a long outage correctly reads as offline.
+///  * **Polling pauses when the app is backgrounded.**
+///
+/// Deliberately not `autoDispose`: `MapPage` is kept alive by
+/// `StatefulShellRoute`'s `IndexedStack` and never stops watching, so it would
+/// never fire. Lifecycle gating is what actually stops the requests.
 final busLocationPollingProvider = StreamProvider<BusLocationModel?>((ref) async* {
   final repository = ref.watch(transitRepositoryProvider);
   final busId = ref.watch(selectedBusProvider).value;
 
-  yield await repository.getBusLocation(busId);
+  final gate = _ForegroundGate();
+  ref.onDispose(gate.dispose);
+
+  BusLocationModel? lastKnown;
+  var consecutiveFailures = 0;
 
   while (true) {
-    await Future<void>.delayed(busRefreshInterval);
-    yield await repository.getBusLocation(busId);
+    await gate.whenForeground();
+
+    try {
+      final location = await repository.getBusLocation(busId);
+      consecutiveFailures = 0;
+      if (location != null) lastKnown = location;
+      yield location ?? lastKnown;
+    } on Object {
+      // Transport failure, bad payload, unconfigured endpoint. Keep the last
+      // fix on screen and try again rather than killing the stream.
+      consecutiveFailures++;
+      yield lastKnown;
+    }
+
+    await Future<void>.delayed(_pollBackoff(consecutiveFailures));
   }
 });
 
