@@ -1,19 +1,20 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/constants/route_metadata.dart';
 import '../../../core/constants/transit_ids.dart';
 
-class OnboardingPage extends StatefulWidget {
+class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
   @override
-  State<OnboardingPage> createState() => _OnboardingPageState();
+  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final _controller = PageController();
   int _page = 0;
   static const _total = 3;
@@ -25,9 +26,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         curve: Curves.easeInOutCubic,
       );
     } else {
-      await markOnboardingSeen();
-      if (!mounted) return;
-      context.go('/map');
+      await _complete();
     }
   }
 
@@ -39,11 +38,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  Future<void> _skip() async {
+  /// Every exit from onboarding goes through here.
+  ///
+  /// The in-memory flag has to advance as well as the stored one, or the
+  /// router's redirect reads the old value and bounces straight back here.
+  Future<void> _complete() async {
     await markOnboardingSeen();
     if (!mounted) return;
+    ref.read(onboardingSeenProvider.notifier).state = true;
     context.go('/map');
   }
+
+  Future<void> _skip() => _complete();
 
   @override
   void dispose() {
@@ -78,7 +84,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
               children: [
                 _WelcomePage(tt: tt, cs: cs),
                 _FeaturesPage(tt: tt, cs: cs),
-                _LocationPage(tt: tt, cs: cs, onContinue: _next),
+                _LocationPage(
+                  tt: tt,
+                  cs: cs,
+                  onContinue: _next,
+                  onSkip: _skip,
+                ),
               ],
             ),
           ),
@@ -425,10 +436,12 @@ class _LocationPage extends StatelessWidget {
     required this.tt,
     required this.cs,
     required this.onContinue,
+    required this.onSkip,
   });
   final TextTheme tt;
   final ColorScheme cs;
   final VoidCallback onContinue;
+  final VoidCallback onSkip;
 
   @override
   Widget build(BuildContext context) {
@@ -509,11 +522,7 @@ class _LocationPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextButton(
-              onPressed: () async {
-                await markOnboardingSeen();
-                if (!context.mounted) return;
-                context.go('/map');
-              },
+              onPressed: onSkip,
               child: const Text('Continue without location'),
             ),
           ],

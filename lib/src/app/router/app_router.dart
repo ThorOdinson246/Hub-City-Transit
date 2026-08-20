@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/layout/responsive.dart';
+import '../providers.dart';
 import '../../features/about/presentation/about_page.dart';
 import '../../features/announcements/presentation/announcements_inbox_page.dart';
 import '../../features/launch/presentation/launch_page.dart';
@@ -14,6 +15,20 @@ import '../../features/settings/presentation/settings_page.dart';
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/launch',
+    // initialLocation only applies when the platform hands go_router "/". On web any URL is an
+    // entry point, so without this guard a first-time visitor arriving at /schedule or a shared
+    // /map link skipped onboarding entirely and never saw it again.
+    redirect: (context, state) {
+      final seen = ref.read(onboardingSeenProvider);
+      final target = state.matchedLocation;
+
+      if (!seen) {
+        return target == '/onboarding' || target == '/launch' ? null : '/onboarding';
+      }
+      // Nothing left to gate, so skip the splash rather than making a returning
+      // visitor watch it before the redirect fires.
+      return target == '/onboarding' ? '/map' : null;
+    },
     routes: [
       GoRoute(
         path: '/launch',

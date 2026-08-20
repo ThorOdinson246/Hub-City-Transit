@@ -1,0 +1,66 @@
+name: Deploy web to GitHub Pages
+
+# Manual for now. Switch to `push: branches: [main]` once the owner is ready for
+# every merge to go live.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# A superseded deploy is worth cancelling; one already publishing is not.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.9
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      # Generated code is gitignored, so nothing compiles from a clean checkout
+      # without this.
+      - run: dart run build_runner build --delete-conflicting-outputs
+
+      - run: flutter analyze
+      - run: flutter test
+
+      # ARCGIS_URL is a repository *variable*, not a secret. The app is a static
+      # site with no server, so this value is public by construction — see
+      # docs/WEB_DEPLOYMENT.md. Keeping it in Actions config rather than the
+      # source tree is about being able to change it without a code commit.
+      - name: Build
+        run: |
+          flutter build web --release \
+            --base-href "/${GITHUB_REPOSITORY#*/}/" \
+            --dart-define=ARCGIS_URL="${{ vars.ARCGIS_URL }}" \
+            --dart-define=HCT_ANNOUNCEMENTS_URL="${{ vars.HCT_ANNOUNCEMENTS_URL }}"
+          # Pages cannot rewrite unknown paths, so serve the app from 404.html
+          # too or a refresh at /schedule 404s before Flutter loads.
+          cp build/web/index.html build/web/404.html
+          touch build/web/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

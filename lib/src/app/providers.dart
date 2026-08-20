@@ -301,14 +301,33 @@ final darkBasemapProvider =
 );
 
 // ─── Onboarding seen flag ─────────────────────────────────────────────────────
-final onboardingSeenProvider = FutureProvider<bool>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool('onboarding_seen') ?? false;
-});
+const String onboardingSeenKey = 'onboarding_seen';
+
+/// Whether onboarding has been completed, readable synchronously.
+///
+/// The router's redirect runs before any frame and cannot await, so this is
+/// seeded in `main()` from [readOnboardingSeen] and overridden into the scope.
+/// Defaults to `true` so a failure to read never traps someone in onboarding
+/// with no way forward — on web the backing store is localStorage, which throws
+/// outright when site data is blocked.
+final onboardingSeenProvider = StateProvider<bool>((ref) => true);
+
+Future<bool> readOnboardingSeen() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(onboardingSeenKey) ?? false;
+  } catch (_) {
+    return true;
+  }
+}
 
 Future<void> markOnboardingSeen() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('onboarding_seen', true);
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(onboardingSeenKey, true);
+  } catch (_) {
+    // Non-fatal: the in-memory flag still advances, so the session completes.
+  }
 }
 
 // ─── BusStatus helpers (keep in sync with existing use case) ──────────────────

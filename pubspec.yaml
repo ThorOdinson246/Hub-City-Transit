@@ -9,6 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Ships with the Flutter SDK, not a third-party package. Only reached through the
+  # conditional import in core/platform/url_strategy.dart, so it never enters the
+  # Android or iOS compile graph.
+  flutter_web_plugins:
+    sdk: flutter
   cupertino_icons: ^1.0.8
   flutter_riverpod: ^2.6.1
   dio: ^5.9.2
