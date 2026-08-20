@@ -2,6 +2,14 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <!-- Play implicitly derives android.hardware.location.gps as *required* from
+         ACCESS_FINE_LOCATION, which silently delists the app on every device
+         without a GPS radio: Wi-Fi tablets, Chromebooks, ChromeOS/ARC. Location
+         is an enhancement here, not the core, so declare both as optional. -->
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
+    <uses-feature android:name="android.hardware.location" android:required="false"/>
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false"/>
     <application
         android:label="Hub City Transit"
         android:name="${applicationName}"
@@ -49,6 +57,17 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Android 11+ package visibility: without these, canLaunchUrl returns
+             false for mailto: and https:, so the About page's Contact Support
+             button silently does nothing. -->
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="mailto"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
         </intent>
     </queries>
 </manifest>
