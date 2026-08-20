@@ -24,7 +24,7 @@ final walkingDirectionsProvider = Provider<WalkingDirectionsService>((ref) {
   );
 });
 
-final tripPlannerProvider = Provider<TripPlanner>((ref) => const TripPlanner());
+final tripPlannerProvider = Provider<TripPlanner>((ref) => TripPlanner());
 
 /// One shared instance, so both trip fields queue behind the same client rather
 /// than each holding its own Dio the way the map search does.

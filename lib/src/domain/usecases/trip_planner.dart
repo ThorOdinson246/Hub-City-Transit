@@ -141,14 +141,101 @@ class _StopRef {
   final int walkMinutes;
 }
 
-/// Plans walk → ride → (transfer → ride) → walk journeys over the timetable.
+class _Ride {
+  const _Ride(this.routeId, this.from, this.to, this.board, this.arrive);
+  final String routeId;
+  final PatternStop from;
+  final PatternStop to;
+  final int board;
+  final int arrive;
+}
+
+/// A place where one route can be swapped for another, either the same physical
+/// stop or a short walk.
+class _Transfer {
+  const _Transfer(this.fromRoute, this.alight, this.toRoute, this.board, this.walkMinutes);
+  final String fromRoute;
+  final PatternStop alight;
+  final String toRoute;
+  final PatternStop board;
+  final int walkMinutes;
+}
+
+/// Precomputed lookups, built once per dataset.
+///
+/// Without this the transfer search was origins x destinations x stops x stops —
+/// about 420,000 iterations per search, each doing a linear scan for a stop time.
+/// Arrive-by ran that up to 144 times and froze the app.
+class _Index {
+  _Index(this.tripTimes, this.transfersByRoute);
+
+  /// routeId -> trips -> sequence -> minutes past midnight.
+  final Map<String, List<Map<int, int>>> tripTimes;
+
+  /// routeId -> the transfers available while riding it.
+  final Map<String, List<_Transfer>> transfersByRoute;
+
+  static _Index build(TransitDataset data, TripPlannerConfig config) {
+    final times = <String, List<Map<int, int>>>{};
+    for (final entry in data.routes.entries) {
+      times[entry.key] = [
+        for (final trip in entry.value.trips)
+          {
+            for (final st in trip.stopTimes)
+              if (st.minutes case final int m) st.sequence: m,
+          },
+      ];
+    }
+
+    final transfers = <String, List<_Transfer>>{};
+    final routes = data.routes.entries.toList();
+    for (var a = 0; a < routes.length; a++) {
+      for (var b = 0; b < routes.length; b++) {
+        if (a == b) continue;
+        for (final alight in routes[a].value.stops) {
+          for (final board in routes[b].value.stops) {
+            final sameGroup = alight.stopGroupId != null &&
+                alight.stopGroupId == board.stopGroupId;
+            final metres = _distanceBetween(
+                alight.lat, alight.lng, board.lat, board.lng);
+            if (!sameGroup && metres > config.transferRadiusMetres) continue;
+            final walk = sameGroup || metres <= config.sameStopTransferMetres
+                ? 0
+                : math.max(1,
+                    (metres * config.walkDetourFactor /
+                            config.walkSpeedMetresPerSecond /
+                            60)
+                        .round());
+            transfers
+                .putIfAbsent(routes[a].key, () => <_Transfer>[])
+                .add(_Transfer(routes[a].key, alight, routes[b].key, board, walk));
+          }
+        }
+      }
+    }
+    return _Index(times, transfers);
+  }
+}
+
+/// Plans walk -> ride -> (transfer -> ride) -> walk journeys over the timetable.
 ///
 /// Pure and synchronous, with time and data injected, so every case is
 /// reproducible in a test.
 class TripPlanner {
-  const TripPlanner({this.config = const TripPlannerConfig()});
+  TripPlanner({this.config = const TripPlannerConfig()});
 
   final TripPlannerConfig config;
+
+  TransitDataset? _indexedFor;
+  _Index? _index;
+
+  _Index _indexFor(TransitDataset data) {
+    if (!identical(_indexedFor, data) || _index == null) {
+      _index = _Index.build(data, config);
+      _indexedFor = data;
+    }
+    return _index!;
+  }
 
   TripPlanResult plan({
     required TransitDataset dataset,
@@ -160,7 +247,8 @@ class TripPlanner {
     bool arriveBy = false,
   }) {
     final walkMetres =
-        _distance(originLat, originLng, destLat, destLng) * config.walkDetourFactor;
+        _distanceBetween(originLat, originLng, destLat, destLng) *
+            config.walkDetourFactor;
     final walkMinutes = _walkMinutes(walkMetres);
 
     final status = serviceStatusAt(dataset, when);
@@ -168,28 +256,22 @@ class TripPlanner {
     if (service == null || status.state == ServiceState.holiday) {
       return TripPlanResult(
         failure: TripPlanFailure.outsideServiceDays,
-        nextServiceMinutes: _firstDepartureOfDay(dataset),
+        nextServiceMinutes: _firstDeparture(dataset),
         walkOnlyMinutes: walkMinutes,
         walkOnlyMetres: walkMetres,
         serviceStatus: status,
       );
     }
 
-    final origins = _nearbyStops(
-      dataset,
-      originLat,
-      originLng,
-      config.accessRadiusMetres,
-      config.accessCandidates,
-    );
+    final origins = _nearbyStops(dataset, originLat, originLng,
+        config.accessRadiusMetres, config.accessCandidates);
     final destinations = _nearbyStops(
-      dataset,
-      destLat,
-      destLng,
-      math.min(config.destinationRadiusMetres,
-          config.maxPracticalDestinationWalkMetres),
-      config.destinationCandidates,
-    );
+        dataset,
+        destLat,
+        destLng,
+        math.min(config.destinationRadiusMetres,
+            config.maxPracticalDestinationWalkMetres),
+        config.destinationCandidates);
 
     if (origins.isEmpty || destinations.isEmpty) {
       return TripPlanResult(
@@ -199,25 +281,14 @@ class TripPlanner {
       );
     }
 
-    final targetMinutes = when.hour * 60 + when.minute;
-    final found = <TripItinerary>[];
-
-    if (arriveBy) {
-      // Brute-force backwards scan. Exact, and cheap enough on 153 trips that a
-      // proper reverse search isn't worth the complexity.
-      for (var depart = targetMinutes; depart >= 0; depart -= 5) {
-        final batch = _search(dataset, origins, destinations, depart, service);
-        found.addAll(batch.where((it) => it.arrivalMinutes <= targetMinutes));
-        if (found.length >= config.maxResults * 3) break;
-      }
-    } else {
-      found.addAll(_search(dataset, origins, destinations, targetMinutes, service));
-    }
+    final index = _indexFor(dataset);
+    final target = when.hour * 60 + when.minute;
+    final found = _search(index, origins, destinations, target, arriveBy);
 
     if (found.isEmpty) {
       return TripPlanResult(
         failure: TripPlanFailure.noServiceAtTime,
-        nextServiceMinutes: _firstDepartureOfDay(dataset),
+        nextServiceMinutes: _firstDeparture(dataset),
         walkOnlyMinutes: walkMinutes,
         walkOnlyMetres: walkMetres,
         serviceStatus: status,
@@ -230,9 +301,9 @@ class TripPlanner {
     });
 
     final unique = <String, TripItinerary>{};
-    for (final itinerary in found) {
-      final key = '${itinerary.routeIds.join('>')}|${itinerary.departureMinutes}';
-      unique.putIfAbsent(key, () => itinerary);
+    for (final it in found) {
+      unique.putIfAbsent(
+          '${it.routeIds.join('>')}|${it.departureMinutes}', () => it);
       if (unique.length >= config.maxResults) break;
     }
 
@@ -240,82 +311,70 @@ class TripPlanner {
       itineraries: unique.values.toList(growable: false),
       walkOnlyMinutes: walkMinutes,
       walkOnlyMetres: walkMetres,
+      serviceStatus: status,
     );
   }
 
   List<TripItinerary> _search(
-    TransitDataset dataset,
+    _Index index,
     List<_StopRef> origins,
     List<_StopRef> destinations,
-    int departAfter,
-    ServiceCalendar service,
+    int target,
+    bool arriveBy,
   ) {
     final results = <TripItinerary>[];
 
     for (final from in origins) {
-      final readyAt = departAfter + from.walkMinutes;
+      // Depart-at: the rider is ready after the walk. Arrive-by: we work
+      // backwards from the deadline instead, so the walk is subtracted later.
+      final readyAt = arriveBy ? null : target + from.walkMinutes;
 
       for (final to in destinations) {
         if (to.routeId != from.routeId) continue;
-        if (to.stop.sequence == from.stop.sequence) continue;
-
-        final ride = _firstRide(dataset, from.routeId, from.stop, to.stop, readyAt);
+        final deadline = arriveBy ? target - to.walkMinutes : null;
+        final ride = _pickRide(
+            index, from.routeId, from.stop, to.stop, readyAt, deadline);
         if (ride == null) continue;
         results.add(_assemble(from, to, [ride]));
       }
     }
 
     if (config.maxTransfers >= 1) {
-      results.addAll(_searchWithTransfer(dataset, origins, destinations, departAfter));
-    }
+      for (final from in origins) {
+        final readyAt = arriveBy ? null : target + from.walkMinutes;
+        final hops = index.transfersByRoute[from.routeId] ?? const <_Transfer>[];
 
-    return results;
-  }
+        for (final hop in hops) {
+          if (hop.alight.sequence == from.stop.sequence) continue;
 
-  List<TripItinerary> _searchWithTransfer(
-    TransitDataset dataset,
-    List<_StopRef> origins,
-    List<_StopRef> destinations,
-    int departAfter,
-  ) {
-    final results = <TripItinerary>[];
+          for (final to in destinations) {
+            if (to.routeId != hop.toRoute) continue;
+            if (hop.board.sequence == to.stop.sequence) continue;
+            final deadline = arriveBy ? target - to.walkMinutes : null;
 
-    for (final from in origins) {
-      final readyAt = departAfter + from.walkMinutes;
-      final firstRoute = dataset.route(from.routeId);
-      if (firstRoute == null) continue;
-
-      for (final to in destinations) {
-        if (to.routeId == from.routeId) continue;
-        final secondRoute = dataset.route(to.routeId);
-        if (secondRoute == null) continue;
-
-        for (final alight in firstRoute.stops) {
-          if (alight.sequence == from.stop.sequence) continue;
-
-          for (final board in secondRoute.stops) {
-            if (board.sequence == to.stop.sequence) continue;
-            final gap = _distance(alight.lat, alight.lng, board.lat, board.lng);
-            final sameGroup = alight.stopGroupId != null &&
-                alight.stopGroupId == board.stopGroupId;
-            if (!sameGroup && gap > config.transferRadiusMetres) continue;
-
-            final legOne =
-                _firstRide(dataset, from.routeId, from.stop, alight, readyAt);
-            if (legOne == null) continue;
-
-            final walkAcross = gap <= config.sameStopTransferMetres
-                ? 0
-                : _walkMinutes(gap * config.walkDetourFactor);
-            final connectAt =
-                legOne.arrive + walkAcross + config.transferBufferMinutes;
-
-            final legTwo =
-                _firstRide(dataset, to.routeId, board, to.stop, connectAt);
-            if (legTwo == null) continue;
-
-            results.add(_assemble(from, to, [legOne, legTwo],
-                transferWalkMetres: sameGroup ? 0 : gap));
+            if (arriveBy) {
+              final second = _pickRide(index, hop.toRoute, hop.board, to.stop,
+                  null, deadline);
+              if (second == null) continue;
+              final firstDeadline =
+                  second.board - hop.walkMinutes - config.transferBufferMinutes;
+              final first = _pickRide(index, from.routeId, from.stop,
+                  hop.alight, null, firstDeadline);
+              if (first == null) continue;
+              results.add(_assemble(from, to, [first, second],
+                  transferWalkMinutes: hop.walkMinutes));
+            } else {
+              final first = _pickRide(
+                  index, from.routeId, from.stop, hop.alight, readyAt, null);
+              if (first == null) continue;
+              final connectAt =
+                  first.arrive + hop.walkMinutes + config.transferBufferMinutes;
+              final second = _pickRide(
+                  index, hop.toRoute, hop.board, to.stop, connectAt, null);
+              if (second == null) continue;
+              results.add(_assemble(from, to, [first, second],
+                  transferWalkMinutes: hop.walkMinutes));
+            }
           }
         }
       }
@@ -324,11 +383,65 @@ class TripPlanner {
     return results;
   }
 
+  /// Earliest ride departing at or after [notBefore], or the latest one arriving
+  /// at or before [notAfter]. Every route is a closed loop, so a ride whose
+  /// sequence goes backwards rides through the terminus onto the next run.
+  _Ride? _pickRide(
+    _Index index,
+    String routeId,
+    PatternStop from,
+    PatternStop to,
+    int? notBefore,
+    int? notAfter,
+  ) {
+    if (from.sequence == to.sequence) return null;
+    final trips = index.tripTimes[routeId];
+    if (trips == null || trips.isEmpty) return null;
+
+    final wraps = to.sequence < from.sequence;
+    var terminus = 0;
+    if (wraps) {
+      for (final t in trips) {
+        for (final seq in t.keys) {
+          if (seq > terminus) terminus = seq;
+        }
+      }
+    }
+
+    _Ride? best;
+    for (final trip in trips) {
+      final board = trip[from.sequence];
+      if (board == null) continue;
+
+      int? arrive;
+      if (!wraps) {
+        arrive = trip[to.sequence];
+      } else {
+        final end = trip[terminus];
+        if (end == null) continue;
+        for (final next in trips) {
+          final candidate = next[to.sequence];
+          if (candidate == null || candidate < end) continue;
+          if (arrive == null || candidate < arrive) arrive = candidate;
+        }
+      }
+      if (arrive == null || arrive <= board) continue;
+      if (notBefore != null && board < notBefore) continue;
+      if (notAfter != null && arrive > notAfter) continue;
+
+      if (best == null ||
+          (notAfter != null ? board > best.board : board < best.board)) {
+        best = _Ride(routeId, from, to, board, arrive);
+      }
+    }
+    return best;
+  }
+
   TripItinerary _assemble(
     _StopRef from,
     _StopRef to,
     List<_Ride> rides, {
-    double transferWalkMetres = 0,
+    int transferWalkMinutes = 0,
   }) {
     final legs = <TripLeg>[];
     final departure = rides.first.board - from.walkMinutes;
@@ -350,7 +463,9 @@ class TripPlanner {
           endMinutes: ride.board,
           fromStop: rides[i - 1].to,
           toStop: ride.from,
-          distanceMetres: transferWalkMetres,
+          distanceMetres: transferWalkMinutes *
+              config.walkSpeedMetresPerSecond *
+              60,
         ));
       }
       legs.add(TripLeg(
@@ -360,7 +475,7 @@ class TripPlanner {
         routeId: ride.routeId,
         fromStop: ride.from,
         toStop: ride.to,
-        stopCount: ride.to.sequence - ride.from.sequence,
+        stopCount: (ride.to.sequence - ride.from.sequence).abs(),
       ));
     }
 
@@ -376,73 +491,17 @@ class TripPlanner {
       legs: legs,
       departureMinutes: departure,
       arrivalMinutes: rides.last.arrive + to.walkMinutes,
-      totalWalkMetres: from.walkMetres + to.walkMetres + transferWalkMetres,
+      totalWalkMetres: from.walkMetres + to.walkMetres,
       transferCount: rides.length - 1,
     );
   }
 
-  /// Every route here is a closed loop — first and last stop are the same
-  /// place. So boarding late in the sequence and alighting early is a normal
-  /// trip: you stay on through the terminus and continue on the next run.
-  /// Refusing that made 209 stop pairs unreachable and pushed 1,727 more into
-  /// walks over 800m.
-  _Ride? _firstRide(
-    TransitDataset dataset,
-    String routeId,
-    PatternStop from,
-    PatternStop to,
-    int readyAt,
-  ) {
-    final pattern = dataset.route(routeId);
-    if (pattern == null || to.sequence == from.sequence) return null;
-
-    if (to.sequence > from.sequence) {
-      _Ride? best;
-      for (final trip in pattern.trips) {
-        final boardAt = trip.timeAtSequence(from.sequence)?.minutes;
-        final arriveAt = trip.timeAtSequence(to.sequence)?.minutes;
-        if (boardAt == null || arriveAt == null) continue;
-        if (boardAt < readyAt || arriveAt <= boardAt) continue;
-        if (best == null || boardAt < best.board) {
-          best = _Ride(routeId, from, to, boardAt, arriveAt);
-        }
-      }
-      return best;
-    }
-
-    final terminus = pattern.lastSequence;
-    _Ride? best;
-    for (final trip in pattern.trips) {
-      final boardAt = trip.timeAtSequence(from.sequence)?.minutes;
-      final endAt = trip.timeAtSequence(terminus)?.minutes;
-      if (boardAt == null || endAt == null || boardAt < readyAt) continue;
-
-      int? arriveAt;
-      for (final next in pattern.trips) {
-        final candidate = next.timeAtSequence(to.sequence)?.minutes;
-        if (candidate == null || candidate < endAt) continue;
-        if (arriveAt == null || candidate < arriveAt) arriveAt = candidate;
-      }
-      if (arriveAt == null) continue;
-
-      if (best == null || boardAt < best.board) {
-        best = _Ride(routeId, from, to, boardAt, arriveAt);
-      }
-    }
-    return best;
-  }
-
-  List<_StopRef> _nearbyStops(
-    TransitDataset dataset,
-    double lat,
-    double lng,
-    double radius,
-    int limit,
-  ) {
+  List<_StopRef> _nearbyStops(TransitDataset data, double lat, double lng,
+      double radius, int limit) {
     final all = <_StopRef>[];
-    for (final entry in dataset.allStops) {
-      final metres =
-          _distance(lat, lng, entry.stop.lat, entry.stop.lng) * config.walkDetourFactor;
+    for (final entry in data.allStops) {
+      final metres = _distanceBetween(lat, lng, entry.stop.lat, entry.stop.lng) *
+          config.walkDetourFactor;
       if (metres > radius) continue;
       all.add(_StopRef(entry.routeId, entry.stop, metres, _walkMinutes(metres)));
     }
@@ -450,16 +509,16 @@ class TripPlanner {
     return all.take(limit).toList(growable: false);
   }
 
-  ServiceCalendar? _serviceFor(TransitDataset dataset, DateTime when) {
-    for (final service in dataset.services.values) {
+  ServiceCalendar? _serviceFor(TransitDataset data, DateTime when) {
+    for (final service in data.services.values) {
       if (service.runsOn(when)) return service;
     }
     return null;
   }
 
-  int? _firstDepartureOfDay(TransitDataset dataset) {
+  int? _firstDeparture(TransitDataset data) {
     int? earliest;
-    for (final pattern in dataset.routes.values) {
+    for (final pattern in data.routes.values) {
       for (final trip in pattern.trips) {
         final minutes = parseHhMm(trip.startTime);
         if (minutes == null) continue;
@@ -471,27 +530,18 @@ class TripPlanner {
 
   int _walkMinutes(double metres) =>
       math.max(1, (metres / config.walkSpeedMetresPerSecond / 60).round());
-
-  double _distance(double lat1, double lng1, double lat2, double lng2) {
-    const earthRadius = 6371000.0;
-    final dLat = _radians(lat2 - lat1);
-    final dLng = _radians(lng2 - lng1);
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(_radians(lat1)) *
-            math.cos(_radians(lat2)) *
-            math.sin(dLng / 2) *
-            math.sin(dLng / 2);
-    return earthRadius * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-  }
-
-  double _radians(double degrees) => degrees * math.pi / 180;
 }
 
-class _Ride {
-  const _Ride(this.routeId, this.from, this.to, this.board, this.arrive);
-  final String routeId;
-  final PatternStop from;
-  final PatternStop to;
-  final int board;
-  final int arrive;
+double _distanceBetween(double lat1, double lng1, double lat2, double lng2) {
+  const earthRadius = 6371000.0;
+  final dLat = _radians(lat2 - lat1);
+  final dLng = _radians(lng2 - lng1);
+  final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+      math.cos(_radians(lat1)) *
+          math.cos(_radians(lat2)) *
+          math.sin(dLng / 2) *
+          math.sin(dLng / 2);
+  return earthRadius * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
 }
+
+double _radians(double degrees) => degrees * math.pi / 180;

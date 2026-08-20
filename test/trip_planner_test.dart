@@ -18,7 +18,7 @@ DateTime _weekdayAt(int hour, int minute) =>
 
 void main() {
   late TransitDataset data;
-  const planner = TripPlanner();
+  final planner = TripPlanner();
 
   setUpAll(() => data = _dataset());
 
