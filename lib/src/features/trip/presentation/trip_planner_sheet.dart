@@ -56,19 +56,24 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
         });
   }
 
-  void _onDrag(DragUpdateDetails details) {
-    if (details.primaryDelta == null) return;
-    if (details.primaryDelta! < -6) {
-      setState(() => _height = switch (_height) {
-            _SheetHeight.peek => _SheetHeight.half,
-            _ => _SheetHeight.full,
-          });
-    } else if (details.primaryDelta! > 6) {
-      setState(() => _height = switch (_height) {
-            _SheetHeight.full => _SheetHeight.half,
-            _ => _SheetHeight.peek,
-          });
-    }
+  /// One step per gesture, decided on release. Reacting to every drag update
+  /// walked peek -> half -> full within a single swipe, so half was unreachable.
+  void _onDragEnd(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    if (velocity.abs() < 60) return;
+    setState(() {
+      if (velocity < 0) {
+        _height = switch (_height) {
+          _SheetHeight.peek => _SheetHeight.half,
+          _ => _SheetHeight.full,
+        };
+      } else {
+        _height = switch (_height) {
+          _SheetHeight.full => _SheetHeight.half,
+          _ => _SheetHeight.peek,
+        };
+      }
+    });
   }
 
   void _plan() {
@@ -127,19 +132,28 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
     });
 
     final media = MediaQuery.of(context);
-    final maxHeight = media.size.height - media.padding.top - 12;
-    final height = switch (_height) {
-      _SheetHeight.peek => 132.0,
-      _SheetHeight.half => maxHeight * 0.52,
-      _SheetHeight.full => maxHeight * 0.92,
-    };
+    final keyboard = media.viewInsets.bottom;
     final activeTrip = ref.watch(activeTripProvider);
 
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: AnimatedContainer(
+    return Positioned.fill(
+      // Measured against the space that actually exists. Sizing off
+      // media.size.height meant the sheet was taller than the body once the
+      // keyboard shrank it, and ran off the top of the screen.
+      child: LayoutBuilder(builder: (context, constraints) {
+        final available = constraints.maxHeight - 12;
+        final wanted = switch (_height) {
+          _SheetHeight.peek => 132.0,
+          _SheetHeight.half => available * 0.52,
+          _SheetHeight.full => available * 0.92,
+        };
+        // Typing needs room; a peek-height sheet with a focused field is
+        // unusable, so the keyboard forces it open.
+        final height =
+            (keyboard > 0 ? available * 0.92 : wanted).clamp(120.0, available);
+
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         curve: Curves.fastOutSlowIn,
         height: height,
@@ -160,7 +174,7 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: _cycleHeight,
-              onVerticalDragUpdate: _onDrag,
+              onVerticalDragEnd: _onDragEnd,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 8, 4),
                 child: Column(
@@ -203,12 +217,13 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
             ),
             // Peek shows the chosen trip rather than a cropped form, so the
             // itinerary stays readable while the map is visible behind it.
-            if (_height == _SheetHeight.peek && activeTrip != null)
+            if (_height == _SheetHeight.peek && activeTrip != null && keyboard == 0)
               Expanded(child: _peekSummary(scheme, activeTrip))
             else
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
+                  // Scroll clear of the keyboard rather than under it.
+                  padding: EdgeInsets.fromLTRB(16, 4, 16, 28 + keyboard),
                   children: [
                     _form(scheme),
                     const SizedBox(height: 18),
@@ -221,7 +236,9 @@ class _TripPlannerSheetState extends ConsumerState<TripPlannerSheet> {
               ),
           ],
         ),
-      ),
+          ),
+        );
+      }),
     );
   }
 

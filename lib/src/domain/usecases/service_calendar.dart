@@ -187,3 +187,34 @@ DateTime? _nextServiceDay(TransitDataset data, DateTime from) {
   }
   return null;
 }
+
+/// Every scheduled departure at one stop, in order.
+///
+/// The schedule page used to show a single time taken from the live-adjustment
+/// path, so rows went blank whenever no bus was running. The timetable has 21
+/// departures per stop on blue; this exposes them.
+List<int> departuresAtSequence(RoutePattern pattern, int sequence) {
+  final times = <int>[];
+  for (final trip in pattern.trips) {
+    final minutes = trip.timeAtSequence(sequence)?.minutes;
+    if (minutes != null) times.add(minutes);
+  }
+  times.sort();
+  return times;
+}
+
+/// The next [count] departures at or after [fromMinutes], falling back to the
+/// start of the next service day once the last bus has gone.
+({List<int> times, bool tomorrow}) upcomingDepartures(
+  RoutePattern pattern,
+  int sequence,
+  int fromMinutes, {
+  int count = 3,
+}) {
+  final all = departuresAtSequence(pattern, sequence);
+  if (all.isEmpty) return (times: const <int>[], tomorrow: false);
+
+  final later = all.where((t) => t >= fromMinutes).take(count).toList();
+  if (later.isNotEmpty) return (times: later, tomorrow: false);
+  return (times: all.take(count).toList(), tomorrow: true);
+}

@@ -9,7 +9,10 @@ import '../../../core/constants/transit_ids.dart';
 import '../../../core/utils/transfer_connections.dart';
 import '../../../data/models/route_schedule_model.dart';
 import '../../../data/models/stop_model.dart';
+import '../../../data/models/transit_dataset.dart';
 import '../../../domain/usecases/schedule_adjustment_use_case.dart';
+import '../../../domain/usecases/service_calendar.dart';
+import '../../trip/application/trip_planner_providers.dart';
 
 class SchedulePage extends ConsumerStatefulWidget {
   const SchedulePage({super.key});
@@ -116,7 +119,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
         data: (stops) => allStopsByRouteAsync.when(
           data: (allStops) => scheduleAsync.when(
             data: (schedule) => _buildList(
-              context, cs, tt, route, accent, stops, allStops, schedule, adjustment),
+              context, cs, tt, route, accent, stops, allStops, schedule, adjustment,
+              ref.watch(transitDatasetProvider).asData?.value,
+              DateTime.now().hour * 60 + DateTime.now().minute),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => _Err('Schedule error: $e'),
           ),
@@ -139,6 +144,8 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     Map<RouteId, List<StopModel>> allStops,
     RouteScheduleModel? schedule,
     AdjustmentResult? adjustment,
+    TransitDataset? dataset,
+    int nowMinutes,
   ) {
     if (schedule == null) {
       return const Center(child: Text('No schedule available'));
@@ -160,10 +167,18 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           : transferMap['${matchedStop.stopId}'] ?? const <TransferStopConnection>[];
       if (_transferOnly && conn.isEmpty) continue;
       final adj = adjustment != null && i < adjustment.stops.length ? adjustment.stops[i] : null;
+      // Straight from the timetable, so rows still show times when no bus is
+      // running. The live adjustment refines these when it is available.
+      final pattern = dataset?.route(route.value);
+      final upcoming = pattern == null
+          ? (times: const <int>[], tomorrow: false)
+          : upcomingDepartures(pattern, i + 1, nowMinutes);
       entries.add(_Entry(
         index: i,
         direction: matchedStop?.direction,
         name: name,
+        departures: upcoming.times,
+        departuresTomorrow: upcoming.tomorrow,
         scheduled: adj?.scheduledTime ?? '',
         adjusted: adj?.adjustedTime ?? '',
         isPast: adj?.isPast ?? false,
@@ -280,6 +295,7 @@ class _RouteChips extends ConsumerWidget {
 
 class _Entry {
   const _Entry({required this.index, required this.direction, required this.name,
+    required this.departures, required this.departuresTomorrow,
     required this.scheduled, required this.adjusted, required this.isPast,
     required this.isCurrent, required this.connections});
   final int index;
@@ -288,6 +304,10 @@ class _Entry {
   /// which the internal stop id never did.
   final String? direction;
   final String name, scheduled, adjusted;
+
+  /// Next few scheduled departures, minutes past midnight.
+  final List<int> departures;
+  final bool departuresTomorrow;
   final bool isPast, isCurrent;
   final List<TransferStopConnection> connections;
 }
@@ -373,6 +393,28 @@ class _StopRow extends StatelessWidget {
                 if (entry.direction case final String direction)
                   Text(direction,
                     style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
+                if (entry.departures.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(entry.departuresTomorrow ? 'Tomorrow' : 'Next',
+                        style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant)),
+                      for (final t in entry.departures)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: cs.surfaceContainerHigh,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(formatClock(t),
+                            style: tt.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
+                        ),
+                    ],
+                  ),
+                ],
                 if (entry.connections.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Wrap(spacing: 5, runSpacing: 5, children: entry.connections.map((c) => Container(
