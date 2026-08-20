@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
 import '../core/constants/app_constants.dart';
+import '../core/platform/heading_source.dart';
 import '../core/constants/transit_ids.dart';
 
 import '../core/network/dio_provider.dart';
@@ -21,9 +20,15 @@ import '../domain/repositories/transit_repository.dart';
 import '../domain/usecases/schedule_adjustment_use_case.dart';
 
 // ─── Location & Sensors ───────────────────────────────────────────────────────
-final compassProvider = StreamProvider<CompassEvent>((ref) {
-  if (kIsWeb) return const Stream.empty();
-  return FlutterCompass.events ?? const Stream.empty();
+final headingSourceProvider = Provider<HeadingSource>((ref) {
+  return createHeadingSource();
+});
+
+/// Heading in degrees clockwise from north, or null where the device cannot
+/// supply one — a desktop browser with no magnetometer, or before the iOS
+/// Safari orientation grant. Consumers draw a plain puck instead of a cone.
+final compassProvider = StreamProvider<double?>((ref) {
+  return ref.watch(headingSourceProvider).headings();
 });
 
 // ─── Route / bus selection ────────────────────────────────────────────────────

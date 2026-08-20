@@ -152,15 +152,21 @@ class SettingsPage extends ConsumerWidget {
                     : null,
                 onTap: () => context.push('/announcements'),
               ),
-              if (!kIsWeb)
-                _SettingsTile(
-                  cs: cs,
-                  tt: tt,
-                  icon: Icons.location_on_outlined,
-                  title: 'Location Services',
-                  subtitle: 'Manage GPS usage and permissions',
-                  onTap: () => Geolocator.openLocationSettings(),
-                ),
+              // No web API can open the browser's permission panel, so on web this
+              // explains where the setting lives instead of hiding the row and
+              // leaving a blocked user with nowhere to go.
+              _SettingsTile(
+                cs: cs,
+                tt: tt,
+                icon: Icons.location_on_outlined,
+                title: 'Location Services',
+                subtitle: kIsWeb
+                    ? 'Managed by your browser for this site'
+                    : 'Manage GPS usage and permissions',
+                onTap: kIsWeb
+                    ? () => _showBrowserLocationHelp(context)
+                    : () => Geolocator.openLocationSettings(),
+              ),
               _SettingsTile(
                 cs: cs,
                 tt: tt,
@@ -264,6 +270,28 @@ class SettingsPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> _showBrowserLocationHelp(BuildContext context) {
+  return showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Location Services'),
+      content: const Text(
+        'Hub City Transit asks your browser for location the first time you tap '
+        'the locate button on the map.\n\n'
+        'If you blocked it, the site cannot ask again. Open the padlock or '
+        'settings icon in the address bar, set Location to Allow, then reload '
+        'this page.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Got it'),
+        ),
+      ],
+    ),
+  );
 }
 
 class _SectionLabel extends StatelessWidget {

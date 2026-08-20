@@ -47,27 +47,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   @override
   bool get wantKeepAlive => true;
 
-  @override
-  void initState() {
-    super.initState();
-    if (kIsWeb) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Hub City Transit is best experienced on our mobile app!'),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 8),
-            action: SnackBarAction(
-              label: 'Dismiss',
-              onPressed: () {},
-            ),
-          ),
-        );
-      });
-    }
-  }
-
   final _mapController = MapController();
   StopModel? _selectedStop;
   bool _headerVisible = true;
@@ -201,10 +180,31 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     });
   }
 
+  /// Camera gestures that mean "the user is driving the map", so bus-follow
+  /// should let go.
+  ///
+  /// A wheel or trackpad zoom is as deliberate as a drag; without `scrollWheel`
+  /// here, follow stayed engaged on desktop and kept yanking the camera back.
+  static const _userDrivenSources = {
+    MapEventSource.onDrag,
+    MapEventSource.onMultiFinger,
+    MapEventSource.scrollWheel,
+    MapEventSource.doubleTapZoomAnimationController,
+  };
+
   void _onMapEvent(MapEvent event) {
-    if (event.source == MapEventSource.onDrag || event.source == MapEventSource.onMultiFinger) {
+    if (_userDrivenSources.contains(event.source)) {
       _isTrackingBus = false;
     }
+
+    // Every camera move carries the resulting zoom. Reading it only from
+    // MapEventMoveEnd missed scroll-wheel zoom entirely — MapEventScrollWheelZoom
+    // is a sibling class, not a MoveEnd — so _currentZoom went stale on desktop
+    // and the bus-follow re-centre below then restored that stale value.
+    if (event is MapEventWithMove && event.camera.zoom != _currentZoom) {
+      setState(() => _currentZoom = event.camera.zoom);
+    }
+
     if (event is MapEventMoveStart || event is MapEventRotateStart || event is MapEventFlingAnimation) {
       _gestureTimer?.cancel();
       if (_headerVisible) setState(() => _headerVisible = false);
@@ -221,6 +221,62 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 
   void _flyToUser(Position pos) {
     _animatedMapMove(LatLng(pos.latitude, pos.longitude), 15);
+  }
+
+  bool _locationRequestInFlight = false;
+
+  /// Asks for location and always says something about the outcome.
+  ///
+  /// Two web-specific hazards the previous version walked into. `geolocator_web`
+  /// implements `requestPermission` as a bare `getCurrentPosition`, which never
+  /// completes while the browser's permission bubble sits unanswered — so the
+  /// button appeared dead with no feedback. And once an origin is blocked the
+  /// page cannot re-prompt at all: `openAppSettings` throws `UnsupportedError`
+  /// on web, so the only route back is the browser's own site settings, which
+  /// the user has to be told about.
+  Future<void> _requestLocation() async {
+    if (_locationRequestInFlight) return;
+    setState(() => _locationRequestInFlight = true);
+    try {
+      // Piggy-backs on this tap because iOS Safari only grants device
+      // orientation from inside a user gesture. No-op on every other platform.
+      unawaited(ref.read(headingSourceProvider).ensurePermission());
+
+      final permission = await Geolocator.requestPermission()
+          .timeout(const Duration(seconds: 20));
+      if (!mounted) return;
+
+      switch (permission) {
+        case LocationPermission.always:
+        case LocationPermission.whileInUse:
+          ref.invalidate(userLocationProvider);
+        case LocationPermission.denied:
+          _showLocationMessage('Location access was dismissed. Tap again to retry.');
+        case LocationPermission.deniedForever:
+        case LocationPermission.unableToDetermine:
+          _showLocationMessage(
+            kIsWeb
+                ? 'Location is blocked for this site. Use the lock icon in the address bar to allow it.'
+                : 'Location is blocked. Enable it for Hub City Transit in your device settings.',
+          );
+      }
+    } on TimeoutException {
+      if (!mounted) return;
+      _showLocationMessage('Location request timed out. Tap again to retry.');
+    } finally {
+      if (mounted) setState(() => _locationRequestInFlight = false);
+    }
+  }
+
+  void _showLocationMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   void _openTripPlanner(BuildContext ctx, dynamic userPos, {NominatimPlace? defaultDestination}) {
@@ -388,8 +444,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     ];
 
 
-    final compassEvent = ref.watch(compassProvider).asData?.value;
-    final heading = compassEvent?.heading;
+    final heading = ref.watch(compassProvider).asData?.value;
 
     final userMarkers = (userPos == null || !GeoUtils.isValidLatLng(userPos.latitude, userPos.longitude)) ? <Marker>[] : [
       Marker(
@@ -446,6 +501,16 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             // Lock north-up — disable rotation gestures
             interactionOptions: const InteractionOptions(
               flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+              // KeyboardOptions defaults to autofocus, which puts the map first
+              // in the tab order and lets it swallow the arrow keys the search
+              // results need. Panning by keyboard is no loss on a map that also
+              // pans by drag; R/F zooming is what a keyboard user actually
+              // lacked, since arrow-panning alone cannot change zoom.
+              keyboardOptions: KeyboardOptions(
+                autofocus: false,
+                enableArrowKeysPanning: false,
+                enableRFZooming: true,
+              ),
             ),
             onMapEvent: _onMapEvent,
             onTap: (_, _) {
@@ -746,14 +811,11 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             backgroundColor: cs.surfaceContainerLowest,
             foregroundColor: cs.primary,
             elevation: 4,
-            onPressed: () async {
+            onPressed: () {
               if (userPos != null) {
                 _flyToUser(userPos);
               } else {
-                final p = await Geolocator.requestPermission();
-                if ((p == LocationPermission.always || p == LocationPermission.whileInUse) && mounted) {
-                  ref.invalidate(userLocationProvider);
-                }
+                _requestLocation();
               }
             },
             child: Tooltip(
