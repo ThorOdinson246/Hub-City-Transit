@@ -7,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/constants/route_metadata.dart';
@@ -508,6 +509,29 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                 ),
               ]),
 
+            // Required, not decorative: the basemap is CARTO-rendered
+            // OpenStreetMap data. ODbL requires OSM attribution and CARTO's
+            // terms require theirs. Placed last so it paints above the layers.
+            RichAttributionWidget(
+              alignment: AttributionAlignment.bottomLeft,
+              showFlutterMapAttribution: false,
+              attributions: [
+                TextSourceAttribution(
+                  'OpenStreetMap contributors',
+                  onTap: () => launchUrl(
+                    Uri.parse('https://www.openstreetmap.org/copyright'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                ),
+                TextSourceAttribution(
+                  'CARTO',
+                  onTap: () => launchUrl(
+                    Uri.parse('https://carto.com/attributions'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
