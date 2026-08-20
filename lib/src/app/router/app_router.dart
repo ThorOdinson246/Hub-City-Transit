@@ -23,10 +23,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final target = state.matchedLocation;
 
       if (!seen) {
-        return target == '/onboarding' || target == '/launch' ? null : '/onboarding';
+        if (target == '/onboarding' || target == '/launch') return null;
+        // Remember where they were actually headed. Without this, someone
+        // opening a shared /about link for the first time is sent through
+        // onboarding and then dumped on /map — the link silently does nothing.
+        ref.read(pendingDeepLinkProvider.notifier).state = state.uri.toString();
+        return '/onboarding';
       }
-      // Nothing left to gate, so skip the splash rather than making a returning
-      // visitor watch it before the redirect fires.
+
+      // Onboarding is the only gated route; everything else passes through.
       return target == '/onboarding' ? '/map' : null;
     },
     routes: [

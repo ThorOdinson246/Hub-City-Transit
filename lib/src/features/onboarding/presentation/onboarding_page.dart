@@ -46,7 +46,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     await markOnboardingSeen();
     if (!mounted) return;
     ref.read(onboardingSeenProvider.notifier).state = true;
-    context.go('/map');
+
+    final pending = ref.read(pendingDeepLinkProvider);
+    ref.read(pendingDeepLinkProvider.notifier).state = null;
+    context.go(pending ?? '/map');
   }
 
   Future<void> _skip() => _complete();

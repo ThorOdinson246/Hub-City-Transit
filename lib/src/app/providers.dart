@@ -317,6 +317,10 @@ const String onboardingSeenKey = 'onboarding_seen';
 /// outright when site data is blocked.
 final onboardingSeenProvider = StateProvider<bool>((ref) => true);
 
+/// Where the user was heading when onboarding intercepted them, so a shared
+/// link still lands after the intro instead of being discarded.
+final pendingDeepLinkProvider = StateProvider<String?>((ref) => null);
+
 Future<bool> readOnboardingSeen() async {
   try {
     final prefs = await SharedPreferences.getInstance();

@@ -180,16 +180,22 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     });
   }
 
+  static double _markerRadiusFor(double zoom) =>
+      zoom >= 15 ? 9.0 : (zoom >= 13 ? 6.0 : 4.0);
+
   /// Camera gestures that mean "the user is driving the map", so bus-follow
   /// should let go.
   ///
-  /// A wheel or trackpad zoom is as deliberate as a drag; without `scrollWheel`
-  /// here, follow stayed engaged on desktop and kept yanking the camera back.
+  /// Every deliberate zoom or pan belongs here, not just dragging. Miss one and
+  /// follow stays engaged, so the next poll re-centres and undoes the gesture
+  /// three seconds later — which is what scroll-wheel zoom did on desktop.
   static const _userDrivenSources = {
     MapEventSource.onDrag,
     MapEventSource.onMultiFinger,
     MapEventSource.scrollWheel,
     MapEventSource.doubleTapZoomAnimationController,
+    MapEventSource.doubleTapHold,
+    MapEventSource.keyboard,
   };
 
   void _onMapEvent(MapEvent event) {
@@ -201,8 +207,16 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     // MapEventMoveEnd missed scroll-wheel zoom entirely — MapEventScrollWheelZoom
     // is a sibling class, not a MoveEnd — so _currentZoom went stale on desktop
     // and the bus-follow re-centre below then restored that stale value.
+    //
+    // Tracked without setState: MapEventWithMove fires every frame of a zoom, and
+    // a rebuild here re-materialises ~4,300 polyline points. The only thing the
+    // zoom feeds into the tree is a three-bucket marker radius, so a rebuild is
+    // only warranted when it crosses a bucket edge.
     if (event is MapEventWithMove && event.camera.zoom != _currentZoom) {
-      setState(() => _currentZoom = event.camera.zoom);
+      final crossedBucket = _markerRadiusFor(event.camera.zoom) !=
+          _markerRadiusFor(_currentZoom);
+      _currentZoom = event.camera.zoom;
+      if (crossedBucket) setState(() {});
     }
 
     if (event is MapEventMoveStart || event is MapEventRotateStart || event is MapEventFlingAnimation) {
@@ -338,7 +352,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
     // Stop marker radius scales with zoom
-    final markerRadius = (_currentZoom >= 15) ? 9.0 : (_currentZoom >= 13) ? 6.0 : 4.0;
+    final markerRadius = _markerRadiusFor(_currentZoom);
 
     List<Polyline> polylines = [];
     if (_activeTrip != null) {
