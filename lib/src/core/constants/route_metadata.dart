@@ -12,6 +12,19 @@ const Map<RouteId, Color> routeColors = {
   RouteId.purple: Color(0xFF7C3AED),
 };
 
+/// Foreground colour that stays legible on [routeColors] for [route].
+///
+/// Hardcoding white was failing WCAG badly on the lighter routes — white on
+/// gold (`#F5CE0A`) is about 1.5:1 against a 4.5:1 requirement. Picking by
+/// luminance keeps every route readable without hand-maintaining a second map.
+Color onRouteColor(RouteId route) {
+  final color = routeColors[route];
+  if (color == null) return const Color(0xFFFFFFFF);
+  return color.computeLuminance() > 0.5
+      ? const Color(0xFF101418)
+      : const Color(0xFFFFFFFF);
+}
+
 const Map<RouteId, String> routeNames = {
   RouteId.blue: 'Blue Route',
   RouteId.gold: 'Gold Route',

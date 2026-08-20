@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../app/providers.dart';
+import '../../../core/layout/responsive.dart';
 import '../../announcements/application/announcements_controller.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -20,7 +21,8 @@ class SettingsPage extends ConsumerWidget {
     final unreadAlerts = ref.watch(unreadAnnouncementCountProvider);
 
     return SafeArea(
-      child: ListView(
+      child: ContentPane(
+        child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: [
           // Page title
@@ -258,6 +260,7 @@ class SettingsPage extends ConsumerWidget {
             ],
           ),
         ],
+        ),
       ),
     );
   }

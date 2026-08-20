@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -30,6 +31,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
   }
 
+  void _goTo(int page) {
+    _controller.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 380),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
   Future<void> _skip() async {
     await markOnboardingSeen();
     if (!mounted) return;
@@ -50,15 +59,28 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Scaffold(
       body: Stack(
         children: [
-          PageView(
-            controller: _controller,
-            onPageChanged: (i) => setState(() => _page = i),
-            physics: const ClampingScrollPhysics(),
-            children: [
-              _WelcomePage(tt: tt, cs: cs),
-              _FeaturesPage(tt: tt, cs: cs),
-              _LocationPage(tt: tt, cs: cs, onContinue: _next),
-            ],
+          // Flutter's default ScrollBehavior omits PointerDeviceKind.mouse from dragDevices, so
+          // without this a desktop-browser visitor cannot drag the pages at all — and with the
+          // dots being the only other back affordance, could not return to a previous page.
+          ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.trackpad,
+                PointerDeviceKind.stylus,
+              },
+            ),
+            child: PageView(
+              controller: _controller,
+              onPageChanged: (i) => setState(() => _page = i),
+              physics: const ClampingScrollPhysics(),
+              children: [
+                _WelcomePage(tt: tt, cs: cs),
+                _FeaturesPage(tt: tt, cs: cs),
+                _LocationPage(tt: tt, cs: cs, onContinue: _next),
+              ],
+            ),
           ),
 
           // Skip button
@@ -94,20 +116,36 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   padding: const EdgeInsets.only(bottom: 24),
                   child: Row(
                     children: [
-                      // Dot indicators
+                      // One dot per page. This counted _total - 1, so a three-page flow only
+                      // ever showed two dots and the last page had no indicator at all.
                       Row(
-                        children: List.generate(_total - 1, (i) {
+                        children: List.generate(_total, (i) {
                           final active = i == _page;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 250),
-                            margin: const EdgeInsets.only(right: 6),
-                            width: active ? 22 : 7,
-                            height: 7,
-                            decoration: BoxDecoration(
-                              color: active
-                                  ? cs.primary
-                                  : cs.outlineVariant,
+                          return Semantics(
+                            button: true,
+                            selected: active,
+                            label: 'Page ${i + 1} of $_total',
+                            child: InkWell(
+                              onTap: () => _goTo(i),
                               borderRadius: BorderRadius.circular(999),
+                              child: Padding(
+                                // Pads a 7px dot out to a 44px target without moving it.
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 3,
+                                  vertical: 18,
+                                ),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  width: active ? 22 : 7,
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                    color: active
+                                        ? cs.primary
+                                        : cs.outlineVariant,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                ),
+                              ),
                             ),
                           );
                         }),
@@ -134,6 +172,33 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 }
 
+/// Lets an onboarding page keep its `Spacer`-based vertical rhythm when there is
+/// room, and scroll instead of overflowing when there is not.
+///
+/// Each page is a fixed-height illustration plus text inside a `Column` of
+/// `Spacer`s. A `Spacer` cannot shrink below zero, so anything under roughly
+/// 640px tall overflowed. A portrait phone never hits that; a landscape phone in
+/// a browser, or a vertically-resized desktop window, does routinely.
+class _OnboardingViewport extends StatelessWidget {
+  const _OnboardingViewport({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(child: child),
+          ),
+        );
+      },
+    );
+  }
+}
+
 // ── Page 1: Welcome ──────────────────────────────────────────────────────────
 class _WelcomePage extends StatelessWidget {
   const _WelcomePage({required this.tt, required this.cs});
@@ -144,7 +209,8 @@ class _WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: false,
-      child: Padding(
+      child: _OnboardingViewport(
+        child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           children: [
@@ -248,6 +314,7 @@ class _WelcomePage extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -273,7 +340,8 @@ class _FeaturesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: false,
-      child: Padding(
+      child: _OnboardingViewport(
+        child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,6 +363,7 @@ class _FeaturesPage extends StatelessWidget {
             const Spacer(),
           ],
         ),
+      ),
       ),
     );
   }
@@ -365,7 +434,8 @@ class _LocationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: false,
-      child: Padding(
+      child: _OnboardingViewport(
+        child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
         child: Column(
           children: [
@@ -448,6 +518,7 @@ class _LocationPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

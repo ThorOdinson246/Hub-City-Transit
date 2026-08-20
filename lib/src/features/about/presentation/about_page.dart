@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/layout/responsive.dart';
 import '../../../core/constants/route_metadata.dart';
 import '../../../core/constants/transit_ids.dart';
+
+final _supportUri =
+    Uri.parse('mailto:support@hubcitytransit.com?subject=App%20Support');
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -17,10 +22,15 @@ class AboutPage extends StatelessWidget {
         title: const Text('About'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: () => Navigator.of(context).pop(),
+          // /about is a deep-linkable top-level route outside the shell, so it can be opened
+          // cold with nothing beneath it. An unconditional pop() is a dead button there, and
+          // the page has no bottom nav to escape through.
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/settings'),
         ),
       ),
-      body: ListView(
+      body: ContentPane(
+        child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           // Hero
@@ -178,13 +188,10 @@ class AboutPage extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: () async {
-                      final uri = Uri.parse(
-                          'mailto:support@hubcitytransit.com?subject=App%20Support');
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                      }
-                    },
+                    // No canLaunchUrl pre-check: awaiting it yields to the event loop, which
+                    // breaks the browser's user-activation chain and gets the subsequent
+                    // window.open blocked. For mailto: it also answers unreliably on web.
+                    onPressed: () => launchUrl(_supportUri),
                     icon: const Icon(Icons.support_agent_rounded),
                     label: const Text('Contact Support'),
                   ),
@@ -193,6 +200,7 @@ class AboutPage extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

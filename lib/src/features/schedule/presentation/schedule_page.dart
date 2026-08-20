@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../core/layout/responsive.dart';
 import '../../../core/constants/route_metadata.dart';
 import '../../../core/constants/transit_ids.dart';
 import '../../../core/utils/transfer_connections.dart';
@@ -30,7 +31,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     final adjustment = ref.watch(selectedRouteAdjustmentProvider);
     final routeColor = routeColors[route]!;
 
-    return SafeArea(child: Column(children: [
+    return SafeArea(child: ContentPane(child: Column(children: [
       // ── Header ──────────────────────────────────────────────────────────
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
@@ -59,38 +60,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 
       // ── Route chips ──────────────────────────────────────────────────────
       const SizedBox(height: 10),
-      SizedBox(
-        height: 38,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: RouteId.values.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 6),
-          itemBuilder: (_, i) {
-            final r = RouteId.values[i];
-            final sel = r == route;
-            return ChoiceChip(
-              showCheckmark: false,
-              selected: sel,
-              selectedColor: routeColors[r],
-              backgroundColor: cs.surfaceContainerLow,
-              side: BorderSide(
-                color: sel ? routeColors[r]! : cs.outlineVariant,
-              ),
-              label: Text(routeNames[r]?.replaceAll(' Route', '') ?? r.value,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: sel ? Colors.white : cs.onSurface,
-                )),
-              onSelected: (_) {
-                ref.read(selectedRouteProvider.notifier).state = r;
-                ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
-              },
-            );
-          },
-        ),
-      ),
+      _RouteChips(route: route, cs: cs),
 
       // ── Search + filter bar ───────────────────────────────────────────────
       Padding(
@@ -155,7 +125,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => _Err('Stops error: $e'),
       )),
-    ]));
+    ])));
   }
 
   Widget _buildList(
@@ -245,6 +215,66 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
   }
 
   String _norm(String v) => v.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+}
+
+/// Route selector.
+///
+/// Wraps rather than scrolls horizontally once there is room. A horizontal
+/// strip is a fine phone pattern but a poor pointer one: it shows no scrollbar,
+/// and a mouse wheel over it scrolls the page instead, so routes past the right
+/// edge are effectively undiscoverable. Height is intrinsic so the chips grow
+/// with browser zoom instead of overflowing a fixed 38px box.
+class _RouteChips extends ConsumerWidget {
+  const _RouteChips({required this.route, required this.cs});
+
+  final RouteId route;
+  final ColorScheme cs;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final chips = [
+      for (final r in RouteId.values) _chip(ref, r, r == route),
+    ];
+
+    if (Breakpoints.of(context).isCompact) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          spacing: 6,
+          children: chips,
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Wrap(spacing: 6, runSpacing: 6, children: chips),
+    );
+  }
+
+  Widget _chip(WidgetRef ref, RouteId r, bool selected) {
+    final color = routeColors[r]!;
+    return ChoiceChip(
+      showCheckmark: false,
+      selected: selected,
+      selectedColor: color,
+      backgroundColor: cs.surfaceContainerLow,
+      side: BorderSide(color: selected ? color : cs.outlineVariant),
+      label: Text(
+        routeNames[r]?.replaceAll(' Route', '') ?? r.value,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: selected ? onRouteColor(r) : cs.onSurface,
+        ),
+      ),
+      onSelected: (_) {
+        ref.read(selectedRouteProvider.notifier).state = r;
+        ref.read(selectedBusProvider.notifier).state = routeBusMap[r]!.first;
+      },
+    );
+  }
 }
 
 class _Entry {

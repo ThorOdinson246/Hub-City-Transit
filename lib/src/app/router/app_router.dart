@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/layout/responsive.dart';
 import '../../features/about/presentation/about_page.dart';
 import '../../features/announcements/presentation/announcements_inbox_page.dart';
 import '../../features/launch/presentation/launch_page.dart';
@@ -75,42 +76,77 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// Scaffold wrapper for StatefulShellRoute that uses the NavigationBar
-/// from MainScaffold to switch between branches without rebuilding.
+/// Shell chrome for [StatefulShellRoute].
+///
+/// Switches between a bottom [NavigationBar] and a side [NavigationRail] at the
+/// Material 3 expanded breakpoint. The destinations and their order are
+/// identical in both — this is the same navigation, placed where the pointer
+/// already is on a wide window, not a different information architecture.
 class _StatefulScaffold extends StatelessWidget {
   const _StatefulScaffold({required this.navigationShell});
   final StatefulNavigationShell navigationShell;
 
+  static const _destinations = <({IconData icon, IconData selected, String label})>[
+    (icon: Icons.map_outlined, selected: Icons.map_rounded, label: 'Map'),
+    (
+      icon: Icons.calendar_today_outlined,
+      selected: Icons.calendar_today_rounded,
+      label: 'Schedule',
+    ),
+    (
+      icon: Icons.settings_outlined,
+      selected: Icons.settings_rounded,
+      label: 'Settings',
+    ),
+  ];
+
+  void _onSelected(int index) {
+    navigationShell.goBranch(
+      index,
+      // Go back to initial route if already on this branch
+      initialLocation: index == navigationShell.currentIndex,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (Breakpoints.of(context).prefersRail) {
+      return Scaffold(
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: navigationShell.currentIndex,
+              onDestinationSelected: _onSelected,
+              labelType: NavigationRailLabelType.all,
+              destinations: [
+                for (final d in _destinations)
+                  NavigationRailDestination(
+                    icon: Icon(d.icon),
+                    selectedIcon: Icon(d.selected),
+                    label: Text(d.label),
+                  ),
+              ],
+            ),
+            const VerticalDivider(width: 1, thickness: 1),
+            Expanded(child: navigationShell),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         animationDuration: const Duration(milliseconds: 300),
-        onDestinationSelected: (index) {
-          navigationShell.goBranch(
-            index,
-            // Go back to initial route if already on this branch
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map_rounded),
-            label: 'Map',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today_rounded),
-            label: 'Schedule',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded),
-            label: 'Settings',
-          ),
+        onDestinationSelected: _onSelected,
+        destinations: [
+          for (final d in _destinations)
+            NavigationDestination(
+              icon: Icon(d.icon),
+              selectedIcon: Icon(d.selected),
+              label: d.label,
+            ),
         ],
       ),
     );
