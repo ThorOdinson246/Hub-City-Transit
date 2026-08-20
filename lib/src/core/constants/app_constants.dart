@@ -30,3 +30,9 @@ const String baseApiUrl = String.fromEnvironment('HCT_BASE_API_URL');
 /// app falls back to cache and then to the bundled asset — the feature degrades to "no alerts"
 /// rather than breaking.
 const String announcementsEndpoint = String.fromEnvironment('HCT_ANNOUNCEMENTS_URL');
+
+/// Public Mapbox token (`pk.…`), scoped to directions:read. Empty falls back to
+/// straight-line walk estimates, so the app works without it.
+const String mapboxToken = String.fromEnvironment('MAPBOX_TOKEN');
+
+const String localTransitAssetPath = 'assets/data/transit.json';
