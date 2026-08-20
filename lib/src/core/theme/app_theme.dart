@@ -189,7 +189,7 @@ class AppTheme {
       ),
 
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: colorScheme.surfaceContainerLowest,
+        backgroundColor: colorScheme.surfaceContainerLow,
         indicatorColor: colorScheme.primary,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
