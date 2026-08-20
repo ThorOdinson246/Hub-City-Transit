@@ -3,6 +3,7 @@ part of 'map_page.dart';
 // ── Bus Info Default Panel ────────────────────────────────────────────────────
 class _BusInfoPanel extends ConsumerWidget {
   const _BusInfoPanel({
+    super.key,
     required this.selectedRoute,
     required this.selectedBus,
     required this.busAsync,
@@ -457,6 +458,7 @@ class _StatCell extends StatelessWidget {
 
 class _StopDetailSheet extends ConsumerWidget {
   const _StopDetailSheet({
+    super.key,
     required this.stop,
     required this.selectedRoute,
     required this.userPos,

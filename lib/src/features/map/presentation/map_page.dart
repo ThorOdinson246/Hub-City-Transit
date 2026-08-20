@@ -78,6 +78,9 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
+    // Nothing listened to focus, so the favourites shortlist never appeared and
+    // the typewriter never stepped aside until the first keystroke.
+    _searchFocus.addListener(_onSearchFocusChanged);
     _syncRouteFromUrl();
   }
 
@@ -147,6 +150,26 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     context.go(Uri(path: '/map', queryParameters: query).toString());
   }
 
+  void _onSearchFocusChanged() {
+    if (mounted) setState(() {});
+  }
+
+  /// Only one bottom panel renders at a time, so a single key measures whichever
+  /// is up. The FAB previously sat at a guessed offset and ended up behind the
+  /// stop sheet, which can be 65% of the screen tall.
+  final GlobalKey _panelKey = GlobalKey();
+  double _panelHeight = 96;
+
+  void _measurePanel() {
+    if (!mounted) return;
+    final box = _panelKey.currentContext?.findRenderObject() as RenderBox?;
+    final height = box?.size.height;
+    if (height == null) return;
+    if ((height - _panelHeight).abs() > 1) {
+      setState(() => _panelHeight = height);
+    }
+  }
+
   void _animatedMapMove(LatLng destLocation, double destZoom) {
     final latTween = Tween<double>(begin: _mapController.camera.center.latitude, end: destLocation.latitude);
     final lngTween = Tween<double>(begin: _mapController.camera.center.longitude, end: destLocation.longitude);
@@ -195,6 +218,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 
   @override
   void dispose() {
+    _searchFocus.removeListener(_onSearchFocusChanged);
     _gestureTimer?.cancel();
     _searchDebounce?.cancel();
     _searchCtrl.dispose();
@@ -342,6 +366,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedRoute = ref.watch(selectedRouteProvider);
     final activeTrip = ref.watch(activeTripProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _measurePanel());
     ref.listen<PlannedTrip?>(activeTripProvider, (previous, next) {
       if (next == null || next == previous) return;
       // MapController throws if touched before FlutterMap has rendered once, and
@@ -737,6 +762,13 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                                 title: Text(mainText, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                                 subtitle: Text(subText, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
                                 onTap: () {
+                                  ref
+                                      .read(pendingDestinationProvider.notifier)
+                                      .state = PendingDestination(
+                                    label: mainText,
+                                    lat: item.place.lat,
+                                    lng: item.place.lon,
+                                  );
                                   StatefulNavigationShell.of(context).goBranch(2);
                                   setState(() => _searchQuery = '');
                                   _searchCtrl.clear();
@@ -761,12 +793,11 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   ),
 
       // ── Location FAB ─────────────────────────────────────────────────────
-      if (activeTrip == null)
-        AnimatedPositioned(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutCubic,
+      AnimatedPositioned(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.fastOutSlowIn,
           right: 12,
-          bottom: selectedStop != null ? 380 : (_busInfoExpanded ? 280 : 100),
+          bottom: _panelHeight + 16,
         child: GestureDetector(
           child: FloatingActionButton.small(
             heroTag: 'loc-fab',
@@ -794,6 +825,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       // ── Bottom panel (bus info, stop detail, or active trip) ────────────────────────────
       if (activeTrip != null)
         Positioned(
+          key: _panelKey,
           bottom: 24, left: 16, right: 16,
           child: SafeArea(
             child: Align(
@@ -813,6 +845,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         )
       else if (selectedStop != null)
         _StopDetailSheet(
+          key: _panelKey,
           stop: selectedStop,
           selectedRoute: selectedRoute,
           userPos: userPos,
@@ -829,6 +862,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         )
       else
         _BusInfoPanel(
+          key: _panelKey,
           selectedRoute: selectedRoute,
           selectedBus: selectedBus,
           busAsync: busAsync,

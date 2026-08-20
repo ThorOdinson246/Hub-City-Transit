@@ -22,7 +22,7 @@ class _TripPlannerPageState extends ConsumerState<TripPlannerPage> {
   TripPlace? _from;
   TripPlace? _to;
   _TimeMode _mode = _TimeMode.leaveNow;
-  TimeOfDay _time = TimeOfDay.now();
+  TimeOfDay? _pickedTime;
   TripQuery? _query;
 
   bool get _canPlan => _from != null && _to != null;
@@ -33,9 +33,10 @@ class _TripPlannerPageState extends ConsumerState<TripPlannerPage> {
     if (from == null || to == null) return;
 
     final now = DateTime.now();
+    final time = _pickedTime ?? TimeOfDay.fromDateTime(now);
     final when = _mode == _TimeMode.leaveNow
         ? now
-        : DateTime(now.year, now.month, now.day, _time.hour, _time.minute);
+        : DateTime(now.year, now.month, now.day, time.hour, time.minute);
 
     setState(() {
       _query = TripQuery(
@@ -63,6 +64,18 @@ class _TripPlannerPageState extends ConsumerState<TripPlannerPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
+
+    // Arriving from a landmark tap on the map. Consumed so returning to the tab
+    // later does not silently re-apply an old destination.
+    ref.listen<PendingDestination?>(pendingDestinationProvider, (_, next) {
+      if (next == null) return;
+      setState(() => _to = TripPlace(
+            label: next.label,
+            lat: next.lat,
+            lng: next.lng,
+          ));
+      ref.read(pendingDestinationProvider.notifier).state = null;
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Plan a trip')),
@@ -110,8 +123,8 @@ class _TripPlannerPageState extends ConsumerState<TripPlannerPage> {
               const SizedBox(height: 12),
               _TimeField(
                 label: _mode == _TimeMode.arriveBy ? 'Arrive by' : 'Leave at',
-                time: _time,
-                onChanged: (time) => setState(() => _time = time),
+                time: _pickedTime ?? TimeOfDay.now(),
+                onChanged: (time) => setState(() => _pickedTime = time),
               ),
             ],
             const SizedBox(height: 16),

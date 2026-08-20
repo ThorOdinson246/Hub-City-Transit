@@ -27,3 +27,20 @@ class PlannedTrip {
 /// dismisses the trip card or taps a stop. Lives above both tabs because the
 /// planner writes it and the map reads it.
 final activeTripProvider = StateProvider<PlannedTrip?>((ref) => null);
+
+/// A destination handed to the planner from elsewhere — tapping a landmark in
+/// map search, or a stop's "plan a trip here". Consumed on arrival.
+class PendingDestination {
+  const PendingDestination({
+    required this.label,
+    required this.lat,
+    required this.lng,
+  });
+
+  final String label;
+  final double lat;
+  final double lng;
+}
+
+final pendingDestinationProvider =
+    StateProvider<PendingDestination?>((ref) => null);
