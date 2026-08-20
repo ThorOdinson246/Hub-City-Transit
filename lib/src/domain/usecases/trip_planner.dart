@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import '../../data/models/transit_dataset.dart';
 
-/// Tuning for the planner. Defaults follow the values the official site settled
-/// on, which are calibrated against this network — reusing them beats guessing.
+/// Defaults come from the official site's own planner — those are calibrated
+/// against this network, so reusing them beats guessing.
 class TripPlannerConfig {
   const TripPlannerConfig({
     this.walkSpeedMetresPerSecond = 1.34,
@@ -22,12 +22,11 @@ class TripPlannerConfig {
     this.longWalkMetres = 1200,
   });
 
-  /// 1.34 m/s ≈ 3 mph, the usual planning figure for an unhurried adult.
+  /// ≈3 mph.
   final double walkSpeedMetresPerSecond;
 
-  /// Straight-line distance underestimates real walking, which follows a street
-  /// grid. Applied to every walk leg so estimates are honest rather than
-  /// flattering. Replaceable by a real walking-directions service later.
+  /// Straight lines underestimate walking on a street grid. Swap for real
+  /// walking directions if we ever get them.
   final double walkDetourFactor;
 
   final double accessRadiusMetres;
@@ -37,9 +36,8 @@ class TripPlannerConfig {
   final double sameStopTransferMetres;
   final int transferBufferMinutes;
 
-  /// Charged against a transfer itinerary when ranking. A connection is worse
-  /// than its clock time suggests: it can be missed, and waiting outdoors is
-  /// unpleasant.
+  /// A connection is worse than its clock time suggests — it can be missed,
+  /// and waiting outdoors is grim.
   final int transferPenaltyMinutes;
   final int maxTransfers;
   final int accessCandidates;
@@ -91,7 +89,7 @@ class TripItinerary {
 
   int get durationMinutes => arrivalMinutes - departureMinutes;
 
-  /// Ranking cost. Not shown to the user — [durationMinutes] is.
+  /// Ranking only; the user sees [durationMinutes].
   int get score =>
       durationMinutes + transferCount * _penalty + (totalWalkMetres ~/ 400);
 
@@ -103,9 +101,8 @@ class TripItinerary {
       .toList(growable: false);
 }
 
-/// Why a plan produced nothing useful. Each case needs different words in the
-/// UI — "no service today" and "nothing near your destination" are not the same
-/// failure and must not share an error message.
+/// "No service today" and "nothing near your destination" need different words,
+/// so they get different cases.
 enum TripPlanFailure { outsideServiceDays, noServiceAtTime, noNearbyStops, noItinerary }
 
 class TripPlanResult {
@@ -120,11 +117,10 @@ class TripPlanResult {
   final List<TripItinerary> itineraries;
   final TripPlanFailure? failure;
 
-  /// First departure of the next service day, when [failure] is a timing one.
+  /// First departure of the next service day, for the timing failures.
   final int? nextServiceMinutes;
 
-  /// Walking the whole way. Surfaced so the UI can say so when riding is no
-  /// faster — the honest answer is sometimes "just walk".
+  /// Sometimes the honest answer is "just walk".
   final int? walkOnlyMinutes;
   final double? walkOnlyMetres;
 
@@ -141,8 +137,8 @@ class _StopRef {
 
 /// Plans walk → ride → (transfer → ride) → walk journeys over the timetable.
 ///
-/// Pure and synchronous: no Flutter, no network, no clock of its own. `now` and
-/// the dataset are injected so every case is reproducible in a test.
+/// Pure and synchronous, with time and data injected, so every case is
+/// reproducible in a test.
 class TripPlanner {
   const TripPlanner({this.config = const TripPlannerConfig()});
 
@@ -199,8 +195,8 @@ class TripPlanner {
     final found = <TripItinerary>[];
 
     if (arriveBy) {
-      // Scan backwards from the target and keep whatever lands in time. Cheap
-      // and exact over a timetable this size; no need for a reverse search.
+      // Brute-force backwards scan. Exact, and cheap enough on 153 trips that a
+      // proper reverse search isn't worth the complexity.
       for (var depart = targetMinutes; depart >= 0; depart -= 5) {
         final batch = _search(dataset, origins, destinations, depart, service);
         found.addAll(batch.where((it) => it.arrivalMinutes <= targetMinutes));

@@ -6,16 +6,12 @@
 -keep class io.flutter.embedding.** { *; }
 -keep class io.flutter.plugins.GeneratedPluginRegistrant { *; }
 
-# Plugin implementations. These survive today only because GeneratedPluginRegistrant
-# constructs them directly; anything moving to reflective or deferred registration
-# breaks method channels at runtime, in release only, with a MissingPluginException
-# that never reproduces in debug.
+# These survive today only because GeneratedPluginRegistrant constructs them
+# directly. Anything reflective breaks method channels in release builds only.
 -keep class io.flutter.plugins.** { *; }
 
-# Note: there is deliberately no rule here for Dart's generated *.g.dart
-# serializers. They are compiled to AOT native code and are outside R8's reach
-# entirely — a `-keep class **.g.** { *; }` rule matches Java package names and
-# protects nothing, while implying the models are covered.
+# No rule for Dart's *.g.dart serializers on purpose: they're AOT-compiled and
+# out of R8's reach, so a `-keep class **.g.**` rule protects nothing.
 
 # Flutter's embedding references Play Core split-install classes internally,
 # but a standard APK build doesn't ship them — safe to suppress these warnings.

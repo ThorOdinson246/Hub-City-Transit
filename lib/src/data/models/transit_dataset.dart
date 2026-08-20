@@ -3,14 +3,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'transit_dataset.freezed.dart';
 part 'transit_dataset.g.dart';
 
-/// The unified timetable: stops carry both coordinates and their position in the
-/// route's stop sequence.
+/// The unified timetable — stops carry coordinates *and* their sequence.
 ///
-/// This replaces the split between `stops.json` (coordinates, but a shorter list)
-/// and `schedules.json` (names and times, but a longer one). That split is what
-/// forced the ratio-based index mapping in [ScheduleAdjustmentUseCase], which
-/// fabricated several minutes of delay on most routes because the two lists do
-/// not correspond. With an explicit `sequence` there is nothing to guess.
+/// Replaces the old split between `stops.json` (44 blue stops) and
+/// `schedules.json` (50). They never corresponded, so the delta engine mapped
+/// between them by ratio and invented several minutes of delay.
 @freezed
 abstract class TransitDataset with _$TransitDataset {
   const factory TransitDataset({
@@ -27,7 +24,6 @@ abstract class TransitDataset with _$TransitDataset {
 
   RoutePattern? route(String routeId) => routes[routeId];
 
-  /// Every stop across every route, for proximity search.
   Iterable<({String routeId, PatternStop stop})> get allStops sync* {
     for (final entry in routes.entries) {
       for (final stop in entry.value.stops) {
@@ -49,8 +45,7 @@ abstract class TransitMeta with _$TransitMeta {
       _$TransitMetaFromJson(json);
 }
 
-/// Which weekdays a service runs. `days` uses `DateTime.monday`..`DateTime.sunday`
-/// (1..7), so it compares directly against `DateTime.weekday`.
+/// `days` uses 1..7 to match `DateTime.weekday`.
 @freezed
 abstract class ServiceCalendar with _$ServiceCalendar {
   const factory ServiceCalendar({
@@ -90,16 +85,15 @@ abstract class PatternStop with _$PatternStop {
   const factory PatternStop({
     required int stopId,
 
-    /// Position along the route, 1-based. The authoritative link between a stop
-    /// and its scheduled times — never infer this from a list index.
+    /// 1-based. The link between a stop and its times — never infer it from a
+    /// list index.
     required int sequence,
     required String name,
     required double lat,
     required double lng,
     @Default(<String>[]) List<String> transfersTo,
 
-    /// Stops sharing a group are the same physical place, so a transfer between
-    /// them costs no walking.
+    /// Same group means same physical place, so transfers there cost no walk.
     String? stopGroupId,
   }) = _PatternStop;
 
@@ -134,7 +128,7 @@ abstract class StopTime with _$StopTime {
   const factory StopTime({
     required int sequence,
 
-    /// `HH:mm`, local agency time.
+    /// `HH:mm`, agency local time.
     required String time,
   }) = _StopTime;
 
@@ -143,7 +137,6 @@ abstract class StopTime with _$StopTime {
   factory StopTime.fromJson(Map<String, dynamic> json) =>
       _$StopTimeFromJson(json);
 
-  /// Minutes since midnight, or null if unparseable.
   int? get minutes => parseHhMm(time);
 }
 
@@ -158,10 +151,8 @@ abstract class StopGroup with _$StopGroup {
       _$StopGroupFromJson(json);
 }
 
-/// Parses `HH:mm` (24-hour) to minutes since midnight.
-///
-/// Deliberately strict: the old 12-hour parser silently produced NaN for any
-/// 24-hour input, which showed up as a skipped trip with no error anywhere.
+/// `HH:mm` to minutes since midnight. Strict on purpose — the old 12-hour
+/// parser turned 24-hour input into NaN and silently dropped the trip.
 int? parseHhMm(String value) {
   final parts = value.split(':');
   if (parts.length < 2) return null;
@@ -172,7 +163,6 @@ int? parseHhMm(String value) {
   return hour * 60 + minute;
 }
 
-/// Formats minutes since midnight as `h:mm AM/PM`.
 String formatClock(int minutesOfDay) {
   final normalised = minutesOfDay % (24 * 60);
   final hour24 = normalised ~/ 60;

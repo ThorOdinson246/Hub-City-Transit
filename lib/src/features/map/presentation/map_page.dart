@@ -668,9 +668,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                 ),
               ]),
 
-            // Required, not decorative: the basemap is CARTO-rendered
-            // OpenStreetMap data. ODbL requires OSM attribution and CARTO's
-            // terms require theirs. Placed last so it paints above the layers.
+            // Licence requirement, not decoration — ODbL and CARTO's terms both
+            // want credit. Last so it paints above the layers.
             RichAttributionWidget(
               alignment: AttributionAlignment.bottomLeft,
               showFlutterMapAttribution: false,
@@ -695,14 +694,9 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         ),
       ),
 
-      // ── Severe service alert ──────────────────────────────────────────────
-      // Sibling of the header rather than nested inside it, so panning the map
-      // (which slides the search bar away) cannot hide an active alert.
-      //
-      // The top offset clears the search bar: 8 top padding + 52 bar height + 8
-      // gap. Hardcoded because the header is built inline several hundred lines
-      // below and has no measurable key; see docs/REMEDIATION_PLAN.md 7-1, which
-      // decomposes this file and would let both read a shared layout constant.
+      // Sibling of the header, not nested in it, so panning the map can't hide an
+      // active alert. Offset 68 = 8 padding + 52 bar + 8 gap; hardcoded because the
+      // header is built inline below with no measurable key.
       Positioned(
         top: 0,
         left: 0,

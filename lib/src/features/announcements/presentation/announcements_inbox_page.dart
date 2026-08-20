@@ -20,8 +20,8 @@ class AnnouncementsInboxPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        // Never an unconditional pop: reached as a deep link or a notification
-        // tap there is nothing to pop, and iOS has no hardware back.
+        // Deep links and notification taps have nothing to pop, and iOS has no
+        // hardware back.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           tooltip: 'Back',
@@ -50,7 +50,6 @@ class AnnouncementsInboxPage extends ConsumerWidget {
             error: (error, stackTrace) => const _InboxMessage(
               icon: Icons.cloud_off_rounded,
               title: 'Could not load alerts',
-              // Never the raw exception — it leaks the request path.
               message: 'Check your connection and pull down to try again.',
             ),
             data: (result) {
@@ -109,7 +108,7 @@ class _AnnouncementCard extends StatelessWidget {
 
     return Semantics(
       button: true,
-      // Unread is a dot in the visual design; it must also be spoken.
+      // Unread is a dot visually, so say it out loud too.
       label: '${view.isRead ? '' : 'Unread. '}${style.label}. '
           '${announcement.title}. $age',
       child: Material(
@@ -163,8 +162,8 @@ class _AnnouncementCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(announcement.body, style: text.bodyMedium),
                 const SizedBox(height: 12),
-                // Wrap, not Row: these chips must reflow rather than overflow
-                // when the rider uses a large text scale.
+                // Wrap, not Row — these reflow instead of overflowing at large
+                // text scales.
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -184,7 +183,6 @@ class _AnnouncementCard extends StatelessWidget {
                 if (announcement.url case final String url
                     when url.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  // 48dp minimum target, enforced by the widget not by padding.
                   ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 48),
                     child: TextButton.icon(
@@ -232,8 +230,7 @@ class _Chip extends StatelessWidget {
   }
 }
 
-/// Tells the rider how old the data is. A cached document rendered during an
-/// outage must not be presented as current fact.
+/// A cached document during an outage shouldn't read as current fact.
 class _FreshnessFooter extends StatelessWidget {
   const _FreshnessFooter({required this.result});
 
@@ -296,8 +293,7 @@ class _InboxMessage extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
 
-    // Scrollable so pull-to-refresh still works, and so the content survives
-    // a large text scale on a short screen.
+    // Scrollable so pull-to-refresh works and large text scales don't overflow.
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(32, 96, 32, 32),

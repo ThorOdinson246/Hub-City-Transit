@@ -15,11 +15,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.mukeshpoudel.hctransit"
-    // Pinned deliberately. Reading these from the Flutter SDK made the API level
-    // the app declares to Play a property of whichever Flutter version happened
-    // to be installed on the build machine, with nothing in git to explain a
-    // rejection. Google Play requires new apps to target API 36 from
-    // 2026-08-31. Changing these is a reviewed commit, not an ambient effect.
+    // Pinned, not read from the Flutter SDK: otherwise the API level we declare
+    // to Play depends on whoever's laptop built it. Play needs 36 from 2026-08-31.
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -43,8 +40,8 @@ android {
         versionName = flutter.versionName
     }
 
-    // Belongs to `android`, not inside `buildTypes`. It resolved there by Kotlin
-    // DSL scoping, but it read as if signing were a property of the build type.
+    // Belongs here, not in buildTypes — it resolved there by DSL scoping but read
+    // as if signing were a property of the build type.
     if (keystorePropertiesFile.exists()) {
         signingConfigs {
             create("release") {
@@ -64,11 +61,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // Fail loudly. This previously fell back to the debug signing config,
-            // so a missing key.properties produced a minified, shrunk,
-            // debug-signed AAB and exited 0 — indistinguishable from a real
-            // release until Play rejected the upload, and non-deterministic on CI
-            // where the debug keystore is regenerated per runner.
+            // Used to fall back to debug signing and exit 0, so you only found out
+            // when Play rejected the upload.
             signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
             } else if (project.hasProperty("allowUnsignedRelease")) {
@@ -82,8 +76,7 @@ android {
             }
 
             ndk {
-                // Play warns on every upload without these, and any native crash
-                // in libflutter.so is otherwise unsymbolicated.
+                // Without these, native crashes come back unsymbolicated.
                 debugSymbolLevel = "FULL"
             }
         }

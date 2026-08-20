@@ -3,10 +3,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
-    <!-- Play implicitly derives android.hardware.location.gps as *required* from
-         ACCESS_FINE_LOCATION, which silently delists the app on every device
-         without a GPS radio: Wi-Fi tablets, Chromebooks, ChromeOS/ARC. Location
-         is an enhancement here, not the core, so declare both as optional. -->
+    <!-- Play infers location.gps as *required* from ACCESS_FINE_LOCATION, which
+         delists us on Wi-Fi tablets and Chromebooks. Location is optional here. -->
     <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
     <uses-feature android:name="android.hardware.location" android:required="false"/>
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false"/>
@@ -58,9 +56,8 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-        <!-- Android 11+ package visibility: without these, canLaunchUrl returns
-             false for mailto: and https:, so the About page's Contact Support
-             button silently does nothing. -->
+        <!-- Android 11+ visibility: without these canLaunchUrl returns false and
+             Contact Support silently does nothing. -->
         <intent>
             <action android:name="android.intent.action.SENDTO"/>
             <data android:scheme="mailto"/>

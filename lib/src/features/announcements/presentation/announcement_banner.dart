@@ -6,12 +6,8 @@ import '../application/announcement_read_store.dart';
 import '../application/announcements_controller.dart';
 import 'announcement_presentation.dart';
 
-/// Pins the single most urgent live alert above the map.
-///
-/// Renders nothing unless there is a severe, undismissed alert scoped to
-/// [routeId], so the map is unchanged on an ordinary day. Dismissal is keyed on
-/// the announcement's revision, so escalating an alert brings it back for a
-/// rider who dismissed the earlier wording.
+/// Pins the most urgent live alert above the map. Renders nothing on an
+/// ordinary day.
 class AnnouncementBanner extends ConsumerWidget {
   const AnnouncementBanner({required this.routeId, super.key});
 
@@ -68,8 +64,7 @@ class AnnouncementBanner extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                // Full 48dp target — this sits over a map, where a mis-tap
-                // pans the camera instead of dismissing.
+                // Full 48dp: a mis-tap here pans the map instead of dismissing.
                 IconButton(
                   icon: const Icon(Icons.close_rounded, size: 20),
                   color: style.onColor,

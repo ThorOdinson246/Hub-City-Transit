@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../data/models/announcement.dart';
 
-/// Presentation mapping for announcements, kept in one place so the banner, the
-/// inbox, and any future notification share a vocabulary.
+/// One place, so the banner, inbox and any future notification agree.
 class AnnouncementStyle {
   const AnnouncementStyle({
     required this.icon,
@@ -14,14 +13,11 @@ class AnnouncementStyle {
   final IconData icon;
   final Color color;
 
-  /// Spoken and written label. Severity is never conveyed by colour alone.
+  /// Severity is never conveyed by colour alone.
   final String label;
 
-  /// Foreground that actually contrasts against [color].
-  ///
-  /// Derived from luminance rather than hardcoded white — the gold route colour
-  /// gives white a 1.53:1 ratio, which is why the existing route chips are
-  /// unreadable. Do not replace this with a literal.
+  /// Derived, not hardcoded: white on the gold route colour is 1.53:1, which is
+  /// why the existing route chips are unreadable.
   Color get onColor =>
       color.computeLuminance() > 0.5 ? const Color(0xFF16161A) : Colors.white;
 }
@@ -56,7 +52,7 @@ AnnouncementStyle announcementStyle(
   }
 }
 
-/// Short human label for the GTFS-RT effect, or null when it adds nothing.
+/// Null when the effect adds nothing worth showing.
 String? announcementEffectLabel(AnnouncementEffect effect) {
   switch (effect) {
     case AnnouncementEffect.noService:
@@ -79,7 +75,6 @@ String? announcementEffectLabel(AnnouncementEffect effect) {
   }
 }
 
-/// Relative age, phrased for a rider glancing at a stop.
 String announcementAge(DateTime timestamp, DateTime now) {
   final elapsed = now.difference(timestamp);
   if (elapsed.isNegative || elapsed.inMinutes < 1) return 'Just now';

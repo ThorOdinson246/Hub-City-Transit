@@ -17,14 +17,11 @@ final announcementsRepositoryProvider = Provider<AnnouncementsRepository>((ref) 
   );
 });
 
-/// Loads the document and keeps it fresh while the app is in the foreground.
+/// Keeps the document fresh while the app is foregrounded.
 ///
-/// Deliberately *not* modelled on `busLocationPollingProvider`: this is
-/// `autoDispose`, the timer is cancelled on dispose, and polling stops when the
-/// app is backgrounded. A conditional `If-None-Match` GET every few minutes is
-/// three orders of magnitude cheaper than that provider's 3-second loop, and
-/// without it a rider watching the map for forty minutes would never see an
-/// alert published during that window.
+/// A conditional GET every few minutes, not the 3-second firehose that
+/// `busLocationPollingProvider` runs. Without any poll, a rider watching the map
+/// for forty minutes would never see an alert published in that window.
 class AnnouncementsController extends AutoDisposeAsyncNotifier<AnnouncementsResult> {
   Timer? _timer;
   AppLifecycleListener? _lifecycle;
@@ -65,8 +62,7 @@ class AnnouncementsController extends AutoDisposeAsyncNotifier<AnnouncementsResu
     unawaited(refresh());
   }
 
-  /// Poll faster while something urgent is on screen — a severe alert is
-  /// exactly when a correction or an all-clear matters most.
+  /// Faster while a severe alert is live — that's when a correction matters.
   void _schedule(AnnouncementsResult result) {
     _cancelTimer();
     if (announcementsEndpoint.isEmpty) return;
@@ -100,7 +96,6 @@ class AnnouncementsController extends AutoDisposeAsyncNotifier<AnnouncementsResu
 final announcementsControllerProvider = AutoDisposeAsyncNotifierProvider<
     AnnouncementsController, AnnouncementsResult>(AnnouncementsController.new);
 
-/// An announcement paired with the rider's state for it, ready to render.
 class AnnouncementView {
   const AnnouncementView({
     required this.announcement,
@@ -113,7 +108,7 @@ class AnnouncementView {
   final bool isDismissed;
 }
 
-/// Active announcements, most severe first then newest, with read state applied.
+/// Active announcements, most severe first then newest.
 final visibleAnnouncementsProvider =
     Provider.autoDispose<List<AnnouncementView>>((ref) {
   final result = ref.watch(announcementsControllerProvider).valueOrNull;
@@ -151,8 +146,7 @@ final unreadAnnouncementCountProvider = Provider.autoDispose<int>((ref) {
       .length;
 });
 
-/// The single alert worth pinning to the Map screen, if any. Severe only, not
-/// yet dismissed, and scoped to the route the rider is looking at.
+/// Severe, undismissed, and relevant to the route on screen.
 final pinnedAnnouncementProvider =
     Provider.autoDispose.family<AnnouncementView?, String?>((ref, routeId) {
   final candidates = ref.watch(visibleAnnouncementsProvider).where(

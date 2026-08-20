@@ -8,12 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/repositories/announcements_repository.dart';
 import '../models/announcement.dart';
 
-/// Cache-first announcements source.
-///
-/// Order of preference is network, then the last good cached document, then the
-/// bundled asset. The endpoint is injected rather than hardcoded so that
-/// repointing it at whatever host the API tier lands on is configuration, not a
-/// code change.
+/// Network, then last good cache, then the bundled asset. Endpoint is injected
+/// so repointing it is configuration.
 final class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
   AnnouncementsRepositoryImpl({
     required Dio dio,
@@ -92,8 +88,7 @@ final class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
         droppedRecords: parsed.dropped,
       );
     } on DioException {
-      // Offline, DNS failure, 5xx after retry. The caller falls back to cache;
-      // an alert the rider has already seen beats an error screen.
+      // Caller falls back to cache; a stale alert beats an error screen.
       return null;
     }
   }
@@ -127,8 +122,7 @@ final class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
         );
       }
     } on FlutterError {
-      // Asset missing from the bundle — degrade to empty rather than taking
-      // down the app on a cosmetic feature.
+      // Missing asset shouldn't take down the app over a cosmetic feature.
     }
 
     return const AnnouncementsResult(
@@ -137,9 +131,8 @@ final class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
     );
   }
 
-  /// Parses defensively: a single malformed announcement is dropped, not
-  /// allowed to discard every other alert in the document. The whole document
-  /// is rejected only when the envelope itself is unusable.
+  /// Drops individual bad records rather than binning the whole document —
+  /// unlike `_loadStops`, where one bad field takes out all seven routes.
   _ParsedDocument? _parseDocument(String raw) {
     final Object? decoded;
     try {
@@ -152,7 +145,7 @@ final class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
 
     final schema = decoded['schema'];
     if (schema is! int || schema > announcementsSchemaVersion) {
-      // A newer schema may reinterpret fields we think we understand.
+      // A newer schema may redefine fields we think we understand.
       return null;
     }
 
@@ -170,7 +163,6 @@ final class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
         try {
           parsed.add(Announcement.fromJson(item));
         } on Object {
-          // Bad enum value, missing field, unparseable date. Drop this one.
           dropped++;
         }
       }

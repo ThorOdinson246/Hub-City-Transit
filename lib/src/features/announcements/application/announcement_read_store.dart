@@ -1,16 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Tracks which announcement revisions the rider has read and which banners
-/// they have dismissed.
+/// Read and dismissed state, keyed on `id@updatedAt` rather than bare id, so
+/// escalating an alert resurfaces it for someone who dismissed the mild version.
 ///
-/// Keys are revision keys (`id@updatedAt`), not bare ids, so editing an
-/// announcement resurfaces it. Escalating "minor delays" to "route suspended"
-/// must reach someone who dismissed the milder wording.
-///
-/// Unlike the older preference notifiers in `app/providers.dart`, the initial
-/// load is awaited via [AsyncNotifier] rather than racing the constructor, so a
-/// tap during startup cannot be silently reverted by a late load completing.
+/// Loads via [AsyncNotifier] instead of racing the constructor like the older
+/// preference notifiers, where a tap during startup gets silently reverted.
 class AnnouncementReadState {
   const AnnouncementReadState({
     this.readKeys = const <String>{},
@@ -90,8 +85,7 @@ class AnnouncementReadStore extends AsyncNotifier<AnnouncementReadState> {
     );
   }
 
-  /// Drops keys for announcements no longer in the document, so the stored
-  /// sets cannot grow without bound across years of service alerts.
+  /// Stops the stored sets growing forever.
   Future<void> pruneTo(Set<String> liveRevisionKeys) async {
     final current = state.valueOrNull;
     if (current == null) return;
