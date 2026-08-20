@@ -35,7 +35,11 @@ dev_dependencies:
   freezed: ^3.2.3
   json_serializable: ^6.11.1
   flutter_launcher_icons: ^0.14.4
-  flutter_native_splash: ^2.4.7
+  # flutter_native_splash is an author-time generator only; its output lives in
+  # android/app/src/main/res. Kept out of the dependency graph because Flutter still
+  # registers it in GeneratedPluginRegistrant while excluding dev-dependency plugins
+  # from the release classpath, which breaks `flutter build appbundle --release`.
+  # Re-add temporarily to regenerate splash assets from the config block below.
 
 flutter:
   uses-material-design: true
