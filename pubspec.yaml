@@ -47,6 +47,7 @@ flutter:
     - assets/data/routes_wgs84.json
     - assets/data/stops.json
     - assets/data/schedules.json
+    - assets/data/announcements.json
     - env.txt
 
 flutter_launcher_icons:

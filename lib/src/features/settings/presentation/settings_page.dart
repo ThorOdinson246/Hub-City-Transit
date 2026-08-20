@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../app/providers.dart';
+import '../../announcements/application/announcements_controller.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -16,6 +17,7 @@ class SettingsPage extends ConsumerWidget {
     final tt = Theme.of(context).textTheme;
     final themeMode = ref.watch(themeModeProvider);
     final darkBasemap = ref.watch(darkBasemapProvider);
+    final unreadAlerts = ref.watch(unreadAnnouncementCountProvider);
 
     return SafeArea(
       child: ListView(
@@ -135,16 +137,20 @@ class SettingsPage extends ConsumerWidget {
           _SettingsCard(
             cs: cs,
             children: [
-              if (!kIsWeb) ...[
-                _SettingsTile(
-                  cs: cs,
-                  tt: tt,
-                  icon: Icons.notifications_outlined,
-                  title: 'Alerts & Notifications',
-                  subtitle: 'Route changes and delay updates',
-                  isFirst: true,
-                  onTap: () => Geolocator.openAppSettings(),
-                ),
+              _SettingsTile(
+                cs: cs,
+                tt: tt,
+                icon: Icons.campaign_outlined,
+                title: 'Service Alerts',
+                subtitle: unreadAlerts > 0
+                    ? '$unreadAlerts unread'
+                    : 'Detours, delays, and service changes',
+                trailing: unreadAlerts > 0
+                    ? _UnreadBadge(count: unreadAlerts, cs: cs)
+                    : null,
+                onTap: () => context.push('/announcements'),
+              ),
+              if (!kIsWeb)
                 _SettingsTile(
                   cs: cs,
                   tt: tt,
@@ -153,14 +159,12 @@ class SettingsPage extends ConsumerWidget {
                   subtitle: 'Manage GPS usage and permissions',
                   onTap: () => Geolocator.openLocationSettings(),
                 ),
-              ],
               _SettingsTile(
                 cs: cs,
                 tt: tt,
                 icon: Icons.info_outline_rounded,
                 title: 'About',
                 subtitle: 'Route legend, app info, and support',
-                isFirst: kIsWeb,
                 isLast: true,
                 onTap: () => context.push('/about'),
               ),
@@ -182,7 +186,6 @@ class SettingsPage extends ConsumerWidget {
                 icon: Icons.privacy_tip_outlined,
                 title: 'Privacy Policy',
                 subtitle: 'How we handle your data',
-                isFirst: true,
                 onTap: () => launchUrl(Uri.parse('https://www.hattiesburgms.com/hubcitytransit/')),
               ),
               _SettingsTile(
@@ -308,18 +311,18 @@ class _SettingsTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
-    this.isFirst = false,
     this.isLast = false,
     this.onTap,
+    this.trailing,
   });
   final ColorScheme cs;
   final TextTheme tt;
   final IconData icon;
   final String title;
   final String subtitle;
-  final bool isFirst;
   final bool isLast;
   final VoidCallback? onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -348,6 +351,10 @@ class _SettingsTile extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (trailing case final Widget badge) ...[
+                  badge,
+                  const SizedBox(width: 8),
+                ],
                 Icon(
                   Icons.chevron_right_rounded,
                   color: cs.onSurfaceVariant,
@@ -513,3 +520,36 @@ class _ThemePill extends StatelessWidget {
   }
 }
 
+/// Count badge for unread service alerts. Announces itself rather than relying
+/// on the number being read as decoration.
+class _UnreadBadge extends StatelessWidget {
+  const _UnreadBadge({required this.count, required this.cs});
+
+  final int count;
+  final ColorScheme cs;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: '$count unread alert${count == 1 ? '' : 's'}',
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 22, minHeight: 22),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+        decoration: BoxDecoration(
+          color: cs.error,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Center(
+          widthFactor: 1,
+          child: Text(
+            count > 99 ? '99+' : '$count',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: cs.onError,
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}

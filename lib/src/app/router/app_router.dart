@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/about/presentation/about_page.dart';
+import '../../features/announcements/presentation/announcements_inbox_page.dart';
 import '../../features/launch/presentation/launch_page.dart';
 import '../../features/map/presentation/map_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
@@ -27,6 +28,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/about',
         pageBuilder: (context, state) => const MaterialPage(child: AboutPage()),
+      ),
+      GoRoute(
+        path: '/announcements',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: AnnouncementsInboxPage()),
       ),
       // StatefulShellRoute keeps each branch widget alive in an IndexedStack,
       // so the MapPage camera position, selected stop, and bus info panel are
