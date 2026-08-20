@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/services.dart';
 import '../../core/constants/app_constants.dart';
 import '../../domain/repositories/transit_repository.dart';
 import '../models/bus_location_model.dart';
-import '../models/eta_result_model.dart';
 import '../models/route_polyline_model.dart';
 import '../models/route_schedule_model.dart';
 import '../models/stop_model.dart';
@@ -115,85 +113,6 @@ final class TransitRepositoryImpl implements TransitRepository {
     }
   }
 
-  @override
-  Future<EtaResultModel> getEta({
-    required String busId,
-    required double userLat,
-    required double userLng,
-  }) async {
-    final busLocation = await getBusLocation(busId);
-    if (busLocation == null) {
-      return EtaResultModel(
-        busId: busId,
-        status: 'bus-offline',
-        message: 'Bus location unavailable',
-      );
-    }
-
-    if (googleMapsApiKey.isEmpty) {
-      return EtaResultModel(
-        busId: busId,
-        status: 'error',
-        message: 'GOOGLE_MAPS_API_KEY is not configured.',
-      );
-    }
-
-    final stops = await getStops(routeId: _routeIdForBus(busId));
-    if (stops.isEmpty) {
-      return EtaResultModel(
-        busId: busId,
-        status: 'error',
-        message: 'No stops available for selected route.',
-      );
-    }
-
-    final userStopIdx = _findNearestStopIndex(userLat, userLng, stops);
-    final busStopIdx = _findNearestStopIndex(
-      busLocation.lat,
-      busLocation.lng,
-      stops,
-    );
-    final userStop = stops[userStopIdx];
-
-    final waypoints = busStopIdx <= userStopIdx
-        ? stops
-              .sublist(busStopIdx, userStopIdx + 1)
-              .map((stop) => [stop.lat, stop.lng])
-              .toList(growable: false)
-        : [
-            ...stops
-                .sublist(busStopIdx)
-                .map((stop) => [stop.lat, stop.lng]),
-            ...stops
-                .sublist(0, userStopIdx + 1)
-                .map((stop) => [stop.lat, stop.lng]),
-          ];
-
-    final totalSeconds = await _calculateEtaWithWaypointLimit(
-      origin: [busLocation.lat, busLocation.lng],
-      destination: waypoints.last,
-      waypoints: waypoints,
-    );
-
-    if (totalSeconds == null) {
-      return EtaResultModel(
-        busId: busId,
-        status: 'error',
-        nearestStopId: userStop.stopId,
-        nearestStopName: userStop.location,
-        message: 'Could not calculate directions.',
-      );
-    }
-
-    return EtaResultModel(
-      busId: busId,
-      status: 'ok',
-      etaMinutes: (totalSeconds / 60).round(),
-      nearestStopId: userStop.stopId,
-      nearestStopName: userStop.location,
-    );
-  }
-
   String _mapDioError(DioException error, String fallbackMessage) {
     if (error.type == DioExceptionType.connectionTimeout ||
         error.type == DioExceptionType.sendTimeout ||
@@ -268,136 +187,6 @@ final class TransitRepositoryImpl implements TransitRepository {
         : trimmed;
   }
 
-  String _routeIdForBus(String busId) {
-    if (busId.startsWith('blue')) return 'blue';
-    if (busId.startsWith('gold')) return 'gold';
-    return busId;
-  }
-
-  int _findNearestStopIndex(
-    double lat,
-    double lng,
-    List<StopModel> stops,
-  ) {
-    var minDistance = double.infinity;
-    var minIndex = 0;
-
-    for (var i = 0; i < stops.length; i++) {
-      final stop = stops[i];
-      final distance = _haversineMeters(lat, lng, stop.lat, stop.lng);
-      if (distance < minDistance) {
-        minDistance = distance;
-        minIndex = i;
-      }
-    }
-
-    return minIndex;
-  }
-
-  Future<int?> _calculateEtaWithWaypointLimit({
-    required List<double> origin,
-    required List<double> destination,
-    required List<List<double>> waypoints,
-  }) async {
-    if (waypoints.length <= 25) {
-      return _fetchDirectionsEta(
-        origin: origin,
-        destination: destination,
-        waypoints: waypoints,
-      );
-    }
-
-    var totalSeconds = 0;
-    var currentOrigin = origin;
-    var remaining = List<List<double>>.from(waypoints);
-
-    while (remaining.isNotEmpty) {
-      final batch = remaining.take(25).toList(growable: false);
-      final eta = await _fetchDirectionsEta(
-        origin: currentOrigin,
-        destination: batch.last,
-        waypoints: batch,
-      );
-
-      if (eta == null) {
-        return null;
-      }
-
-      totalSeconds += eta;
-      currentOrigin = batch.last;
-      remaining = remaining.skip(25).toList(growable: false);
-    }
-
-    return totalSeconds;
-  }
-
-  Future<int?> _fetchDirectionsEta({
-    required List<double> origin,
-    required List<double> destination,
-    required List<List<double>> waypoints,
-  }) async {
-    try {
-      final response = await _dio.get<Map<String, dynamic>>(
-        'https://maps.googleapis.com/maps/api/directions/json',
-        queryParameters: {
-          'origin': '${origin[0]},${origin[1]}',
-          'destination': '${destination[0]},${destination[1]}',
-          'waypoints': waypoints.map((w) => '${w[0]},${w[1]}').join('|'),
-          'mode': 'driving',
-          'key': googleMapsApiKey,
-          'departure_time': 'now',
-          'traffic_model': 'optimistic',
-          'optimize_waypoints': 'false',
-        },
-      );
-
-      final data = response.data;
-      final routes = data?['routes'];
-      if (data?['status'] != 'OK' || routes is! List || routes.isEmpty) {
-        return null;
-      }
-
-      final firstRoute = routes.first;
-      if (firstRoute is! Map<String, dynamic>) return null;
-      final legs = firstRoute['legs'];
-      if (legs is! List || legs.isEmpty) return null;
-
-      var total = 0;
-      for (var i = 0; i < legs.length - 1; i++) {
-        final leg = legs[i];
-        if (leg is! Map<String, dynamic>) continue;
-        final duration = leg['duration'];
-        if (duration is! Map<String, dynamic>) continue;
-        final value = duration['value'];
-        if (value is num) {
-          total += value.toInt();
-        }
-      }
-      return total;
-    } on DioException {
-      return null;
-    }
-  }
-
-  double _haversineMeters(
-    double lat1,
-    double lng1,
-    double lat2,
-    double lng2,
-  ) {
-    const earthRadiusMeters = 6371000;
-    final dLat = _degreesToRadians(lat2 - lat1);
-    final dLng = _degreesToRadians(lng2 - lng1);
-    final a =
-        (sin(dLat / 2) * sin(dLat / 2)) +
-        cos(_degreesToRadians(lat1)) *
-            cos(_degreesToRadians(lat2)) *
-            (sin(dLng / 2) * sin(dLng / 2));
-    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadiusMeters * c;
-  }
-
-  double _degreesToRadians(double degrees) => degrees * (pi / 180);
 }
 
 List<RoutePolylineModel> parseRoutePolylines(dynamic decoded) {

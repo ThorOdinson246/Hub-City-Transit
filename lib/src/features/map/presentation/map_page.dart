@@ -78,13 +78,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   List<dynamic> _landmarkResults = [];
   Timer? _searchDebounce;
 
-  bool _etaLoading = false;
-  bool _etaInFlight = false;
-  bool _etaRequested = false;
-  String? _etaError;
-  int? _etaMinutes;
-  String? _etaNearestStop;
-
   bool _busInfoExpanded = true;
   bool _isTrackingBus = false;
 
@@ -249,33 +242,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     );
   }
 
-  Future<void> _fetchEta(BusId bus, Position pos) async {
-    if (_etaInFlight) return;
-    _etaInFlight = true;
-    setState(() { _etaLoading = true; _etaError = null; });
-    try {
-      final result = await ref.read(transitRepositoryProvider).getEta(
-        busId: bus.value, userLat: pos.latitude, userLng: pos.longitude,
-      );
-      if (!mounted) return;
-      setState(() {
-        _etaLoading = false;
-        _etaRequested = true;
-        if (result.status == 'ok') {
-          _etaMinutes = result.etaMinutes;
-          _etaNearestStop = result.nearestStopName;
-        } else {
-          _etaError = result.message ?? 'ETA unavailable';
-        }
-      });
-    } catch (e) {
-      if (mounted) setState(() { _etaLoading = false; _etaError = e.toString(); });
-    } finally {
-      _etaInFlight = false;
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     super.build(context); // required for AutomaticKeepAliveClientMixin
@@ -378,9 +344,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           setState(() {
             _selectedStop = stop;
             _activeTrip = null; // Close active trip if they tap a stop
-            _etaRequested = false;
-            _etaMinutes = null;
-            _etaError = null;
           });
         },
         child: Center(
@@ -779,16 +742,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           allStopsAsync: allStopsAsync,
           stopsAsync: stopsAsync,
           selectedBus: selectedBus,
-          etaLoading: _etaLoading,
-          etaRequested: _etaRequested,
-          etaMinutes: _etaMinutes,
-          etaNearestStop: _etaNearestStop,
-          etaError: _etaError,
           onClose: () => setState(() { _selectedStop = null; }),
-          onGetEta: () {
-            ref.read(analyticsProvider).logEvent('get_eta_clicked');
-            if (userPos != null) _fetchEta(selectedBus, userPos);
-          },
           onSwitchRoute: (r) {
             ref.read(analyticsProvider).logEvent('route_switched_from_stop', {'new_route': r.name});
             ref.read(selectedRouteProvider.notifier).state = r;

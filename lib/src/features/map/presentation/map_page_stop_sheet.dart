@@ -463,13 +463,7 @@ class _StopDetailSheet extends ConsumerWidget {
     required this.allStopsAsync,
     required this.stopsAsync,
     required this.selectedBus,
-    required this.etaLoading,
-    required this.etaRequested,
-    required this.etaMinutes,
-    required this.etaNearestStop,
-    required this.etaError,
     required this.onClose,
-    required this.onGetEta,
     required this.onSwitchRoute,
   });
 
@@ -479,10 +473,7 @@ class _StopDetailSheet extends ConsumerWidget {
   final AsyncValue<Map<RouteId, List<StopModel>>> allStopsAsync;
   final AsyncValue<List<StopModel>> stopsAsync;
   final BusId selectedBus;
-  final bool etaLoading, etaRequested;
-  final int? etaMinutes;
-  final String? etaNearestStop, etaError;
-  final VoidCallback onClose, onGetEta;
+  final VoidCallback onClose;
   final void Function(RouteId) onSwitchRoute;
 
   @override
