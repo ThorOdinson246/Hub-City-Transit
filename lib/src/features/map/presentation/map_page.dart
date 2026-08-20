@@ -171,6 +171,13 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   }
 
   void _animatedMapMove(LatLng destLocation, double destZoom) {
+    // Last line of defence: flutter_map throws on a non-finite LatLng, and a
+    // single bad coordinate anywhere upstream would otherwise take out the map.
+    if (!destLocation.latitude.isFinite ||
+        !destLocation.longitude.isFinite ||
+        !destZoom.isFinite) {
+      return;
+    }
     final latTween = Tween<double>(begin: _mapController.camera.center.latitude, end: destLocation.latitude);
     final lngTween = Tween<double>(begin: _mapController.camera.center.longitude, end: destLocation.longitude);
     final zoomTween = Tween<double>(begin: _mapController.camera.zoom, end: destZoom);
@@ -208,7 +215,18 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     }
     
     if (points.isEmpty) return;
-    
+
+    // Zero-area bounds make CameraFit divide down to an infinite zoom, which
+    // surfaces as LatLng(NaN, NaN) inside flutter_map. Needs two points that are
+    // actually apart.
+    final spread = points.any((p) =>
+        (p.latitude - points.first.latitude).abs() > 1e-6 ||
+        (p.longitude - points.first.longitude).abs() > 1e-6);
+    if (!spread) {
+      _animatedMapMove(points.first, 16);
+      return;
+    }
+
     final bounds = LatLngBounds.fromPoints(points);
     final fit = CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50));
     final targetCamera = fit.fit(_mapController.camera);

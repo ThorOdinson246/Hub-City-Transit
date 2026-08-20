@@ -17,6 +17,8 @@ import '../application/active_trip.dart';
 /// polyline circles the loop about three times, so a slice can pick the wrong
 /// pass — tracked in docs/DATA_RECONCILIATION_2026-08-20.md. Walk legs fall back
 /// to a straight line when no Mapbox geometry has been fetched.
+bool _finite(LatLng p) => p.latitude.isFinite && p.longitude.isFinite;
+
 List<Polyline> tripPolylines({
   required PlannedTrip trip,
   required List<RoutePolylineModel> routes,
@@ -72,7 +74,17 @@ List<Polyline> tripPolylines({
     }
   }
 
-  return result;
+  // flutter_map throws on a non-finite LatLng, which takes out the whole map
+  // rather than one line.
+  return result
+      .map((line) => Polyline(
+            points: line.points.where(_finite).toList(growable: false),
+            strokeWidth: line.strokeWidth,
+            color: line.color,
+            pattern: line.pattern,
+          ))
+      .where((line) => line.points.length >= 2)
+      .toList(growable: false);
 }
 
 List<Marker> tripMarkers({required PlannedTrip trip}) {
@@ -99,7 +111,7 @@ List<Marker> tripMarkers({required PlannedTrip trip}) {
     trip.destLabel ?? 'Destination',
   ));
 
-  return markers;
+  return markers.where((m) => _finite(m.point)).toList(growable: false);
 }
 
 Marker _pin(LatLng point, Color color, IconData icon, String label) {
