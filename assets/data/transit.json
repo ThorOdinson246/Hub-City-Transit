@@ -29,7 +29,8 @@
       "orange",
       "purple"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     },
     {
      "stopId": 1,
@@ -38,7 +39,8 @@
      "lat": 31.3263974,
      "lng": -89.2895029,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 2,
@@ -47,7 +49,8 @@
      "lat": 31.3280242,
      "lng": -89.2919284,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 3,
@@ -56,7 +59,8 @@
      "lat": 31.3279935,
      "lng": -89.293734,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 4,
@@ -65,7 +69,8 @@
      "lat": 31.3249087,
      "lng": -89.296941,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 5,
@@ -74,7 +79,8 @@
      "lat": 31.3248473,
      "lng": -89.3099306,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 6,
@@ -83,7 +89,8 @@
      "lat": 31.3248473,
      "lng": -89.3144042,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 7,
@@ -92,7 +99,8 @@
      "lat": 31.3248473,
      "lng": -89.317746,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 8,
@@ -101,7 +109,8 @@
      "lat": 31.324855,
      "lng": -89.3226957,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 9,
@@ -110,7 +119,8 @@
      "lat": 31.324878,
      "lng": -89.3276813,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 10,
@@ -119,7 +129,8 @@
      "lat": 31.324878,
      "lng": -89.3312027,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 11,
@@ -128,7 +139,8 @@
      "lat": 31.324901,
      "lng": -89.335847,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 12,
@@ -137,7 +149,8 @@
      "lat": 31.3249547,
      "lng": -89.3394672,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 13,
@@ -146,7 +159,8 @@
      "lat": 31.3250391,
      "lng": -89.3431144,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 14,
@@ -155,7 +169,8 @@
      "lat": 31.3250852,
      "lng": -89.345459,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 15,
@@ -164,7 +179,8 @@
      "lat": 31.3251159,
      "lng": -89.347579,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 16,
@@ -173,7 +189,8 @@
      "lat": 31.3243792,
      "lng": -89.3592032,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 17,
@@ -182,7 +199,8 @@
      "lat": 31.3237039,
      "lng": -89.3634792,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 18,
@@ -191,7 +209,8 @@
      "lat": 31.3244176,
      "lng": -89.3660304,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 19,
@@ -200,7 +219,8 @@
      "lat": 31.3256968,
      "lng": -89.3668491,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 20,
@@ -209,7 +229,8 @@
      "lat": 31.3239725,
      "lng": -89.3677013,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 21,
@@ -218,7 +239,8 @@
      "lat": 31.3244022,
      "lng": -89.3743578,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 22,
@@ -227,7 +249,8 @@
      "lat": 31.32342,
      "lng": -89.3757771,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 23,
@@ -236,7 +259,8 @@
      "lat": 31.3273949,
      "lng": -89.3780499,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 24,
@@ -245,7 +269,8 @@
      "lat": 31.3236272,
      "lng": -89.3813557,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 25,
@@ -254,7 +279,8 @@
      "lat": 31.3205116,
      "lng": -89.3792626,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Station"
     },
     {
      "stopId": 26,
@@ -263,7 +289,8 @@
      "lat": 31.3219926,
      "lng": -89.3751483,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 27,
@@ -272,7 +299,8 @@
      "lat": 31.3222766,
      "lng": -89.3715371,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 28,
@@ -281,7 +309,8 @@
      "lat": 31.3227293,
      "lng": -89.3667131,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 29,
@@ -290,7 +319,8 @@
      "lat": 31.3232281,
      "lng": -89.3631109,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 30,
@@ -299,7 +329,8 @@
      "lat": 31.3230363,
      "lng": -89.3578557,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 31,
@@ -308,7 +339,8 @@
      "lat": 31.3232895,
      "lng": -89.3558615,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 32,
@@ -317,7 +349,8 @@
      "lat": 31.324832,
      "lng": -89.3445068,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 33,
@@ -326,7 +359,8 @@
      "lat": 31.3247399,
      "lng": -89.3405183,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 34,
@@ -335,7 +369,8 @@
      "lat": 31.3246631,
      "lng": -89.3344367,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 35,
@@ -344,7 +379,8 @@
      "lat": 31.3238113,
      "lng": -89.3326221,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 36,
@@ -353,7 +389,8 @@
      "lat": 31.3212406,
      "lng": -89.3312297,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 37,
@@ -362,7 +399,8 @@
      "lat": 31.3245557,
      "lng": -89.3312476,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 38,
@@ -371,7 +409,8 @@
      "lat": 31.3245941,
      "lng": -89.327879,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 39,
@@ -380,7 +419,8 @@
      "lat": 31.3246017,
      "lng": -89.3228753,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 40,
@@ -389,7 +429,8 @@
      "lat": 31.3246248,
      "lng": -89.3179705,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 41,
@@ -398,7 +439,8 @@
      "lat": 31.3246171,
      "lng": -89.3146737,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 42,
@@ -407,7 +449,8 @@
      "lat": 31.3246478,
      "lng": -89.3095443,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 43,
@@ -416,7 +459,8 @@
      "lat": 31.3246555,
      "lng": -89.3036514,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 44,
@@ -425,7 +469,8 @@
      "lat": 31.3247015,
      "lng": -89.2999414,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 45,
@@ -434,7 +479,8 @@
      "lat": 31.3247092,
      "lng": -89.2956923,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 46,
@@ -443,7 +489,8 @@
      "lat": 31.3254765,
      "lng": -89.2907696,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 47,
@@ -452,7 +499,8 @@
      "lat": 31.3259677,
      "lng": -89.2892245,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 48,
@@ -461,7 +509,8 @@
      "lat": 31.3263744,
      "lng": -89.2856492,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 0,
@@ -474,7 +523,8 @@
       "orange",
       "purple"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     }
    ],
    "trips": [
@@ -4836,7 +4886,8 @@
      "lat": 31.3353904,
      "lng": -89.3297295,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 602,
@@ -4845,7 +4896,8 @@
      "lat": 31.3338942,
      "lng": -89.3294241,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 603,
@@ -4854,7 +4906,8 @@
      "lat": 31.330472,
      "lng": -89.3306368,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 604,
@@ -4863,7 +4916,8 @@
      "lat": 31.3279781,
      "lng": -89.3306278,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 605,
@@ -4872,7 +4926,8 @@
      "lat": 31.3258833,
      "lng": -89.3330083,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 606,
@@ -4881,7 +4936,8 @@
      "lat": 31.3249547,
      "lng": -89.3329544,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 607,
@@ -4890,7 +4946,8 @@
      "lat": 31.324901,
      "lng": -89.335847,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 608,
@@ -4899,7 +4956,8 @@
      "lat": 31.3266506,
      "lng": -89.3359369,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 609,
@@ -4908,7 +4966,8 @@
      "lat": 31.3268271,
      "lng": -89.3407608,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 610,
@@ -4917,7 +4976,8 @@
      "lat": 31.3284155,
      "lng": -89.3419645,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 611,
@@ -4926,7 +4986,8 @@
      "lat": 31.3283771,
      "lng": -89.3382904,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 612,
@@ -4935,7 +4996,8 @@
      "lat": 31.3283311,
      "lng": -89.3348589,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 613,
@@ -4944,7 +5006,8 @@
      "lat": 31.3294591,
      "lng": -89.3347241,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 614,
@@ -4953,7 +5016,8 @@
      "lat": 31.3319069,
      "lng": -89.3329455,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 601,
@@ -4962,7 +5026,8 @@
      "lat": 31.3353904,
      "lng": -89.3297295,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     }
    ],
    "trips": [
@@ -7927,7 +7992,8 @@
      "transfersTo": [
       "red"
      ],
-     "stopGroupId": "walmart_49"
+     "stopGroupId": "walmart_49",
+     "direction": "Station"
     },
     {
      "stopId": 201,
@@ -7936,7 +8002,8 @@
      "lat": 31.3095063,
      "lng": -89.3207194,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 202,
@@ -7945,7 +8012,8 @@
      "lat": 31.327441,
      "lng": -89.3286964,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 203,
@@ -7954,7 +8022,8 @@
      "lat": 31.3353904,
      "lng": -89.3297295,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 204,
@@ -7963,7 +8032,8 @@
      "lat": 31.3320833,
      "lng": -89.330511,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 205,
@@ -7972,7 +8042,8 @@
      "lat": 31.3323059,
      "lng": -89.3377155,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 206,
@@ -7981,7 +8052,8 @@
      "lat": 31.3347459,
      "lng": -89.3440936,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 207,
@@ -7990,7 +8062,8 @@
      "lat": 31.3347766,
      "lng": -89.3492499,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 208,
@@ -7999,7 +8072,8 @@
      "lat": 31.3304873,
      "lng": -89.350777,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 209,
@@ -8008,7 +8082,8 @@
      "lat": 31.3284462,
      "lng": -89.3480192,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 210,
@@ -8017,7 +8092,8 @@
      "lat": 31.3269269,
      "lng": -89.3456297,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 211,
@@ -8026,7 +8102,8 @@
      "lat": 31.324832,
      "lng": -89.3445068,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Station"
     },
     {
      "stopId": 212,
@@ -8035,7 +8112,8 @@
      "lat": 31.3247399,
      "lng": -89.3405183,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 213,
@@ -8044,7 +8122,8 @@
      "lat": 31.3246631,
      "lng": -89.3344367,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 214,
@@ -8053,7 +8132,8 @@
      "lat": 31.3238113,
      "lng": -89.3326221,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 215,
@@ -8062,7 +8142,8 @@
      "lat": 31.3210027,
      "lng": -89.3309782,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 216,
@@ -8071,7 +8152,8 @@
      "lat": 31.319276,
      "lng": -89.3297205,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 200,
@@ -8082,7 +8164,8 @@
      "transfersTo": [
       "red"
      ],
-     "stopGroupId": "walmart_49"
+     "stopGroupId": "walmart_49",
+     "direction": "Station"
     }
    ],
    "trips": [
@@ -9997,7 +10080,8 @@
       "orange",
       "purple"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     },
     {
      "stopId": 301,
@@ -10006,7 +10090,8 @@
      "lat": 31.3306945,
      "lng": -89.2874907,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 302,
@@ -10015,7 +10100,8 @@
      "lat": 31.3300192,
      "lng": -89.2899251,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 303,
@@ -10024,7 +10110,8 @@
      "lat": 31.3320373,
      "lng": -89.2899251,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 304,
@@ -10033,7 +10120,8 @@
      "lat": 31.3356896,
      "lng": -89.2899521,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 305,
@@ -10042,7 +10130,8 @@
      "lat": 31.3356359,
      "lng": -89.2844185,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 306,
@@ -10051,7 +10140,8 @@
      "lat": 31.3384518,
      "lng": -89.2872032,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 307,
@@ -10060,7 +10150,8 @@
      "lat": 31.338283,
      "lng": -89.2898982,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 308,
@@ -10069,7 +10160,8 @@
      "lat": 31.3382907,
      "lng": -89.2923775,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 309,
@@ -10078,7 +10170,8 @@
      "lat": 31.3405924,
      "lng": -89.2943449,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 310,
@@ -10087,7 +10180,8 @@
      "lat": 31.3429018,
      "lng": -89.2943898,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 311,
@@ -10096,7 +10190,8 @@
      "lat": 31.3425259,
      "lng": -89.3013337,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 312,
@@ -10105,7 +10200,8 @@
      "lat": 31.3426026,
      "lng": -89.3073525,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 313,
@@ -10114,7 +10210,8 @@
      "lat": 31.3464693,
      "lng": -89.3149702,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 314,
@@ -10123,7 +10220,8 @@
      "lat": 31.3467992,
      "lng": -89.3244833,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 315,
@@ -10132,7 +10230,8 @@
      "lat": 31.3473593,
      "lng": -89.3315351,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 316,
@@ -10141,7 +10240,8 @@
      "lat": 31.3484487,
      "lng": -89.3351104,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 317,
@@ -10150,7 +10250,8 @@
      "lat": 31.3476892,
      "lng": -89.335317,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 318,
@@ -10159,7 +10260,8 @@
      "lat": 31.3467762,
      "lng": -89.3376437,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 319,
@@ -10168,7 +10270,8 @@
      "lat": 31.3467532,
      "lng": -89.3432222,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 320,
@@ -10177,7 +10280,8 @@
      "lat": 31.3456331,
      "lng": -89.3483965,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 321,
@@ -10186,7 +10290,8 @@
      "lat": 31.3395797,
      "lng": -89.3439947,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 322,
@@ -10195,7 +10300,8 @@
      "lat": 31.3356589,
      "lng": -89.3355506,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 323,
@@ -10204,7 +10310,8 @@
      "lat": 31.3355976,
      "lng": -89.3295768,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 324,
@@ -10213,7 +10320,8 @@
      "lat": 31.3356436,
      "lng": -89.32787,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 325,
@@ -10222,7 +10330,8 @@
      "lat": 31.3356896,
      "lng": -89.3195875,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 326,
@@ -10231,7 +10340,8 @@
      "lat": 31.335705,
      "lng": -89.3136856,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 327,
@@ -10240,7 +10350,8 @@
      "lat": 31.335705,
      "lng": -89.3058792,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 328,
@@ -10249,7 +10360,8 @@
      "lat": 31.3356513,
      "lng": -89.2992586,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 329,
@@ -10258,7 +10370,8 @@
      "lat": 31.3321677,
      "lng": -89.2967523,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 330,
@@ -10267,7 +10380,8 @@
      "lat": 31.327817,
      "lng": -89.2918386,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 331,
@@ -10276,7 +10390,8 @@
      "lat": 31.3259677,
      "lng": -89.2892245,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 300,
@@ -10289,7 +10404,8 @@
       "orange",
       "purple"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     }
    ],
    "trips": [
@@ -12532,7 +12648,8 @@
       "brown",
       "purple"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     },
     {
      "stopId": 101,
@@ -12541,7 +12658,8 @@
      "lat": 31.3251773,
      "lng": -89.2843736,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 102,
@@ -12550,7 +12668,8 @@
      "lat": 31.3240799,
      "lng": -89.2801605,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 103,
@@ -12559,7 +12678,8 @@
      "lat": 31.319207,
      "lng": -89.2801425,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 104,
@@ -12568,7 +12688,8 @@
      "lat": 31.3158303,
      "lng": -89.2800886,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 105,
@@ -12577,7 +12698,8 @@
      "lat": 31.3157842,
      "lng": -89.2829812,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 106,
@@ -12586,7 +12708,8 @@
      "lat": 31.3157612,
      "lng": -89.285191,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 107,
@@ -12595,7 +12718,8 @@
      "lat": 31.3119392,
      "lng": -89.2851461,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 108,
@@ -12604,7 +12728,8 @@
      "lat": 31.3063058,
      "lng": -89.2851461,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 109,
@@ -12613,7 +12738,8 @@
      "lat": 31.3063595,
      "lng": -89.2940304,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 110,
@@ -12622,7 +12748,8 @@
      "lat": 31.310128,
      "lng": -89.2940664,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 111,
@@ -12631,7 +12758,8 @@
      "lat": 31.3127835,
      "lng": -89.2946323,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 112,
@@ -12640,7 +12768,8 @@
      "lat": 31.3156998,
      "lng": -89.295351,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 113,
@@ -12649,7 +12778,8 @@
      "lat": 31.3174265,
      "lng": -89.2930962,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 114,
@@ -12658,7 +12788,8 @@
      "lat": 31.318923,
      "lng": -89.2993036,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 115,
@@ -12667,7 +12798,8 @@
      "lat": 31.3167282,
      "lng": -89.3037682,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 116,
@@ -12676,7 +12808,8 @@
      "lat": 31.3140421,
      "lng": -89.309203,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 117,
@@ -12685,7 +12818,8 @@
      "lat": 31.3114174,
      "lng": -89.3131107,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 118,
@@ -12694,7 +12828,8 @@
      "lat": 31.3091993,
      "lng": -89.3153385,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 119,
@@ -12703,7 +12838,8 @@
      "lat": 31.3100512,
      "lng": -89.3179975,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 120,
@@ -12712,7 +12848,8 @@
      "lat": 31.3114864,
      "lng": -89.3183928,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 121,
@@ -12721,7 +12858,8 @@
      "lat": 31.3080327,
      "lng": -89.3194348,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Station"
     },
     {
      "stopId": 122,
@@ -12730,7 +12868,8 @@
      "lat": 31.3049549,
      "lng": -89.3222645,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 123,
@@ -12739,7 +12878,8 @@
      "lat": 31.3040723,
      "lng": -89.3180694,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 124,
@@ -12748,7 +12888,8 @@
      "lat": 31.305592,
      "lng": -89.3131825,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 125,
@@ -12757,7 +12898,8 @@
      "lat": 31.3111718,
      "lng": -89.308107,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 126,
@@ -12766,7 +12908,8 @@
      "lat": 31.3138886,
      "lng": -89.3090054,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 127,
@@ -12775,7 +12918,8 @@
      "lat": 31.3160528,
      "lng": -89.3056367,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 128,
@@ -12784,7 +12928,8 @@
      "lat": 31.3188233,
      "lng": -89.2994114,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 129,
@@ -12793,7 +12938,8 @@
      "lat": 31.3235197,
      "lng": -89.2940035,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 130,
@@ -12802,7 +12948,8 @@
      "lat": 31.3254765,
      "lng": -89.2907696,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 131,
@@ -12811,7 +12958,8 @@
      "lat": 31.3259677,
      "lng": -89.2892245,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 100,
@@ -12824,7 +12972,8 @@
       "brown",
       "purple"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     }
    ],
    "trips": [
@@ -15065,7 +15214,8 @@
      "transfersTo": [
       "green"
      ],
-     "stopGroupId": "walmart_49"
+     "stopGroupId": "walmart_49",
+     "direction": null
     },
     {
      "stopId": 401,
@@ -15074,7 +15224,8 @@
      "lat": 31.3109569,
      "lng": -89.3199558,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 402,
@@ -15083,7 +15234,8 @@
      "lat": 31.3093298,
      "lng": -89.3181682,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 403,
@@ -15092,7 +15244,8 @@
      "lat": 31.3113022,
      "lng": -89.3131286,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 404,
@@ -15101,7 +15254,8 @@
      "lat": 31.309798,
      "lng": -89.3135598,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 405,
@@ -15110,7 +15264,8 @@
      "lat": 31.3053464,
      "lng": -89.3136497,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 406,
@@ -15119,7 +15274,8 @@
      "lat": 31.3042104,
      "lng": -89.3179256,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 407,
@@ -15128,7 +15284,8 @@
      "lat": 31.3042258,
      "lng": -89.323064,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 408,
@@ -15137,7 +15294,8 @@
      "lat": 31.3033738,
      "lng": -89.3312926,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 409,
@@ -15146,7 +15304,8 @@
      "lat": 31.2990908,
      "lng": -89.3308254,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 410,
@@ -15155,7 +15314,8 @@
      "lat": 31.2990908,
      "lng": -89.3284808,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 411,
@@ -15164,7 +15324,8 @@
      "lat": 31.2991062,
      "lng": -89.324115,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 412,
@@ -15173,7 +15334,8 @@
      "lat": 31.2981083,
      "lng": -89.3169285,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 413,
@@ -15182,7 +15344,8 @@
      "lat": 31.3022148,
      "lng": -89.3142695,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 414,
@@ -15191,7 +15354,8 @@
      "lat": 31.3043486,
      "lng": -89.3110625,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 415,
@@ -15200,7 +15364,8 @@
      "lat": 31.3073266,
      "lng": -89.307613,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 416,
@@ -15209,7 +15374,8 @@
      "lat": 31.3101357,
      "lng": -89.304379,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 417,
@@ -15218,7 +15384,8 @@
      "lat": 31.311732,
      "lng": -89.2995551,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 418,
@@ -15227,7 +15394,8 @@
      "lat": 31.3064133,
      "lng": -89.299582,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 419,
@@ -15236,7 +15404,8 @@
      "lat": 31.306206,
      "lng": -89.2941652,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 420,
@@ -15245,7 +15414,8 @@
      "lat": 31.3002192,
      "lng": -89.2948299,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 421,
@@ -15254,7 +15424,8 @@
      "lat": 31.2994209,
      "lng": -89.2963391,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 422,
@@ -15263,7 +15434,8 @@
      "lat": 31.2992597,
      "lng": -89.3015314,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 423,
@@ -15272,7 +15444,8 @@
      "lat": 31.299229,
      "lng": -89.3076938,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 424,
@@ -15281,7 +15454,8 @@
      "lat": 31.3067126,
      "lng": -89.3146198,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 425,
@@ -15290,7 +15464,8 @@
      "lat": 31.3096214,
      "lng": -89.3135868,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 426,
@@ -15299,7 +15474,8 @@
      "lat": 31.3091993,
      "lng": -89.3153385,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 427,
@@ -15308,7 +15484,8 @@
      "lat": 31.3100512,
      "lng": -89.3179975,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 428,
@@ -15317,7 +15494,8 @@
      "lat": 31.3114864,
      "lng": -89.3183928,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 400,
@@ -15328,7 +15506,8 @@
      "transfersTo": [
       "green"
      ],
-     "stopGroupId": "walmart_49"
+     "stopGroupId": "walmart_49",
+     "direction": null
     }
    ],
    "trips": [
@@ -17633,7 +17812,8 @@
       "brown",
       "orange"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     },
     {
      "stopId": 501,
@@ -17642,7 +17822,8 @@
      "lat": 31.3243715,
      "lng": -89.287338,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 502,
@@ -17651,7 +17832,8 @@
      "lat": 31.3190688,
      "lng": -89.2863768,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 503,
@@ -17660,7 +17842,8 @@
      "lat": 31.3156641,
      "lng": -89.2902041,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 504,
@@ -17669,7 +17852,8 @@
      "lat": 31.3157612,
      "lng": -89.285191,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 505,
@@ -17678,7 +17862,8 @@
      "lat": 31.3119392,
      "lng": -89.2851461,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 506,
@@ -17687,7 +17872,8 @@
      "lat": 31.3063058,
      "lng": -89.2851461,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 507,
@@ -17696,7 +17882,8 @@
      "lat": 31.3011863,
      "lng": -89.2828374,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 508,
@@ -17705,7 +17892,8 @@
      "lat": 31.2964349,
      "lng": -89.2863319,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 509,
@@ -17714,7 +17902,8 @@
      "lat": 31.2932033,
      "lng": -89.2868529,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 510,
@@ -17723,7 +17912,8 @@
      "lat": 31.2881829,
      "lng": -89.28573,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 511,
@@ -17732,7 +17922,8 @@
      "lat": 31.2808897,
      "lng": -89.2883531,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 512,
@@ -17741,7 +17932,8 @@
      "lat": 31.2773427,
      "lng": -89.2887484,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 513,
@@ -17750,7 +17942,8 @@
      "lat": 31.2773504,
      "lng": -89.2829902,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 514,
@@ -17759,7 +17952,8 @@
      "lat": 31.2773197,
      "lng": -89.2757587,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 515,
@@ -17768,7 +17962,8 @@
      "lat": 31.2772736,
      "lng": -89.2716175,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 516,
@@ -17777,7 +17972,8 @@
      "lat": 31.2764291,
      "lng": -89.2669193,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 517,
@@ -17786,7 +17982,8 @@
      "lat": 31.2781796,
      "lng": -89.262814,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 518,
@@ -17795,7 +17992,8 @@
      "lat": 31.2792391,
      "lng": -89.2588255,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 519,
@@ -17804,7 +18002,8 @@
      "lat": 31.2760145,
      "lng": -89.2561754,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 520,
@@ -17813,7 +18012,8 @@
      "lat": 31.269089,
      "lng": -89.2655179,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 521,
@@ -17822,7 +18022,8 @@
      "lat": 31.2669314,
      "lng": -89.2697669,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 522,
@@ -17831,7 +18032,8 @@
      "lat": 31.2619479,
      "lng": -89.2731177,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 523,
@@ -17840,7 +18042,8 @@
      "lat": 31.2663785,
      "lng": -89.277744,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 524,
@@ -17849,7 +18052,8 @@
      "lat": 31.2666166,
      "lng": -89.2815439,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 525,
@@ -17858,7 +18062,8 @@
      "lat": 31.2859489,
      "lng": -89.296959,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Outbound"
     },
     {
      "stopId": 526,
@@ -17867,7 +18072,8 @@
      "lat": 31.2810126,
      "lng": -89.2880566,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 527,
@@ -17876,7 +18082,8 @@
      "lat": 31.2883901,
      "lng": -89.2847149,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 528,
@@ -17885,7 +18092,8 @@
      "lat": 31.2920518,
      "lng": -89.2841759,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 529,
@@ -17894,7 +18102,8 @@
      "lat": 31.2955368,
      "lng": -89.284149,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 530,
@@ -17903,7 +18112,8 @@
      "lat": 31.3011786,
      "lng": -89.2827476,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 531,
@@ -17912,7 +18122,8 @@
      "lat": 31.3061216,
      "lng": -89.2849844,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 532,
@@ -17921,7 +18132,8 @@
      "lat": 31.3119469,
      "lng": -89.2849934,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 533,
@@ -17930,7 +18142,8 @@
      "lat": 31.3157612,
      "lng": -89.2850293,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 534,
@@ -17939,7 +18152,8 @@
      "lat": 31.3190765,
      "lng": -89.2863049,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 535,
@@ -17948,7 +18162,8 @@
      "lat": 31.3244866,
      "lng": -89.2872122,
      "transfersTo": [],
-     "stopGroupId": null
+     "stopGroupId": null,
+     "direction": "Inbound"
     },
     {
      "stopId": 500,
@@ -17961,7 +18176,8 @@
       "brown",
       "orange"
      ],
-     "stopGroupId": "train_depot"
+     "stopGroupId": "train_depot",
+     "direction": null
     }
    ],
    "trips": [

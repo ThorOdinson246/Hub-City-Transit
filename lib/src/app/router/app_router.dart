@@ -72,7 +72,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 // Query parameters rather than path segments so /map stays the
                 // branch's initialLocation and goBranch() can still return to a
                 // clean map without a second route.
+                // Stable key: without one, every ?stop= change is a new Page, so
+                // the Navigator rebuilds the subtree and FlutterMap reloads its
+                // tiles from blank on each stop tap.
                 pageBuilder: (context, state) => NoTransitionPage(
+                  key: const ValueKey('map-branch'),
                   child: MapPage(
                     routeId: RouteId.tryParse(state.uri.queryParameters['route']),
                     stopId: state.uri.queryParameters['stop'],

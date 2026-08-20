@@ -166,7 +166,9 @@ void main() {
       }
     });
 
-    test('a ride always moves forward along the route sequence', () {
+    test('a ride may wrap past the terminus, but never arrives before boarding', () {
+      // Every route is a closed loop, so boarding at sequence 41 and alighting
+      // at sequence 9 is a normal trip through the terminus — not an error.
       final result = planner.plan(
         dataset: data,
         originLat: 31.3271,
@@ -178,9 +180,54 @@ void main() {
 
       for (final itinerary in result.itineraries) {
         for (final leg in itinerary.legs.where((l) => l.kind == TripLegKind.ride)) {
-          expect(leg.toStop!.sequence, greaterThan(leg.fromStop!.sequence));
+          expect(leg.endMinutes, greaterThan(leg.startMinutes),
+              reason: 'a ride cannot arrive before it departs');
+          expect(leg.fromStop!.sequence, isNot(leg.toStop!.sequence));
         }
       }
+    });
+
+    test('a trip back to the loop terminus is reachable at all', () {
+      // Refusing wraparound made 209 stop pairs unreachable, most of them
+      // journeys to the Train Depot — the busiest destination on the network.
+      final blue = data.routes['blue']!;
+      final ordered = [...blue.stops]..sort((a, b) => a.sequence.compareTo(b.sequence));
+      final origin = ordered[ordered.length ~/ 2];
+      final depot = ordered.first;
+
+      final result = planner.plan(
+        dataset: data,
+        originLat: origin.lat,
+        originLng: origin.lng,
+        destLat: depot.lat,
+        destLng: depot.lng,
+        when: _weekdayAt(9, 0),
+      );
+
+      expect(result.hasResults, isTrue,
+          reason: 'mid-route to the depot must be plannable');
+    });
+
+    test('boarding the stop you are standing at beats walking past it', () {
+      // The reported symptom: standing at a late-sequence stop and being told to
+      // walk to a far one, because the near stop was rejected for wraparound.
+      final blue = data.routes['blue']!;
+      final ordered = [...blue.stops]..sort((a, b) => a.sequence.compareTo(b.sequence));
+      final standingAt = ordered[ordered.length - 6];
+      final target = ordered[3];
+
+      final result = planner.plan(
+        dataset: data,
+        originLat: standingAt.lat,
+        originLng: standingAt.lng,
+        destLat: target.lat,
+        destLng: target.lng,
+        when: _weekdayAt(9, 0),
+      );
+
+      expect(result.hasResults, isTrue);
+      expect(result.itineraries.first.legs.first.distanceMetres, lessThan(500),
+          reason: 'should not send the rider on a long walk past a usable stop');
     });
 
     test('arrive-by never arrives after the requested time', () {

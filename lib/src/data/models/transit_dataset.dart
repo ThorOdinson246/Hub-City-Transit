@@ -72,6 +72,9 @@ abstract class RoutePattern with _$RoutePattern {
   factory RoutePattern.fromJson(Map<String, dynamic> json) =>
       _$RoutePatternFromJson(json);
 
+  int get lastSequence =>
+      stops.isEmpty ? 0 : stops.map((s) => s.sequence).reduce((a, b) => a > b ? a : b);
+
   PatternStop? stopBySequence(int sequence) {
     for (final stop in stops) {
       if (stop.sequence == sequence) return stop;
@@ -92,6 +95,11 @@ abstract class PatternStop with _$PatternStop {
     required double lat,
     required double lng,
     @Default(<String>[]) List<String> transfersTo,
+
+    /// Outbound, Inbound or Station. Distinguishes the two sides of a road at a
+    /// paired stop, which is the difference between catching your bus and
+    /// watching it go the other way.
+    String? direction,
 
     /// Same group means same physical place, so transfers there cost no walk.
     String? stopGroupId,

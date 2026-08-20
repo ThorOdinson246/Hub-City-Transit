@@ -248,7 +248,7 @@ class TripPlanner {
 
       for (final to in destinations) {
         if (to.routeId != from.routeId) continue;
-        if (to.stop.sequence <= from.stop.sequence) continue;
+        if (to.stop.sequence == from.stop.sequence) continue;
 
         final ride = _firstRide(dataset, from.routeId, from.stop, to.stop, readyAt);
         if (ride == null) continue;
@@ -282,10 +282,10 @@ class TripPlanner {
         if (secondRoute == null) continue;
 
         for (final alight in firstRoute.stops) {
-          if (alight.sequence <= from.stop.sequence) continue;
+          if (alight.sequence == from.stop.sequence) continue;
 
           for (final board in secondRoute.stops) {
-            if (board.sequence >= to.stop.sequence) continue;
+            if (board.sequence == to.stop.sequence) continue;
             final gap = _distance(alight.lat, alight.lng, board.lat, board.lng);
             final sameGroup = alight.stopGroupId != null &&
                 alight.stopGroupId == board.stopGroupId;
@@ -372,6 +372,11 @@ class TripPlanner {
     );
   }
 
+  /// Every route here is a closed loop — first and last stop are the same
+  /// place. So boarding late in the sequence and alighting early is a normal
+  /// trip: you stay on through the terminus and continue on the next run.
+  /// Refusing that made 209 stop pairs unreachable and pushed 1,727 more into
+  /// walks over 800m.
   _Ride? _firstRide(
     TransitDataset dataset,
     String routeId,
@@ -380,14 +385,37 @@ class TripPlanner {
     int readyAt,
   ) {
     final pattern = dataset.route(routeId);
-    if (pattern == null || to.sequence <= from.sequence) return null;
+    if (pattern == null || to.sequence == from.sequence) return null;
 
+    if (to.sequence > from.sequence) {
+      _Ride? best;
+      for (final trip in pattern.trips) {
+        final boardAt = trip.timeAtSequence(from.sequence)?.minutes;
+        final arriveAt = trip.timeAtSequence(to.sequence)?.minutes;
+        if (boardAt == null || arriveAt == null) continue;
+        if (boardAt < readyAt || arriveAt <= boardAt) continue;
+        if (best == null || boardAt < best.board) {
+          best = _Ride(routeId, from, to, boardAt, arriveAt);
+        }
+      }
+      return best;
+    }
+
+    final terminus = pattern.lastSequence;
     _Ride? best;
     for (final trip in pattern.trips) {
       final boardAt = trip.timeAtSequence(from.sequence)?.minutes;
-      final arriveAt = trip.timeAtSequence(to.sequence)?.minutes;
-      if (boardAt == null || arriveAt == null) continue;
-      if (boardAt < readyAt || arriveAt <= boardAt) continue;
+      final endAt = trip.timeAtSequence(terminus)?.minutes;
+      if (boardAt == null || endAt == null || boardAt < readyAt) continue;
+
+      int? arriveAt;
+      for (final next in pattern.trips) {
+        final candidate = next.timeAtSequence(to.sequence)?.minutes;
+        if (candidate == null || candidate < endAt) continue;
+        if (arriveAt == null || candidate < arriveAt) arriveAt = candidate;
+      }
+      if (arriveAt == null) continue;
+
       if (best == null || boardAt < best.board) {
         best = _Ride(routeId, from, to, boardAt, arriveAt);
       }
