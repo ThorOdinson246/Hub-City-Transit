@@ -6,6 +6,7 @@ import '../../../core/directions/walking_directions.dart';
 import '../../../core/network/dio_provider.dart';
 import '../../../data/models/transit_dataset.dart';
 import '../../../data/repositories/transit_dataset_repository.dart';
+import '../../../data/services/nominatim_service.dart';
 import '../../../domain/usecases/trip_planner.dart';
 
 final transitDatasetRepositoryProvider =
@@ -24,6 +25,17 @@ final walkingDirectionsProvider = Provider<WalkingDirectionsService>((ref) {
 });
 
 final tripPlannerProvider = Provider<TripPlanner>((ref) => const TripPlanner());
+
+/// One shared instance, so both trip fields queue behind the same client rather
+/// than each holding its own Dio the way the map search does.
+final nominatimServiceProvider =
+    Provider<NominatimService>((ref) => NominatimService());
+
+final placeSearchProvider =
+    FutureProvider.autoDispose.family<List<NominatimPlace>, String>((ref, query) {
+  if (query.trim().length < 3) return Future.value(const <NominatimPlace>[]);
+  return ref.watch(nominatimServiceProvider).search(query);
+});
 
 class TripQuery {
   const TripQuery({

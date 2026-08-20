@@ -142,6 +142,14 @@ class SettingsPage extends ConsumerWidget {
               _SettingsTile(
                 cs: cs,
                 tt: tt,
+                icon: Icons.alt_route_rounded,
+                title: 'Plan a trip',
+                subtitle: 'Walk and ride directions with transfers',
+                onTap: () => context.push('/plan'),
+              ),
+              _SettingsTile(
+                cs: cs,
+                tt: tt,
                 icon: Icons.campaign_outlined,
                 title: 'Service Alerts',
                 subtitle: unreadAlerts > 0
