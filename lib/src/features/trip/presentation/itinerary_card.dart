@@ -200,7 +200,7 @@ class _ModeStrip extends StatelessWidget {
             background: scheme.surfaceContainerHighest));
       } else {
         final route = RouteId.tryParse(leg.routeId);
-        final color = route == null ? scheme.primary : routeColors[route]!;
+        final color = route == null ? scheme.primary : routeColor(route);
         chips.add(_ModeChip(
             icon: Icons.directions_bus_rounded,
             color: route == null ? scheme.onPrimary : onRouteColor(route),
@@ -242,7 +242,7 @@ class _LegRow extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
     final route = RouteId.tryParse(leg.routeId);
-    final accent = route == null ? scheme.onSurfaceVariant : routeColors[route]!;
+    final accent = route == null ? scheme.onSurfaceVariant : routeColor(route);
 
     return Padding(
       padding: const EdgeInsets.only(top: 14),
@@ -304,7 +304,7 @@ class _LegRow extends StatelessWidget {
           ],
         );
       case TripLegKind.ride:
-        final name = route == null ? 'Bus' : routeNames[route]!;
+        final name = route == null ? 'Bus' : routeName(route);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

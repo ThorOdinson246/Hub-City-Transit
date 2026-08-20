@@ -63,7 +63,7 @@ List<Polyline> tripPolylines({
             LatLng(leg.toStop!.lat, leg.toStop!.lng),
           ],
           strokeWidth: 5,
-          color: nextRoute == null ? _walkGrey : routeColors[nextRoute]!,
+          color: nextRoute == null ? _walkGrey : routeColor(nextRoute),
           pattern: StrokePattern.dashed(segments: const [10, 7]),
         ));
 
@@ -83,7 +83,7 @@ List<Polyline> tripPolylines({
         result.add(Polyline(
           points: points,
           strokeWidth: 6,
-          color: routeColors[routeId]!,
+          color: routeColor(routeId),
         ));
     }
   }
@@ -107,7 +107,7 @@ List<Marker> tripMarkers({required PlannedTrip trip}) {
   for (final leg in trip.itinerary.legs) {
     if (leg.kind != TripLegKind.ride) continue;
     final routeId = RouteId.tryParse(leg.routeId);
-    final color = routeId == null ? const Color(0xFF1976D2) : routeColors[routeId]!;
+    final color = routeId == null ? const Color(0xFF1976D2) : routeColor(routeId);
     if (leg.fromStop case final board?) {
       markers.add(_pin(
         LatLng(board.lat, board.lng),

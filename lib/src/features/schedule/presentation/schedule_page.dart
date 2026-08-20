@@ -30,7 +30,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     final allStopsByRouteAsync = ref.watch(allStopsByRouteProvider);
     final scheduleAsync = ref.watch(selectedRouteScheduleProvider);
     final adjustment = ref.watch(selectedRouteAdjustmentProvider);
-    final routeColor = routeColors[route]!;
+    final accent = routeColor(route);
 
     return SafeArea(child: ContentPane(child: Column(children: [
       // ── Header ──────────────────────────────────────────────────────────
@@ -40,10 +40,10 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
           Text('Schedule', style: tt.headlineLarge),
           const SizedBox(height: 4),
           Row(children: [
-            Icon(Icons.alt_route_rounded, color: routeColor, size: 18),
+            Icon(Icons.alt_route_rounded, color: accent, size: 18),
             const SizedBox(width: 6),
             Text(routeNames[route] ?? route.value,
-              style: TextStyle(color: routeColor, fontWeight: FontWeight.w800, fontSize: 18)),
+              style: TextStyle(color: accent, fontWeight: FontWeight.w800, fontSize: 18)),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -116,7 +116,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
         data: (stops) => allStopsByRouteAsync.when(
           data: (allStops) => scheduleAsync.when(
             data: (schedule) => _buildList(
-              context, cs, tt, route, routeColor, stops, allStops, schedule, adjustment),
+              context, cs, tt, route, accent, stops, allStops, schedule, adjustment),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => _Err('Schedule error: $e'),
           ),
@@ -134,7 +134,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     ColorScheme cs,
     TextTheme tt,
     RouteId route,
-    Color routeColor,
+    Color accent,
     List<StopModel> stops,
     Map<RouteId, List<StopModel>> allStops,
     RouteScheduleModel? schedule,
@@ -180,7 +180,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       itemBuilder: (_, i) => _StopRow(
         entry: entries[i],
         route: route,
-        routeColor: routeColor,
+        accent: accent,
         cs: cs, tt: tt,
         isLast: i == entries.length - 1,
       ),
@@ -255,7 +255,7 @@ class _RouteChips extends ConsumerWidget {
   }
 
   Widget _chip(WidgetRef ref, RouteId r, bool selected) {
-    final color = routeColors[r]!;
+    final color = routeColor(r);
     return ChoiceChip(
       showCheckmark: false,
       selected: selected,
@@ -293,11 +293,11 @@ class _Entry {
 }
 
 class _StopRow extends StatelessWidget {
-  const _StopRow({required this.entry, required this.route, required this.routeColor,
+  const _StopRow({required this.entry, required this.route, required this.accent,
     required this.cs, required this.tt, required this.isLast});
   final _Entry entry;
   final RouteId route;
-  final Color routeColor;
+  final Color accent;
   final ColorScheme cs;
   final TextTheme tt;
   final bool isLast;
@@ -316,9 +316,9 @@ class _StopRow extends StatelessWidget {
             width: 12, height: 12,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: entry.isCurrent ? routeColor : cs.surfaceContainerLowest,
+              color: entry.isCurrent ? accent : cs.surfaceContainerLowest,
               border: Border.all(
-                color: entry.isCurrent ? routeColor
+                color: entry.isCurrent ? accent
                     : entry.isPast ? cs.outlineVariant : cs.outline,
                 width: 2,
               ),
@@ -339,7 +339,7 @@ class _StopRow extends StatelessWidget {
                   : cs.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: entry.isCurrent ? routeColor : cs.outlineVariant.withValues(alpha: 0.6),
+                color: entry.isCurrent ? accent : cs.outlineVariant.withValues(alpha: 0.6),
                 width: entry.isCurrent ? 1.5 : 1,
               ),
             ),
@@ -347,7 +347,7 @@ class _StopRow extends StatelessWidget {
               // Accent bar
               Container(
                 width: 3.5, height: entry.isCurrent ? 80 : 44,
-                decoration: BoxDecoration(color: routeColor, borderRadius: BorderRadius.circular(999)),
+                decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(999)),
               ),
               const SizedBox(width: 10),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -378,7 +378,7 @@ class _StopRow extends StatelessWidget {
                   Wrap(spacing: 5, runSpacing: 5, children: entry.connections.map((c) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: routeColors[c.routeId]!.withValues(alpha: 0.15),
+                      color: routeColor(c.routeId).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(routeNames[c.routeId]?.replaceAll(' Route', '') ?? c.routeId.name,

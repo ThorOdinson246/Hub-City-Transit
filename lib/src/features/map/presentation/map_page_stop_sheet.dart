@@ -271,7 +271,7 @@ class _BusInfoPanel extends ConsumerWidget {
                                 width: 40,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: routeColors[selectedRoute]!.withValues(
+                                  color: routeColor(selectedRoute).withValues(
                                     alpha: 0.12,
                                   ),
                                   shape: BoxShape.circle,
@@ -641,7 +641,7 @@ class _StopDetailSheet extends ConsumerWidget {
                     ),
                     child: _NextArrivalsSection(
                       stop: stop,
-                      routeColor: routeColors[selectedRoute]!,
+                      routeColor: routeColor(selectedRoute),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -669,10 +669,10 @@ class _StopDetailSheet extends ConsumerWidget {
                                       radius: 6,
                                       backgroundColor: routeColors[c.routeId],
                                     ),
-                                    backgroundColor: routeColors[c.routeId]!
+                                    backgroundColor: routeColor(c.routeId)
                                         .withValues(alpha: 0.12),
                                     side: BorderSide(
-                                      color: routeColors[c.routeId]!.withValues(
+                                      color: routeColor(c.routeId).withValues(
                                         alpha: 0.3,
                                       ),
                                     ),
@@ -734,7 +734,7 @@ class _StopDetailSheet extends ConsumerWidget {
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                            color: routeColors[selectedRoute]!,
+                                            color: routeColor(selectedRoute),
                                             width: 2,
                                           ),
                                           color: cs.surfaceContainerLowest,
@@ -1121,7 +1121,7 @@ Widget buildBusMarker({
   required BusId selectedBus,
   required VoidCallback onTap,
 }) {
-  final color = routeColors[selectedRoute]!;
+  final color = routeColor(selectedRoute);
   final isOffline = busStatus == BusStatus.offline;
   final isConnecting = busStatus == BusStatus.connecting;
 

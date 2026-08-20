@@ -85,7 +85,7 @@ class TripMarkerLayer extends StatelessWidget {
         point: LatLng(leg.fromStop!.lat, leg.fromStop!.lng),
         color: routeId == null
             ? Theme.of(context).colorScheme.primary
-            : routeColors[routeId]!,
+            : routeColor(routeId),
         foreground: routeId == null ? Colors.white : onRouteColor(routeId),
         label: 'Board $boardNumber at ${leg.fromStop!.name}',
         text: '$boardNumber',

@@ -101,9 +101,9 @@ class AboutPage extends StatelessWidget {
               children: RouteId.values.asMap().entries.map((entry) {
                 final i = entry.key;
                 final route = entry.value;
-                final color = routeColors[route]!;
-                final name = routeNames[route]!;
-                final desc = routeDescriptions[route]!;
+                final color = routeColor(route);
+                final name = routeName(route);
+                final desc = routeDescription(route);
                 final isLast = i == RouteId.values.length - 1;
 
                 return Column(

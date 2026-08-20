@@ -44,3 +44,37 @@ const Map<RouteId, String> routeDescriptions = {
   RouteId.red: 'Country Club · Cloverleaf · William Carey',
   RouteId.purple: 'Palmer\'s Crossing · Edwards St',
 };
+
+// Exhaustive switches, not map lookups. A `routeColors[r]!` crashes at runtime
+// when a RouteId gains a member and one of these maps does not; a switch makes
+// that a compile error instead. There were 27 such lookups.
+
+Color routeColor(RouteId route) => switch (route) {
+      RouteId.blue => const Color(0xFF1C73B8),
+      RouteId.gold => const Color(0xFFF5CE0A),
+      RouteId.green => const Color(0xFF16A34A),
+      RouteId.brown => const Color(0xFF8B5E34),
+      RouteId.orange => const Color(0xFFF97316),
+      RouteId.red => const Color(0xFFDC2626),
+      RouteId.purple => const Color(0xFF7C3AED),
+    };
+
+String routeName(RouteId route) => switch (route) {
+      RouteId.blue => 'Blue Route',
+      RouteId.gold => 'Gold Route',
+      RouteId.green => 'Green Route',
+      RouteId.brown => 'Brown Route',
+      RouteId.orange => 'Orange Route',
+      RouteId.red => 'Red Route',
+      RouteId.purple => 'Purple Route',
+    };
+
+String routeDescription(RouteId route) => switch (route) {
+      RouteId.blue => 'Hardy St · Midtown · Turtle Creek',
+      RouteId.gold => 'USM',
+      RouteId.green => '4th Street · USM · Midtown',
+      RouteId.brown => '7th Street · Hwy 42 · Downtown',
+      RouteId.orange => 'Broadway · William Carey · James St',
+      RouteId.red => 'Country Club · Cloverleaf · William Carey',
+      RouteId.purple => "Palmer's Crossing · Edwards St",
+    };

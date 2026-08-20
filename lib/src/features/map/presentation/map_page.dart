@@ -445,7 +445,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                   .map((p) => LatLng(p[0], p[1]))
                   .toList(),
               strokeWidth: 3,
-              color: routeColors[rId]!
+              color: routeColor(rId)
                   .withValues(alpha: used.contains(rId) ? 0.22 : 0.08),
             );
           })
@@ -456,7 +456,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         return Polyline(
           points: r.polyline.where((p) => p.length == 2 && GeoUtils.isValidLatLng(p[0], p[1])).map((p) => LatLng(p[0], p[1])).toList(),
           strokeWidth: rId == selectedRoute ? 4.5 : 2,
-          color: routeColors[rId]!.withValues(alpha: rId == selectedRoute ? 0.9 : 0.2),
+          color: routeColor(rId).withValues(alpha: rId == selectedRoute ? 0.9 : 0.2),
         );
       }).toList() ?? [];
     }
@@ -482,7 +482,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
               color: selectedStop?.stopId == stop.stopId ? Colors.white : routeColors[selectedRoute],
               shape: BoxShape.circle,
               border: Border.all(
-                color: selectedStop?.stopId == stop.stopId ? routeColors[selectedRoute]! : Colors.white,
+                color: selectedStop?.stopId == stop.stopId ? routeColor(selectedRoute) : Colors.white,
                 width: 2,
               ),
               boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 3)],

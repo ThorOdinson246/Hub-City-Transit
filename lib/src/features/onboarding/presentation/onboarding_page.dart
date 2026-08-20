@@ -293,10 +293,10 @@ class _WelcomePage extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: routeColors[r]!.withValues(alpha: 0.15),
+                    color: routeColor(r).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
-                      color: routeColors[r]!.withValues(alpha: 0.35),
+                      color: routeColor(r).withValues(alpha: 0.35),
                     ),
                   ),
                   child: Row(
@@ -312,7 +312,7 @@ class _WelcomePage extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        routeNames[r]!,
+                        routeName(r),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
