@@ -19,6 +19,7 @@ import '../../../data/models/stop_model.dart';
 import '../../../domain/usecases/schedule_adjustment_use_case.dart';
 import '../../../data/services/nominatim_service.dart';
 import '../../../core/utils/analytics_service.dart';
+import '../../announcements/presentation/announcement_banner.dart';
 
 part 'map_page_stop_sheet.dart';
 part 'map_page_navigation.dart';
@@ -508,6 +509,33 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
               ]),
 
           ],
+        ),
+      ),
+
+      // ── Severe service alert ──────────────────────────────────────────────
+      // Sibling of the header rather than nested inside it, so panning the map
+      // (which slides the search bar away) cannot hide an active alert.
+      //
+      // The top offset clears the search bar: 8 top padding + 52 bar height + 8
+      // gap. Hardcoded because the header is built inline several hundred lines
+      // below and has no measurable key; see docs/REMEDIATION_PLAN.md 7-1, which
+      // decomposes this file and would let both read a shared layout constant.
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        child: SafeArea(
+          bottom: false,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 68, 10, 0),
+                child: AnnouncementBanner(routeId: selectedRoute.value),
+              ),
+            ),
+          ),
         ),
       ),
 
