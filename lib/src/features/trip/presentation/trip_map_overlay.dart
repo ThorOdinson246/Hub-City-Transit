@@ -12,6 +12,15 @@ import '../application/active_trip.dart';
 
 bool _finite(LatLng p) => p.latitude.isFinite && p.longitude.isFinite;
 
+const Color _walkGrey = Color(0xFF64748B);
+
+RouteId? _nextRideRoute(List<TripLeg> legs, int from) {
+  for (var i = from + 1; i < legs.length; i++) {
+    if (legs[i].kind == TripLegKind.ride) return RouteId.tryParse(legs[i].routeId);
+  }
+  return null;
+}
+
 /// Draws a planned trip: dashed for walking, the route's own colour for each
 /// ride leg.
 ///
@@ -21,10 +30,12 @@ bool _finite(LatLng p) => p.latitude.isFinite && p.longitude.isFinite;
 List<Polyline> tripPolylines({
   required PlannedTrip trip,
   required List<RoutePolylineModel> routes,
+  Map<int, List<LatLng>> walkGeometry = const {},
 }) {
   final result = <Polyline>[];
 
-  for (final leg in trip.itinerary.legs) {
+  for (var index = 0; index < trip.itinerary.legs.length; index++) {
+    final leg = trip.itinerary.legs[index];
     switch (leg.kind) {
       case TripLegKind.walk:
         final from = leg.fromStop != null
@@ -34,22 +45,26 @@ List<Polyline> tripPolylines({
             ? LatLng(leg.toStop!.lat, leg.toStop!.lng)
             : LatLng(trip.destLat, trip.destLng);
         result.add(Polyline(
-          points: [from, to],
+          // Real pavement where Mapbox has answered, a straight line until then.
+          points: walkGeometry[index] ?? [from, to],
           strokeWidth: 4,
-          color: const Color(0xFF64748B),
-          pattern: StrokePattern.dashed(segments: const [8, 6]),
+          color: _walkGrey,
+          pattern: const StrokePattern.dotted(spacingFactor: 2.2),
         ));
 
       case TripLegKind.transfer:
         if (leg.fromStop == null || leg.toStop == null) continue;
+        // Dashed rather than dotted, in the colour of the route being joined, so
+        // a connection reads differently from a walk to or from the street.
+        final nextRoute = _nextRideRoute(trip.itinerary.legs, index);
         result.add(Polyline(
           points: [
             LatLng(leg.fromStop!.lat, leg.fromStop!.lng),
             LatLng(leg.toStop!.lat, leg.toStop!.lng),
           ],
-          strokeWidth: 4,
-          color: const Color(0xFF64748B),
-          pattern: StrokePattern.dashed(segments: const [6, 5]),
+          strokeWidth: 5,
+          color: nextRoute == null ? _walkGrey : routeColors[nextRoute]!,
+          pattern: StrokePattern.dashed(segments: const [10, 7]),
         ));
 
       case TripLegKind.ride:

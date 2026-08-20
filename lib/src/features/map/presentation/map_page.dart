@@ -26,7 +26,7 @@ import '../../announcements/presentation/announcement_banner.dart';
 import '../../../data/models/transit_dataset.dart';
 import '../../../domain/usecases/trip_planner.dart';
 import '../../trip/application/active_trip.dart';
-import '../../trip/presentation/trip_map_overlay.dart';
+import '../../trip/presentation/trip_map_layers.dart';
 
 part 'map_page_stop_sheet.dart';
 
@@ -430,10 +430,24 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 
     List<Polyline> polylines = [];
     if (activeTrip != null) {
-      polylines = tripPolylines(
-        trip: activeTrip,
-        routes: routesAsync.asData?.value ?? const [],
-      );
+      final used = activeTrip.itinerary.routeIds
+          .map(RouteId.tryParse)
+          .whereType<RouteId>()
+          .toSet();
+      polylines = (routesAsync.asData?.value ?? const [])
+          .map((r) {
+            final rId = RouteId.fromValue(r.routeId);
+            return Polyline(
+              points: r.polyline
+                  .where((p) => p.length == 2 && GeoUtils.isValidLatLng(p[0], p[1]))
+                  .map((p) => LatLng(p[0], p[1]))
+                  .toList(),
+              strokeWidth: 3,
+              color: routeColors[rId]!
+                  .withValues(alpha: used.contains(rId) ? 0.22 : 0.08),
+            );
+          })
+          .toList();
     } else {
       polylines = routesAsync.asData?.value.map((r) {
         final rId = RouteId.fromValue(r.routeId);
@@ -583,11 +597,15 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
               subdomains: const ['a','b','c','d'],
               userAgentPackageName: 'com.hubcitytransit'),
             PolylineLayer(polylines: polylines),
+            if (activeTrip != null)
+              TripPolylineLayer(
+                trip: activeTrip,
+                routes: routesAsync.asData?.value ?? const [],
+              ),
             MarkerLayer(markers: userMarkers),
             MarkerLayer(markers: stopMarkers),
             MarkerLayer(markers: busMarkers),
-            if (activeTrip != null)
-              MarkerLayer(markers: tripMarkers(trip: activeTrip)),
+            if (activeTrip != null) TripMarkerLayer(trip: activeTrip),
 
             // Licence requirement, not decoration — ODbL and CARTO's terms both
             // want credit. Last so it paints above the layers.
