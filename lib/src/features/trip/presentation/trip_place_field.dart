@@ -22,6 +22,7 @@ class TripPlaceField extends ConsumerStatefulWidget {
     required this.value,
     required this.onChanged,
     this.allowCurrentLocation = false,
+    this.onFocused,
     super.key,
   });
 
@@ -29,6 +30,9 @@ class TripPlaceField extends ConsumerStatefulWidget {
   final TripPlace? value;
   final ValueChanged<TripPlace?> onChanged;
   final bool allowCurrentLocation;
+
+  /// Lets a host sheet expand so the suggestions are not typed into a 4-line gap.
+  final VoidCallback? onFocused;
 
   @override
   ConsumerState<TripPlaceField> createState() => _TripPlaceFieldState();
@@ -57,7 +61,9 @@ class _TripPlaceFieldState extends ConsumerState<TripPlaceField> {
   }
 
   void _onFocusChanged() {
-    if (mounted) setState(() => _showSuggestions = _focus.hasFocus);
+    if (!mounted) return;
+    setState(() => _showSuggestions = _focus.hasFocus);
+    if (_focus.hasFocus) widget.onFocused?.call();
   }
 
   @override

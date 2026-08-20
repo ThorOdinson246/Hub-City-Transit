@@ -27,6 +27,7 @@ import '../../../data/models/transit_dataset.dart';
 import '../../../domain/usecases/trip_planner.dart';
 import '../../trip/application/active_trip.dart';
 import '../../trip/presentation/trip_map_layers.dart';
+import '../../trip/presentation/trip_planner_sheet.dart';
 
 part 'map_page_stop_sheet.dart';
 
@@ -384,6 +385,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedRoute = ref.watch(selectedRouteProvider);
     final activeTrip = ref.watch(activeTripProvider);
+    final plannerOpen = ref.watch(plannerOpenProvider);
     WidgetsBinding.instance.addPostFrameCallback((_) => _measurePanel());
     ref.listen<PlannedTrip?>(activeTripProvider, (previous, next) {
       if (next == null || next == previous) return;
@@ -732,7 +734,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                     IconButton(
                       icon: Icon(Icons.directions_rounded, color: cs.primary),
                       onPressed: () =>
-                          StatefulNavigationShell.of(context).goBranch(2),
+                          ref.read(plannerOpenProvider.notifier).state = true,
                       visualDensity: VisualDensity.compact,
                       tooltip: 'Plan a trip',
                     ),
@@ -805,7 +807,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                                     lat: item.place.lat,
                                     lng: item.place.lon,
                                   );
-                                  StatefulNavigationShell.of(context).goBranch(2);
+                                  ref.read(plannerOpenProvider.notifier).state =
+                                      true;
                                   setState(() => _searchQuery = '');
                                   _searchCtrl.clear();
                                   _searchFocus.unfocus();
@@ -858,8 +861,10 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         ),
       ),
 
+      if (plannerOpen) const TripPlannerSheet(),
+
       // ── Bottom panel (bus info, stop detail, or active trip) ────────────────────────────
-      if (activeTrip != null)
+      if (activeTrip != null && !plannerOpen)
         Positioned(
           key: _panelKey,
           bottom: 24, left: 16, right: 16,
@@ -879,7 +884,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             ),
           ),
         )
-      else if (selectedStop != null)
+      else if (selectedStop != null && !plannerOpen)
         _StopDetailSheet(
           key: _panelKey,
           stop: selectedStop,
@@ -896,7 +901,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             _pushSelection(route: r);
           },
         )
-      else
+      else if (!plannerOpen)
         _BusInfoPanel(
           key: _panelKey,
           selectedRoute: selectedRoute,

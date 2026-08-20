@@ -7,7 +7,6 @@ import '../../core/layout/responsive.dart';
 import '../providers.dart';
 import '../../features/about/presentation/about_page.dart';
 import '../../features/announcements/presentation/announcements_inbox_page.dart';
-import '../../features/trip/presentation/trip_planner_page.dart';
 import '../../features/launch/presentation/launch_page.dart';
 import '../../features/map/presentation/map_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
@@ -52,11 +51,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/about',
         pageBuilder: (context, state) => const MaterialPage(child: AboutPage()),
       ),
-      GoRoute(
-        path: '/announcements',
-        pageBuilder: (context, state) =>
-            const MaterialPage(child: AnnouncementsInboxPage()),
-      ),
+      GoRoute(path: '/announcements', redirect: (_, _) => '/alerts'),
       // StatefulShellRoute keeps each branch widget alive in an IndexedStack,
       // so the MapPage camera position, selected stop, and bus info panel are
       // preserved when the user navigates to Schedule or Settings and back.
@@ -97,9 +92,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/plan',
+                path: '/alerts',
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: TripPlannerPage()),
+                    const NoTransitionPage(child: AnnouncementsInboxPage()),
               ),
             ],
           ),
@@ -136,9 +131,9 @@ class _StatefulScaffold extends StatelessWidget {
       label: 'Schedule',
     ),
     (
-      icon: Icons.directions_outlined,
-      selected: Icons.directions_rounded,
-      label: 'Plan',
+      icon: Icons.campaign_outlined,
+      selected: Icons.campaign_rounded,
+      label: 'Alerts',
     ),
     (
       icon: Icons.settings_outlined,
