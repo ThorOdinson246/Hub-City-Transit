@@ -7,10 +7,11 @@ import '../../../data/models/transit_dataset.dart';
 import '../../../domain/usecases/trip_planner.dart';
 import '../application/trip_planner_providers.dart';
 
-class ItineraryCard extends StatefulWidget {
+class ItineraryCard extends ConsumerStatefulWidget {
   const ItineraryCard({
     required this.itinerary,
     required this.label,
+    required this.onShowOnMap,
     this.highlight = false,
     this.footnote,
     super.key,
@@ -18,16 +19,17 @@ class ItineraryCard extends StatefulWidget {
 
   final TripItinerary itinerary;
   final String label;
+  final VoidCallback onShowOnMap;
   final bool highlight;
 
   /// e.g. a warning that walking the whole way would be quicker.
   final String? footnote;
 
   @override
-  State<ItineraryCard> createState() => _ItineraryCardState();
+  ConsumerState<ItineraryCard> createState() => _ItineraryCardState();
 }
 
-class _ItineraryCardState extends State<ItineraryCard> {
+class _ItineraryCardState extends ConsumerState<ItineraryCard> {
   bool _expanded = false;
 
   @override
@@ -127,6 +129,16 @@ class _ItineraryCardState extends State<ItineraryCard> {
                 children: [
                   const Divider(height: 1),
                   for (final leg in it.legs) _LegRow(leg: leg),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: FilledButton.tonalIcon(
+                      onPressed: widget.onShowOnMap,
+                      icon: const Icon(Icons.map_rounded, size: 20),
+                      label: const Text('Show on map'),
+                    ),
+                  ),
                 ],
               ),
             ),

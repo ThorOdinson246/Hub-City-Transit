@@ -76,8 +76,10 @@ android {
             }
 
             ndk {
-                // Without these, native crashes come back unsymbolicated.
-                debugSymbolLevel = "FULL"
+                // Without this, native crashes come back unsymbolicated. FULL adds
+                // ~378MB of .dbg files and pushed the bundle to 133MB; SYMBOL_TABLE
+                // symbolicates just as well for a fraction of that.
+                debugSymbolLevel = "SYMBOL_TABLE"
             }
         }
     }

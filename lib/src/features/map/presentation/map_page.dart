@@ -22,9 +22,12 @@ import '../../../domain/usecases/schedule_adjustment_use_case.dart';
 import '../../../data/services/nominatim_service.dart';
 import '../../../core/utils/analytics_service.dart';
 import '../../announcements/presentation/announcement_banner.dart';
+import '../../../data/models/transit_dataset.dart';
+import '../../../domain/usecases/trip_planner.dart';
+import '../../trip/application/active_trip.dart';
+import '../../trip/presentation/trip_map_overlay.dart';
 
 part 'map_page_stop_sheet.dart';
-part 'map_page_navigation.dart';
 
 abstract class SearchResultItem {}
 class StopResult extends SearchResultItem {
@@ -70,7 +73,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   bool _isTrackingBus = false;
 
   Timer? _gestureTimer;
-  TripResult? _activeTrip;
 
   @override
   void initState() {
@@ -168,19 +170,17 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     controller.forward();
   }
 
-  void _fitTripBounds(TripResult trip, Position? userPos) {
+  void _fitTripBounds(PlannedTrip trip) {
     final points = <LatLng>[];
-    if (userPos != null && GeoUtils.isValidLatLng(userPos.latitude, userPos.longitude)) {
-      points.add(LatLng(userPos.latitude, userPos.longitude));
+    void add(double lat, double lng) {
+      if (GeoUtils.isValidLatLng(lat, lng)) points.add(LatLng(lat, lng));
     }
-    if (GeoUtils.isValidLatLng(trip.destinationPoint.latitude, trip.destinationPoint.longitude)) {
-      points.add(trip.destinationPoint);
-    }
-    if (GeoUtils.isValidLatLng(trip.boardStop.lat, trip.boardStop.lng)) {
-      points.add(LatLng(trip.boardStop.lat, trip.boardStop.lng));
-    }
-    if (GeoUtils.isValidLatLng(trip.destStop.lat, trip.destStop.lng)) {
-      points.add(LatLng(trip.destStop.lat, trip.destStop.lng));
+
+    add(trip.originLat, trip.originLng);
+    add(trip.destLat, trip.destLng);
+    for (final leg in trip.itinerary.legs) {
+      if (leg.fromStop case final stop?) add(stop.lat, stop.lng);
+      if (leg.toStop case final stop?) add(stop.lat, stop.lng);
     }
     
     if (points.isEmpty) return;
@@ -191,46 +191,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     _animatedMapMove(targetCamera.center, targetCamera.zoom);
   }
 
-  List<LatLng> _getRouteSlice(List<List<double>> rawPolyline, LatLng start, LatLng end) {
-    if (rawPolyline.isEmpty) return [start, end];
-    
-    int startIdx = 0;
-    double minStartDist = double.infinity;
-    for (int i=0; i<rawPolyline.length; i++) {
-      final pt = rawPolyline[i];
-      final dist = haversineMeters(start.latitude, start.longitude, pt[0], pt[1]);
-      if (dist < minStartDist) { minStartDist = dist; startIdx = i; }
-    }
-    
-    int endIdx = 0;
-    double minEndDist = double.infinity;
-    for (int i=0; i<rawPolyline.length; i++) {
-      final pt = rawPolyline[i];
-      final dist = haversineMeters(end.latitude, end.longitude, pt[0], pt[1]);
-      if (dist < minEndDist) { minEndDist = dist; endIdx = i; }
-    }
-    
-    final points = <LatLng>[];
-    if (startIdx <= endIdx) {
-      for (int i=startIdx; i<=endIdx; i++) {
-        if (GeoUtils.isValidLatLng(rawPolyline[i][0], rawPolyline[i][1])) {
-          points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
-        }
-      }
-    } else {
-      for (int i=startIdx; i<rawPolyline.length; i++) {
-        if (GeoUtils.isValidLatLng(rawPolyline[i][0], rawPolyline[i][1])) {
-          points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
-        }
-      }
-      for (int i=0; i<=endIdx; i++) {
-        if (GeoUtils.isValidLatLng(rawPolyline[i][0], rawPolyline[i][1])) {
-          points.add(LatLng(rawPolyline[i][0], rawPolyline[i][1]));
-        }
-      }
-    }
-    return points;
-  }
 
   @override
   void dispose() {
@@ -372,26 +332,6 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       );
   }
 
-  void _openTripPlanner(BuildContext ctx, dynamic userPos, {NominatimPlace? defaultDestination}) {
-    ref.read(analyticsProvider).logEvent('open_trip_planner');
-    final cs = Theme.of(ctx).colorScheme;
-    showModalBottomSheet(
-      context: ctx,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: cs.surfaceContainerLowest,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => TripPlannerSheet(
-        userPos: userPos,
-        defaultDestination: defaultDestination,
-        onTripCalculated: (res) {
-          setState(() { _activeTrip = res; _headerVisible = false; });
-          _fitTripBounds(res, userPos);
-          Navigator.pop(ctx);
-        },
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -400,6 +340,10 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedRoute = ref.watch(selectedRouteProvider);
+    final activeTrip = ref.watch(activeTripProvider);
+    ref.listen<PlannedTrip?>(activeTripProvider, (previous, next) {
+      if (next != null && next != previous) _fitTripBounds(next);
+    });
     final selectedBus = ref.watch(selectedBusProvider);
     final routesAsync = ref.watch(routesProvider);
     final stopsAsync = ref.watch(stopsBySelectedRouteProvider);
@@ -436,43 +380,11 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
     final markerRadius = _markerRadiusFor(_currentZoom);
 
     List<Polyline> polylines = [];
-    if (_activeTrip != null) {
-      final trip = _activeTrip!;
-      final walkToOrigin = Polyline(
-        points: [
-          if (userPos != null) LatLng(userPos.latitude, userPos.longitude),
-          LatLng(trip.boardStop.lat, trip.boardStop.lng),
-        ],
-        strokeWidth: 4.0,
-        color: const Color(0xFF1976D2).withValues(alpha: 0.6),
-        pattern: StrokePattern.dashed(segments: const [8, 6]),
+    if (activeTrip != null) {
+      polylines = tripPolylines(
+        trip: activeTrip,
+        routes: routesAsync.asData?.value ?? const [],
       );
-      
-      final walkFromDest = Polyline(
-        points: [
-          LatLng(trip.destStop.lat, trip.destStop.lng),
-          trip.destinationPoint,
-        ],
-        strokeWidth: 4.0,
-        color: const Color(0xFF16A34A).withValues(alpha: 0.6),
-        pattern: StrokePattern.dashed(segments: const [8, 6]),
-      );
-
-      final routeModel = routesAsync.asData?.value.firstWhere((r) => RouteId.fromValue(r.routeId) == trip.route);
-      final rawPolyline = routeModel?.polyline.where((p) => p.length == 2).toList() ?? [];
-      final busSlice = _getRouteSlice(
-        rawPolyline,
-        LatLng(trip.boardStop.lat, trip.boardStop.lng),
-        LatLng(trip.destStop.lat, trip.destStop.lng),
-      );
-
-      final busRoute = Polyline(
-        points: busSlice,
-        strokeWidth: 5.0,
-        color: routeColors[trip.route]!,
-      );
-
-      polylines = [walkToOrigin, walkFromDest, busRoute];
     } else {
       polylines = routesAsync.asData?.value.map((r) {
         final rId = RouteId.fromValue(r.routeId);
@@ -494,7 +406,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
         child: GestureDetector(
         onTap: () {
           _animatedMapMove(LatLng(stop.lat, stop.lng), 16);
-          setState(() => _activeTrip = null); // Close active trip if they tap a stop
+          ref.read(activeTripProvider.notifier).state = null;
           _pushSelection(stop: stop);
         },
         child: Center(
@@ -530,7 +442,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
           selectedBus: selectedBus,
           onTap: () {
             _animatedMapMove(LatLng(effectiveBusLocation.lat, effectiveBusLocation.lng), 16);
-            setState(() { _activeTrip = null; _busInfoExpanded = true; _isTrackingBus = true; });
+            ref.read(activeTripProvider.notifier).state = null;
+            setState(() { _busInfoExpanded = true; _isTrackingBus = true; });
             _pushSelection();
           },
         ),
@@ -623,50 +536,8 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
             MarkerLayer(markers: userMarkers),
             MarkerLayer(markers: stopMarkers),
             MarkerLayer(markers: busMarkers),
-            // Trip waypoint markers (board stop + destination pin)
-            if (_activeTrip != null)
-              MarkerLayer(markers: [
-                // Board stop — where you get on the bus
-                Marker(
-                  point: LatLng(_activeTrip!.boardStop.lat, _activeTrip!.boardStop.lng),
-                  width: 36, height: 52,
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1976D2),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
-                      ),
-                      child: const Icon(Icons.directions_walk_rounded, color: Colors.white, size: 13),
-                    ),
-                    const CustomPaint(
-                      size: Size(10, 7),
-                      painter: _TrianglePainter(color: Color(0xFF1976D2)),
-                    ),
-                  ]),
-                ),
-                // Destination pin
-                Marker(
-                  point: _activeTrip!.destinationPoint,
-                  width: 40, height: 52,
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF16A34A),
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
-                      ),
-                      child: const Icon(Icons.location_on_rounded, color: Colors.white, size: 14),
-                    ),
-                    const CustomPaint(
-                      size: Size(10, 7),
-                      painter: _TrianglePainter(color: Color(0xFF16A34A)),
-                    ),
-                  ]),
-                ),
-              ]),
+            if (activeTrip != null)
+              MarkerLayer(markers: tripMarkers(trip: activeTrip)),
 
             // Licence requirement, not decoration — ODbL and CARTO's terms both
             // want credit. Last so it paints above the layers.
@@ -792,9 +663,10 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                       ),
                     IconButton(
                       icon: Icon(Icons.directions_rounded, color: cs.primary),
-                      onPressed: () => _openTripPlanner(context, locationAsync.asData?.value),
+                      onPressed: () =>
+                          StatefulNavigationShell.of(context).goBranch(2),
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Plan a Trip',
+                      tooltip: 'Plan a trip',
                     ),
                     const SizedBox(width: 4),
                   ]),
@@ -858,7 +730,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
                                 title: Text(mainText, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
                                 subtitle: Text(subText, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
                                 onTap: () {
-                                  _openTripPlanner(context, locationAsync.asData?.value, defaultDestination: item.place);
+                                  StatefulNavigationShell.of(context).goBranch(2);
                                   setState(() => _searchQuery = '');
                                   _searchCtrl.clear();
                                   _searchFocus.unfocus();
@@ -882,7 +754,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
   ),
 
       // ── Location FAB ─────────────────────────────────────────────────────
-      if (_activeTrip == null)
+      if (activeTrip == null)
         AnimatedPositioned(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOutCubic,
@@ -913,7 +785,7 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
       ),
 
       // ── Bottom panel (bus info, stop detail, or active trip) ────────────────────────────
-      if (_activeTrip != null)
+      if (activeTrip != null)
         Positioned(
           bottom: 24, left: 16, right: 16,
           child: SafeArea(
@@ -921,11 +793,12 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
               alignment: Alignment.bottomCenter,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
-                child: TripActiveCard(
-                  result: _activeTrip!,
+                child: _ActiveTripCard(
+                  trip: activeTrip,
                   cs: cs,
                   tt: Theme.of(context).textTheme,
-                  onClose: () => setState(() => _activeTrip = null),
+                  onClose: () =>
+                      ref.read(activeTripProvider.notifier).state = null,
                 ),
               ),
             ),
@@ -975,21 +848,95 @@ class _MapPageState extends ConsumerState<MapPage> with TickerProviderStateMixin
 }
 
 // ── Triangle CustomPainter for map pin tails ─────────────────────────────────
-class _TrianglePainter extends CustomPainter {
-  const _TrianglePainter({required this.color});
-  final Color color;
+
+/// Summary of the itinerary currently drawn on the map.
+class _ActiveTripCard extends StatelessWidget {
+  const _ActiveTripCard({
+    required this.trip,
+    required this.cs,
+    required this.tt,
+    required this.onClose,
+  });
+
+  final PlannedTrip trip;
+  final ColorScheme cs;
+  final TextTheme tt;
+  final VoidCallback onClose;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color;
-    final path = ui.Path()
-      ..moveTo(size.width / 2, size.height)
-      ..lineTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..close();
-    canvas.drawPath(path, paint);
+  Widget build(BuildContext context) {
+    final it = trip.itinerary;
+    final rides = it.legs.where((l) => l.kind == TripLegKind.ride).toList();
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 8, 14),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 14),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${it.durationMinutes} min · ${formatClock(it.departureMinutes)}'
+                  ' – ${formatClock(it.arrivalMinutes)}',
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close_rounded, size: 20),
+                tooltip: 'Clear trip',
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                onPressed: onClose,
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (final leg in rides)
+                if (RouteId.tryParse(leg.routeId) case final route?)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: routeColors[route],
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      routeNames[route] ?? leg.routeId!,
+                      style: tt.labelSmall?.copyWith(
+                        color: onRouteColor(route),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+              Text(
+                '${it.totalWalkMetres.round()} m walk'
+                '${it.transferCount > 0 ? " · ${it.transferCount} transfer" : ""}',
+                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+              ),
+            ],
+          ),
+          if (trip.destLabel case final String label) ...[
+            const SizedBox(height: 6),
+            Text('To $label',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+          ],
+        ],
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(_TrianglePainter old) => old.color != color;
 }

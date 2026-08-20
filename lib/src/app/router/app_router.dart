@@ -53,11 +53,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => const MaterialPage(child: AboutPage()),
       ),
       GoRoute(
-        path: '/plan',
-        pageBuilder: (context, state) =>
-            const MaterialPage(child: TripPlannerPage()),
-      ),
-      GoRoute(
         path: '/announcements',
         pageBuilder: (context, state) =>
             const MaterialPage(child: AnnouncementsInboxPage()),
@@ -98,6 +93,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: '/plan',
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: TripPlannerPage()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: '/settings',
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: SettingsPage()),
@@ -126,6 +130,11 @@ class _StatefulScaffold extends StatelessWidget {
       icon: Icons.calendar_today_outlined,
       selected: Icons.calendar_today_rounded,
       label: 'Schedule',
+    ),
+    (
+      icon: Icons.alt_route_outlined,
+      selected: Icons.alt_route_rounded,
+      label: 'Plan',
     ),
     (
       icon: Icons.settings_outlined,

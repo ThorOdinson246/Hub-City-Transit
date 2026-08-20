@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../data/models/transit_dataset.dart';
 import '../../../domain/usecases/trip_planner.dart';
+import '../application/active_trip.dart';
 import '../application/trip_planner_providers.dart';
 import 'itinerary_card.dart';
 import 'trip_place_field.dart';
@@ -64,14 +65,7 @@ class _TripPlannerPageState extends ConsumerState<TripPlannerPage> {
     final text = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          tooltip: 'Back',
-          onPressed: () => context.canPop() ? context.pop() : context.go('/map'),
-        ),
-        title: const Text('Plan a trip'),
-      ),
+      appBar: AppBar(title: const Text('Plan a trip')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
@@ -257,6 +251,18 @@ class _Results extends ConsumerWidget {
                     itinerary: result.itineraries[i],
                     label: i == 0 ? 'Recommended route' : _altLabel(result, i),
                     highlight: i == 0,
+                    onShowOnMap: () {
+                      ref.read(activeTripProvider.notifier).state = PlannedTrip(
+                        itinerary: result.itineraries[i],
+                        originLat: query.originLat,
+                        originLng: query.originLng,
+                        destLat: query.destLat,
+                        destLng: query.destLng,
+                        originLabel: query.originLabel,
+                        destLabel: query.destLabel,
+                      );
+                      StatefulNavigationShell.of(context).goBranch(0);
+                    },
                     footnote: i == 0 && walkingBeatsRiding
                         ? 'Walking the whole way takes about $walkOnly min, '
                             'which may be quicker than waiting.'
